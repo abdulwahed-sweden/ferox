@@ -1,0 +1,236 @@
+//! theme.rs
+//! Modernized dynamic terminal theming system for Ferox.
+//!
+//! Provides robust, cross-platform color/symbol support and adaptive display profiles
+//! for both interactive and automated environments.
+
+use std::env;
+use std::fmt::{self, Display};
+use std::sync::{RwLock, OnceLock};
+
+use owo_colors::{OwoColorize, Stream};
+use atty::Stream as AttyStream;
+use std::io;
+
+#[cfg(windows)]
+use windows::Win32::System::Console::{
+    GetConsoleMode, SetConsoleMode, GetStdHandle, ENABLE_VIRTUAL_TERMINAL_PROCESSING,
+    STD_OUTPUT_HANDLE,
+};
+
+/// Global singleton for theme state
+static THEME_STATE: OnceLock<RwLock<Theme>> = OnceLock::new();
+
+/// Display modes describing output richness
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DisplayProfile {
+    /// Full color, emoji, Unicode
+    Rich,
+    /// Color + ASCII
+    Minimal,
+    /// No color, no emoji
+    Plain,
+    /// Reduced whitespace for scripting
+    Compact,
+}
+
+/// Terminal symbol set (emoji + ASCII fallbacks)
+#[derive(Debug, Clone)]
+pub struct Symbols {
+    pub fox: &'static str,
+    pub ok: &'static str,
+    pub warn: &'static str,
+    pub err: &'static str,
+    pub arrow: &'static str,
+    pub line: &'static str,
+}
+
+impl Symbols {
+    fn for_profile(profile: DisplayProfile) -> Self {
+        match profile {
+            DisplayProfile::Rich => Self {
+                fox: "🦊",
+                ok: "✓",
+                warn: "⚠️",
+                err: "❌",
+                arrow: "➡️",
+                line: "─",
+            },
+            DisplayProfile::Minimal => Self {
+                fox: "[fox]",
+                ok: "[+]",
+                warn: "[!]",
+                err: "[x]",
+                arrow: "->",
+                line: "-",
+            },
+            DisplayProfile::Plain | DisplayProfile::Compact => Self {
+                fox: "",
+                ok: "+",
+                warn: "!",
+                err: "x",
+                arrow: "->",
+                line: "-",
+            },
+        }
+    }
+}
+
+/// Core theme configuration
+#[derive(Debug, Clone)]
+pub struct Theme {
+    pub profile: DisplayProfile,
+    pub use_color: bool,
+    pub use_unicode: bool,
+    pub is_tty: bool,
+    pub symbols: Symbols,
+}
+
+impl Theme {
+    /// Initialize and store the global theme.
+    /// Automatically detects terminal capabilities.
+    pub fn init() {
+        let theme = Theme::detect();
+        THEME_STATE
+            .set(RwLock::new(theme))
+            .expect("Theme state already initialized");
+    }
+
+    /// Detect terminal capabilities and environment constraints.
+    pub fn detect() -> Self {
+        #[cfg(windows)]
+        enable_windows_ansi_support().ok();
+
+        let no_color = env::var_os("NO_COLOR").is_some();
+        let no_emoji = env::var_os("NO_EMOJI").is_some();
+        let is_ci = env::var_os("CI").is_some();
+        let is_tty = atty::is(AttyStream::Stdout);
+
+        // Check LANG for UTF-8 support
+        let utf8_env = env::var("LANG")
+            .unwrap_or_default()
+            .to_ascii_lowercase()
+            .contains("utf-8");
+
+        let use_color = !no_color && is_tty;
+        let use_unicode = !no_emoji && utf8_env && !is_ci;
+
+        let profile = if !is_tty || no_color || is_ci {
+            DisplayProfile::Plain
+        } else if use_color && use_unicode {
+            DisplayProfile::Rich
+        } else if use_color {
+            DisplayProfile::Minimal
+        } else {
+            DisplayProfile::Plain
+        };
+
+        Theme {
+            profile,
+            use_color,
+            use_unicode,
+            is_tty,
+            symbols: Symbols::for_profile(profile),
+        }
+    }
+
+    /// Reloads the theme (useful if environment changes, e.g., SSH)
+    pub fn refresh() {
+        if let Some(lock) = THEME_STATE.get() {
+            *lock.write().expect("Theme lock poisoned") = Theme::detect();
+        }
+    }
+
+    /// Get a read lock to the current theme
+    pub fn get() -> std::sync::RwLockReadGuard<'static, Theme> {
+        THEME_STATE
+            .get()
+            .expect("Theme not initialized; call Theme::init() first")
+            .read()
+            .expect("Theme lock poisoned")
+    }
+
+    /// Apply color to text if enabled
+    pub fn colorize<T: Display>(&self, text: T, color: owo_colors::AnsiColors) -> String {
+        if self.use_color {
+            format!("{}", text.color(color))
+        } else {
+            text.to_string()
+        }
+    }
+
+    /// Render a status message with symbol and color
+    pub fn status(&self, level: &str, message: &str) -> String {
+        let sym = match level {
+            "ok" => self.symbols.ok,
+            "warn" => self.symbols.warn,
+            "err" => self.symbols.err,
+            _ => self.symbols.arrow,
+        };
+
+        let msg = match level {
+            "ok" => self.colorize(message, owo_colors::AnsiColors::Green),
+            "warn" => self.colorize(message, owo_colors::AnsiColors::Yellow),
+            "err" => self.colorize(message, owo_colors::AnsiColors::Red),
+            _ => message.to_string(),
+        };
+
+        match self.profile {
+            DisplayProfile::Compact => format!("{} {}", sym, msg),
+            _ => format!("\n{} {}", sym, msg),
+        }
+    }
+
+    /// Return the ASCII/emoji banner based on profile
+    pub fn banner(&self) -> String {
+        match self.profile {
+            DisplayProfile::Rich => format!(
+                "{} {} Ferox Framework\n{}",
+                self.symbols.fox,
+                self.colorize("Ferox Reconnaissance", owo_colors::AnsiColors::BrightCyan),
+                self.colorize("=========================", owo_colors::AnsiColors::BrightBlack)
+            ),
+            DisplayProfile::Minimal => format!(
+                "[Ferox] Reconnaissance\n{}",
+                self.colorize("=================", owo_colors::AnsiColors::BrightBlack)
+            ),
+            _ => String::from("Ferox Reconnaissance"),
+        }
+    }
+}
+
+/// Windows-specific ANSI/VT enablement (safe, modern, no unsafe)
+#[cfg(windows)]
+fn enable_windows_ansi_support() -> io::Result<()> {
+    use windows::Win32::Foundation::HANDLE;
+
+    unsafe {
+        let handle: HANDLE = GetStdHandle(STD_OUTPUT_HANDLE)?;
+        let mut mode = 0;
+        GetConsoleMode(handle, &mut mode)?;
+        SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)?;
+    }
+    Ok(())
+}
+
+#[cfg(not(windows))]
+fn enable_windows_ansi_support() -> io::Result<()> {
+    Ok(())
+}
+
+/// Convenience global helpers
+pub fn banner() -> String {
+    Theme::get().banner()
+}
+
+pub fn status_ok(msg: &str) -> String {
+    Theme::get().status("ok", msg)
+}
+
+pub fn status_warn(msg: &str) -> String {
+    Theme::get().status("warn", msg)
+}
+
+pub fn status_err(msg: &str) -> String {
+    Theme::get().status("err", msg)
+}

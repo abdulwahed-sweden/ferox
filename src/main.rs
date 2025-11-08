@@ -9,6 +9,7 @@ use core::module::ModuleRegistry;
 use modules::exploit::example::ExampleExploit;
 use modules::recon::subdomains::SubdomainEnum;
 use modules::scanner::port::PortScanner;
+use modules::scanner::http_scanner::HttpScanner;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -29,6 +30,7 @@ async fn main() -> Result<()> {
 
     // Register scanner modules
     registry.register(Box::new(PortScanner::new()));
+    registry.register(Box::new(HttpScanner::new()));
 
     // Register recon modules
     registry.register(Box::new(SubdomainEnum::new()));
