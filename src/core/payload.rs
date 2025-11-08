@@ -113,22 +113,18 @@ impl PayloadGenerator {
         // NOTE: This is a skeleton implementation
         // Real payload generation would happen here
         // For now, we return a safe placeholder
-        
+
         let data = match config.payload_type {
-            PayloadType::ReverseTcp => {
-                format!(
-                    "#!/bin/bash\n# Reverse TCP payload placeholder\n# Connect to {}:{}\n",
-                    config.lhost, config.lport
-                )
-                .into_bytes()
-            }
-            PayloadType::ReverseHttp => {
-                format!(
-                    "#!/bin/bash\n# Reverse HTTP payload placeholder\n# Connect to http://{}:{}\n",
-                    config.lhost, config.lport
-                )
-                .into_bytes()
-            }
+            PayloadType::ReverseTcp => format!(
+                "#!/bin/bash\n# Reverse TCP payload placeholder\n# Connect to {}:{}\n",
+                config.lhost, config.lport
+            )
+            .into_bytes(),
+            PayloadType::ReverseHttp => format!(
+                "#!/bin/bash\n# Reverse HTTP payload placeholder\n# Connect to http://{}:{}\n",
+                config.lhost, config.lport
+            )
+            .into_bytes(),
             _ => b"# Payload placeholder".to_vec(),
         };
 
@@ -153,11 +149,7 @@ mod tests {
 
     #[test]
     fn test_payload_generation() {
-        let config = PayloadConfig::new(
-            PayloadType::ReverseTcp,
-            "127.0.0.1".to_string(),
-            4444,
-        );
+        let config = PayloadConfig::new(PayloadType::ReverseTcp, "127.0.0.1".to_string(), 4444);
 
         let payload = PayloadGenerator::generate(config).unwrap();
         assert!(payload.size() > 0);

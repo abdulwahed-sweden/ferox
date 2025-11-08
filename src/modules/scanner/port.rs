@@ -1,5 +1,5 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::time::Duration;
@@ -22,7 +22,9 @@ impl PortScanner {
     }
 
     fn parse_ports(&self) -> Result<Vec<u16>> {
-        let ports_str = self.get_option("PORTS").unwrap_or_else(|| "1-1000".to_string());
+        let ports_str = self
+            .get_option("PORTS")
+            .unwrap_or_else(|| "1-1000".to_string());
         let mut ports = Vec::new();
 
         for part in ports_str.split(',') {
@@ -49,13 +51,8 @@ impl PortScanner {
             .unwrap_or(1000);
 
         let addr = format!("{}:{}", host, port);
-        
-        match timeout(
-            Duration::from_millis(timeout_ms),
-            TcpStream::connect(&addr),
-        )
-        .await
-        {
+
+        match timeout(Duration::from_millis(timeout_ms), TcpStream::connect(&addr)).await {
             Ok(Ok(_)) => Some(port),
             _ => None,
         }
@@ -69,7 +66,8 @@ impl Module for PortScanner {
             name: "port_scanner".to_string(),
             version: "2.0.0".to_string(),
             author: "Ferox Team".to_string(),
-            description: "High-performance async TCP port scanner with concurrent connections".to_string(),
+            description: "High-performance async TCP port scanner with concurrent connections"
+                .to_string(),
             module_type: ModuleType::Scanner,
             category: "scanner".to_string(),
         }
@@ -160,24 +158,20 @@ impl Module for PortScanner {
         // Sort results
         open_ports.sort_unstable();
 
-        let mut data = HashMap::new();
-        data.insert("host".to_string(), serde_json::json!(host));
-        data.insert("open_ports".to_string(), serde_json::json!(open_ports));
-        data.insert("total_scanned".to_string(), serde_json::json!(total));
-        data.insert("open_count".to_string(), serde_json::json!(open_ports.len()));
+        let mut result = ModuleResult::success(format!(
+            "🎯 Found {} open ports out of {} scanned on {}",
+            open_ports.len(),
+            total,
+            host
+        ));
 
-        Ok(ModuleResult {
-            success: true,
-            message: format!(
-                "🎯 Found {} open ports out of {} scanned on {}",
-                open_ports.len(),
-                total,
-                host
-            ),
-            data,
-            timestamp: chrono::Utc::now(),
-            session_id: None,
-        })
+        result = result
+            .with_data("host", serde_json::json!(host))
+            .with_data("open_ports", serde_json::json!(open_ports))
+            .with_data("total_scanned", serde_json::json!(total))
+            .with_data("open_count", serde_json::json!(open_ports.len()));
+
+        Ok(result)
     }
 }
 

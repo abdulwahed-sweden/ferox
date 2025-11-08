@@ -1,5 +1,5 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -8,7 +8,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::{Mutex, Semaphore};
-use tokio::time::{timeout, Duration};
+use tokio::time::{Duration, timeout};
 use trust_dns_resolver::TokioAsyncResolver;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -103,22 +103,14 @@ impl SubdomainEnum {
         let url = format!("http://{}", subdomain);
 
         // Try HEAD request first
-        match timeout(
-            Duration::from_millis(timeout_ms),
-            client.head(&url).send(),
-        )
-        .await
-        {
+        match timeout(Duration::from_millis(timeout_ms), client.head(&url).send()).await {
             Ok(Ok(resp)) => {
                 let status = resp.status().as_u16();
 
                 // If successful, try GET for title
                 if resp.status().is_success() {
-                    if let Ok(Ok(get_resp)) = timeout(
-                        Duration::from_millis(timeout_ms),
-                        client.get(&url).send(),
-                    )
-                    .await
+                    if let Ok(Ok(get_resp)) =
+                        timeout(Duration::from_millis(timeout_ms), client.get(&url).send()).await
                     {
                         if let Ok(text) = get_resp.text().await {
                             let title = Self::extract_title(&text);
@@ -281,7 +273,9 @@ impl Module for SubdomainEnum {
             .get_option("PROBE_HTTP")
             .map(|s| s.to_lowercase() == "true")
             .unwrap_or(true);
-        let output = self.get_option("OUTPUT").unwrap_or_else(|| "human".to_string());
+        let output = self
+            .get_option("OUTPUT")
+            .unwrap_or_else(|| "human".to_string());
 
         // Read wordlist
         let words = Self::read_wordlist(&wordlist_path)?;
@@ -346,11 +340,8 @@ impl Module for SubdomainEnum {
         drop(guard);
 
         // Prepare result
-        let mut result = ModuleResult::success(format!(
-            "Found {} subdomains for {}",
-            found.len(),
-            domain
-        ));
+        let mut result =
+            ModuleResult::success(format!("Found {} subdomains for {}", found.len(), domain));
 
         result = result.with_data("subdomains", serde_json::to_value(&found)?);
         result = result.with_data("total_found", serde_json::json!(found.len()));

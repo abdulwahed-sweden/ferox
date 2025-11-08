@@ -1,5 +1,5 @@
 use crate::core::module::Session;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -34,11 +34,7 @@ impl SessionManager {
     /// List all active sessions
     pub async fn list_active(&self) -> Vec<Session> {
         let sessions = self.sessions.lock().await;
-        sessions
-            .values()
-            .filter(|s| s.active)
-            .cloned()
-            .collect()
+        sessions.values().filter(|s| s.active).cloned().collect()
     }
 
     /// List all sessions
@@ -94,7 +90,7 @@ impl SessionManager {
     pub async fn cleanup_stale(&self, max_age_hours: i64) -> usize {
         let mut sessions = self.sessions.lock().await;
         let threshold = chrono::Utc::now() - chrono::Duration::hours(max_age_hours);
-        
+
         let stale_ids: Vec<Uuid> = sessions
             .values()
             .filter(|s| !s.active && s.last_seen < threshold)
@@ -123,20 +119,20 @@ mod tests {
     #[tokio::test]
     async fn test_session_manager() {
         let manager = SessionManager::new();
-        
+
         let session = Session::new(
             "test/module".to_string(),
             "127.0.0.1".to_string(),
             Platform::Linux,
         );
         let id = session.id;
-        
+
         manager.add(session).await;
         assert_eq!(manager.count().await, 1);
-        
+
         let retrieved = manager.get(id).await;
         assert!(retrieved.is_some());
-        
+
         manager.kill(id).await.unwrap();
         assert_eq!(manager.active_count().await, 0);
     }
