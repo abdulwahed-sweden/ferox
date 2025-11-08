@@ -1,0 +1,223 @@
+# Professional Prompt: Fix ANSI Color Rendering in Ferox Framework on Windows
+
+## Context
+I have a Rust-based penetration testing framework called **Ferox** that successfully compiles and runs on Windows. However, when executed in PowerShell or CMD, the ANSI escape codes for colors and Unicode symbols render incorrectly, displaying raw escape sequences like `[0m`, `[91m`, `[93m` instead of colored output.
+
+## Current Problem
+
+**Expected Output:**
+```
+═══════════════════════════════════════
+   ███████╗███████╗██████╗  ██████╗ ██╗  ██╗
+   FEROX FRAMEWORK
+═══════════════════════════════════════
+
+✓ Core engine initialized
+✓ Module registry loaded
+```
+
+**Actual Output in Windows Terminal:**
+```
+[0m
+    [91m🦊[0m   Ferox Framework [93mv2.0.0[0m
+    [93m⚡[0m   Fast. Fierce. Fearless.
+
+[1;92m✓[0m [97mCore engine initialized[0m
+```
+
+## Technical Details
+
+**Framework:** Ferox v2.0.0 (Rust penetration testing framework)
+**Build System:** Cargo (Rust package manager)
+**Environment:** Windows 11, PowerShell 7.x / Windows Terminal
+**Current Dependencies:** 
+- `colored = "2.2"` for terminal colors
+- `rustyline = "14.0"` for CLI REPL
+
+**File Structure:**
+```
+ferox/
+├── Cargo.toml
+├── src/
+│   ├── main.rs
+│   ├── cli/
+│   │   ├── app.rs
+│   │   └── theme.rs    ← Problem is here
+│   ├── core/
+│   └── modules/
+```
+
+## Requirements
+
+I need a comprehensive solution that:
+
+1. **Enables ANSI color support on Windows** properly
+2. **Detects terminal capabilities** automatically (modern vs legacy terminals)
+3. **Provides graceful fallback** to plain text for old terminals (CMD, PowerShell ISE)
+4. **Maintains cross-platform compatibility** (Windows, Linux, macOS)
+5. **Supports NO_COLOR environment variable** for manual color disabling
+6. **Uses proper Windows API calls** to enable Virtual Terminal Processing
+
+## Solution Requirements
+
+### 1. Update `src/cli/theme.rs`
+Create a robust Theme implementation that:
+- Initializes Windows ANSI support on startup
+- Detects terminal capabilities using `atty` crate
+- Provides colored output for modern terminals
+- Falls back to plain text symbols for legacy terminals
+- Uses proper Windows API (VT100 processing) for color support
+
+**Required functionality:**
+```rust
+pub struct Theme;
+
+impl Theme {
+    pub fn init() { /* Enable Windows VT processing */ }
+    pub fn colors_enabled() -> bool { /* Detect terminal */ }
+    pub fn banner() { /* Display with colors or plain */ }
+    pub fn success(msg: &str) { /* ✓ or [+] */ }
+    pub fn error(msg: &str) { /* ✗ or [-] */ }
+    pub fn warning(msg: &str) { /* ⚠ or [!] */ }
+    pub fn info(msg: &str) { /* ℹ or [*] */ }
+}
+```
+
+### 2. Update `src/main.rs`
+Initialize Windows ANSI support at startup:
+```rust
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    #[cfg(windows)]
+    {
+        enable_ansi_support()?;
+    }
+    
+    Theme::init();
+    Theme::banner();
+    // ... rest of initialization
+}
+```
+
+### 3. Update `Cargo.toml`
+Add required dependencies:
+```toml
+[dependencies]
+colored = "2.2"
+atty = "0.2"  # For terminal detection
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["consoleapi", "processenv", "winbase", "wincon"] }
+```
+
+### 4. Windows API Integration
+Implement proper Windows Console API calls:
+```rust
+#[cfg(windows)]
+use winapi::um::consoleapi::{GetConsoleMode, SetConsoleMode};
+use winapi::um::wincon::ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+pub fn enable_ansi_support() -> Result<(), Box<dyn std::error::Error>> {
+    // Enable VT100 processing on Windows Console
+}
+```
+
+## Expected Behavior After Fix
+
+### Modern Terminals (Windows Terminal, ConEmu, Cmder):
+```
+═══════════════════════════════════════
+   ███████╗███████╗██████╗  ██████╗ 
+   FEROX FRAMEWORK
+═══════════════════════════════════════
+
+✓ Core engine initialized       [Green checkmark]
+✓ Module registry loaded         [Green checkmark]
+✗ Connection failed              [Red X]
+⚠ Rate limit exceeded            [Yellow warning]
+ℹ Type 'help' for commands       [Blue info]
+```
+
+### Legacy Terminals (CMD, PowerShell ISE):
+```
+===========================================
+   FEROX FRAMEWORK
+   Ferocious Security Framework
+===========================================
+
+[+] Core engine initialized
+[+] Module registry loaded
+[-] Connection failed
+[!] Rate limit exceeded
+[*] Type 'help' for commands
+```
+
+## Implementation Checklist
+
+- [ ] Update `theme.rs` with Windows ANSI support
+- [ ] Add terminal capability detection
+- [ ] Implement colored and plain text variants
+- [ ] Add Windows API integration for VT processing
+- [ ] Update `main.rs` to initialize ANSI support
+- [ ] Update `Cargo.toml` with required dependencies
+- [ ] Test in Windows Terminal (should show colors)
+- [ ] Test in CMD (should show plain text fallback)
+- [ ] Test NO_COLOR environment variable
+- [ ] Verify cross-platform compatibility
+
+## Testing Instructions
+
+After implementing the fix, test with:
+
+```powershell
+# 1. Clean build
+cargo clean
+cargo build --release
+
+# 2. Test in Windows Terminal (colors enabled)
+wt .\target\release\ferox.exe
+
+# 3. Test in legacy PowerShell (plain text fallback)
+powershell.exe -Command ".\target\release\ferox.exe"
+
+# 4. Test with NO_COLOR (manual disable)
+$env:NO_COLOR = "1"
+.\target\release\ferox.exe
+
+# 5. Test in CMD
+cmd /c "target\release\ferox.exe"
+```
+
+## Success Criteria
+
+1. ✅ Colors and Unicode symbols render correctly in Windows Terminal
+2. ✅ Plain text fallback works in legacy terminals
+3. ✅ NO_COLOR environment variable respected
+4. ✅ No raw ANSI escape codes visible
+5. ✅ Cross-platform compatibility maintained
+6. ✅ Build completes without warnings
+7. ✅ Professional user experience across all terminal types
+
+## Additional Context
+
+The framework uses:
+- **Async runtime:** Tokio
+- **CLI library:** rustyline for REPL
+- **Modules:** Port scanner, subdomain enumeration, exploit framework
+- **Target audience:** Security professionals and penetration testers
+
+The fix should maintain the professional appearance while ensuring compatibility with all Windows terminal environments.
+
+---
+
+## Request
+
+Please provide:
+1. Complete updated `src/cli/theme.rs` with Windows ANSI support
+2. Updated `src/main.rs` with initialization code
+3. Complete `Cargo.toml` with all required dependencies
+4. Windows API integration code for VT processing
+5. Detailed implementation guide
+6. Testing instructions for verification
+
+The solution should be production-ready, well-documented, and follow Rust best practices.
