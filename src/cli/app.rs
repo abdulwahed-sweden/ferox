@@ -1,5 +1,5 @@
 use crate::cli::theme::Theme;
-use crate::core::module::{Module, ModuleRegistry};
+use crate::core::module::ModuleRegistry;
 use anyhow::Result;
 use rustyline::error::ReadlineError;
 use rustyline::DefaultEditor;
@@ -151,8 +151,8 @@ impl FeroxCli {
         if modules.is_empty() {
             Theme::warning("No modules loaded");
         } else {
-            for module_path in modules {
-                if let Some(module) = registry.get(&module_path) {
+            for module_path in &modules {
+                if let Some(module) = registry.get(module_path) {
                     let info = module.info();
                     println!(
                         "  {} {} - {}",

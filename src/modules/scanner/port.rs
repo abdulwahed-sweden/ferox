@@ -2,7 +2,6 @@ use crate::core::module::*;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use std::collections::HashMap;
-use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
@@ -177,6 +176,7 @@ impl Module for PortScanner {
             ),
             data,
             timestamp: chrono::Utc::now(),
+            session_id: None,
         })
     }
 }
