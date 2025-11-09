@@ -2,6 +2,8 @@ use crate::cli::theme::Theme;
 use crate::core::module::{ModuleRegistry, ModuleResult, ModuleType};
 use crate::core::payload::PayloadGenerator;
 use crate::core::session::SessionManager;
+use crate::core::result_store::ResultStore;
+use crate::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
 use anyhow::Result;
 use colored::Colorize;
 use rustyline::{Editor, Config, CompletionType};
@@ -12,6 +14,7 @@ use rustyline::hint::Hinter;
 use rustyline::validate::Validator;
 use rustyline::Helper;
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use uuid::Uuid;
@@ -42,7 +45,7 @@ impl FeroxHelper {
         let commands = vec![
             "help", "?", "modules", "list", "ls", "use", "back", "show",
             "set", "s", "options", "o", "check", "c", "run", "execute", "exploit",
-            "x", "e", "info", "i", "sessions", "payloads", "clear", "cls",
+            "x", "e", "info", "i", "sessions", "payloads", "export", "clear", "cls",
             "banner", "version", "exit", "quit", "q"
         ]
         .into_iter()
@@ -148,6 +151,7 @@ impl Helper for FeroxHelper {}
 pub struct FeroxCli {
     registry: Arc<Mutex<ModuleRegistry>>,
     sessions: SessionManager,
+    result_store: Arc<Mutex<ResultStore>>,
     current_module: Option<String>,
     editor: Editor<FeroxHelper, rustyline::history::DefaultHistory>,
     aliases: HashMap<&'static str, &'static str>,
@@ -174,6 +178,7 @@ impl FeroxCli {
         Ok(Self {
             registry: Arc::new(Mutex::new(registry)),
             sessions: SessionManager::new(),
+            result_store: Arc::new(Mutex::new(ResultStore::default())),
             current_module: None,
             editor,
             aliases: get_aliases(),
@@ -246,6 +251,7 @@ impl FeroxCli {
             "info" => self.cmd_info().await,
             "sessions" => self.cmd_sessions(args).await,
             "payloads" => self.cmd_payloads().await,
+            "export" => self.cmd_export(args).await,
             "clear" | "cls" => self.cmd_clear(),
             "banner" => {
                 Theme::banner();
@@ -298,6 +304,11 @@ impl FeroxCli {
         Theme::command_help("sessions -k <id>", "Mark session inactive");
         Theme::command_help("sessions -r <id>", "Remove session");
         Theme::command_help("sessions -c <hours>", "Cleanup stale sessions");
+        println!();
+
+        println!("  {}", "Report & Export Commands:".bright_yellow().bold());
+        Theme::command_help("export <format> <file>", "Export results (json, html, pdf)");
+        Theme::command_help("export results", "Show stored results summary");
         println!();
 
         println!("  {}", "Utility Commands:".bright_yellow().bold());
@@ -777,8 +788,17 @@ impl FeroxCli {
                         Theme::error(&result.message);
                     }
 
+                    // Store result for later export
+                    let module_info = module.info();
+                    let mut store = self.result_store.lock().await;
+                    let result_id = store.add(module_info, result.clone());
+                    drop(store);
+
                     // Display results
                     self.render_result(&result)?;
+
+                    // Notify user about stored result
+                    Theme::info(&format!("Result stored (ID: {}). Use 'export' to save reports.", result_id));
                 }
                 Err(e) => {
                     spinner.finish_and_clear();
@@ -896,6 +916,152 @@ impl FeroxCli {
         }
 
         println!();
+        Ok(())
+    }
+
+    async fn cmd_export(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: export <format> <filename>");
+            Theme::info("Formats: json, html, pdf");
+            Theme::info("Example: export json results.json");
+            Theme::info("Example: export html report.html");
+            Theme::info("Example: export pdf report.pdf");
+            Theme::info("Or: export results (to view stored results)");
+            return Ok(());
+        }
+
+        // Special command to view stored results
+        if args[0] == "results" {
+            return self.cmd_show_stored_results().await;
+        }
+
+        if args.len() < 2 {
+            Theme::error("Please specify both format and filename");
+            Theme::info("Usage: export <format> <filename>");
+            return Ok(());
+        }
+
+        let format = args[0].to_lowercase();
+        let filename = args[1];
+
+        // Validate format
+        if !["json", "html", "pdf"].contains(&format.as_str()) {
+            Theme::error(&format!("Unknown format: {}", format));
+            Theme::info("Supported formats: json, html, pdf");
+            return Ok(());
+        }
+
+        // Get all stored results
+        let store = self.result_store.lock().await;
+        let results = store.get_all();
+
+        if results.is_empty() {
+            Theme::warning("No results to export. Run some modules first!");
+            Theme::info("Use 'run' to execute modules and generate results");
+            return Ok(());
+        }
+
+        Theme::info(&format!("Exporting {} results to {} format...", results.len(), format));
+
+        // Get all sessions
+        let sessions = self.sessions.list_all().await;
+
+        // Create report data
+        let stored_results: Vec<_> = results.into_iter().cloned().collect();
+        let report_data = ReportData::new(stored_results, sessions);
+
+        // Export based on format
+        let result = match format.as_str() {
+            "json" => {
+                let reporter = JsonReporter;
+                reporter.export(&report_data, Path::new(filename))
+            }
+            "html" => {
+                let reporter = HtmlReporter;
+                reporter.export(&report_data, Path::new(filename))
+            }
+            "pdf" => {
+                let reporter = PdfReporter;
+                reporter.export(&report_data, Path::new(filename))
+            }
+            _ => unreachable!(),
+        };
+
+        match result {
+            Ok(_) => {
+                Theme::success(&format!("✓ Report exported successfully to: {}", filename));
+                Theme::info(&format!("Total results: {}", report_data.summary.total_results));
+                Theme::info(&format!("Successful: {}", report_data.summary.successful_results));
+                Theme::info(&format!("Failed: {}", report_data.summary.failed_results));
+            }
+            Err(e) => {
+                Theme::error(&format!("Export failed: {}", e));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_show_stored_results(&self) -> Result<()> {
+        let store = self.result_store.lock().await;
+        let results = store.get_all();
+
+        Theme::section("STORED RESULTS");
+        println!();
+
+        if results.is_empty() {
+            Theme::warning("No results stored yet");
+            Theme::info("Run some modules to generate results");
+            println!();
+            return Ok(());
+        }
+
+        Theme::info(&format!("Total stored results: {}", results.len()));
+        println!();
+
+        println!(
+            "  {:<8} {:<30} {:<10} {}",
+            "Status".bright_cyan().bold(),
+            "Module".bright_cyan().bold(),
+            "Time".bright_cyan().bold(),
+            "Message".bright_cyan().bold()
+        );
+        println!("  {}", "─".repeat(90).bright_blue());
+
+        for result in results.iter().rev().take(20) {
+            let status = if result.result.success {
+                "SUCCESS".bright_green()
+            } else {
+                "FAILED".bright_red()
+            };
+
+            let module = format!("{}/{}", result.module_info.category, result.module_info.name);
+            let time = result.result.timestamp.format("%H:%M:%S").to_string();
+            let message = if result.result.message.len() > 40 {
+                format!("{}...", &result.result.message[..37])
+            } else {
+                result.result.message.clone()
+            };
+
+            println!(
+                "  {:<8} {:<30} {:<10} {}",
+                status,
+                module.bright_white(),
+                time.bright_yellow(),
+                message
+            );
+        }
+
+        println!();
+
+        let successful = store.get_successful().len();
+        let failed = store.get_failed().len();
+
+        Theme::info(&format!("Successful: {} | Failed: {}", successful, failed));
+        println!();
+        Theme::info("💡 Use 'export <format> <file>' to export these results");
+        println!();
+
         Ok(())
     }
 }

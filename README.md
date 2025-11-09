@@ -96,6 +96,13 @@ ferox(scanner/port_scanner)> run
 | `run` | Execute module |
 | `info` | Display module information |
 
+### Report & Export Commands
+
+| Command | Description |
+|---------|-------------|
+| `export <format> <file>` | Export scan results to file (json, html, pdf) |
+| `export results` | View stored results summary |
+
 ### Utility Commands
 
 | Command | Description |
@@ -196,6 +203,86 @@ ferox(exploit/example/example_exploit)> set LHOST 192.168.1.100
 ferox(exploit/example/example_exploit)> check    # Safe fingerprint first!
 ferox(exploit/example/example_exploit)> run      # Requires confirmation
 ```
+
+---
+
+## 📊 Report Generation
+
+Ferox Framework includes a comprehensive report generation system that automatically stores scan results and allows you to export them in multiple formats.
+
+### Features
+
+- **Automatic Result Storage**: All module execution results are automatically stored in memory (last 100 results by default)
+- **Multiple Export Formats**: Export to JSON, HTML, or PDF
+- **Professional HTML Reports**: Beautiful, printable reports with embedded CSS
+- **Summary Statistics**: Track successful/failed scans, modules used, and time ranges
+- **Session Integration**: Reports include active session information
+
+### Usage
+
+**View Stored Results:**
+```bash
+ferox> export results
+# Shows a summary of all stored scan results
+```
+
+**Export to JSON:**
+```bash
+ferox> export json results.json
+# Exports all results as structured JSON data
+```
+
+**Export to HTML:**
+```bash
+ferox> export html report.html
+# Generates a professional HTML report with styling
+# Perfect for sharing with teams or clients
+```
+
+**Export to PDF:**
+```bash
+ferox> export pdf assessment.pdf
+# Creates a PDF document for formal reporting
+```
+
+### Report Contents
+
+Each report includes:
+- **Executive Summary**: Total results, success/failure rates, active sessions
+- **Modules Used**: List of all security modules executed
+- **Detailed Results**: Full output from each module execution
+  - Module information (name, version, author)
+  - Execution timestamp
+  - Success/failure status
+  - Result data (ports found, subdomains discovered, etc.)
+- **Session Information**: Active exploit sessions (if any)
+- **Metadata**: Report generation time, Ferox version
+
+### Example Workflow
+
+```bash
+# Run multiple scans
+ferox> use scanner/port_scanner
+ferox(scanner/port_scanner)> set RHOSTS 192.168.1.1
+ferox(scanner/port_scanner)> run
+
+ferox> use scanner/http_scanner
+ferox(scanner/http_scanner)> set RHOSTS https://example.com
+ferox(scanner/http_scanner)> run
+
+# View what's been stored
+ferox> export results
+
+# Export everything to HTML
+ferox> export html full_assessment.html
+```
+
+### Report Storage
+
+- Results are stored in-memory (not persisted to disk automatically)
+- Maximum of 100 results stored by default (oldest results are removed when limit is reached)
+- Each result includes a unique UUID for tracking
+- Use `export` command to save results before exiting Ferox
 
 ---
 
@@ -305,8 +392,8 @@ cargo clippy
 - [ ] Vulnerability detection
 - [ ] Exploit modules
 - [ ] Payload generators
-- [ ] Report generation (JSON, HTML, PDF)
-- [ ] Session management
+- [x] Report generation (JSON, HTML, PDF)
+- [x] Session management
 - [ ] Database persistence
 
 ### 🔮 Phase 3 - Enterprise
