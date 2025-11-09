@@ -39,6 +39,7 @@ x509-parser = "0.16"
 
 # Database
 sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "sqlite"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
 
 # Serialization
 serde = { version = "1.0.228", features = ["derive"] }
