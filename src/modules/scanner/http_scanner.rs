@@ -3,9 +3,56 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use reqwest::redirect::Policy;
 use reqwest::{Client, Url};
-use futures::{StreamExt, stream};
+use futures::{stream, StreamExt};
 use std::collections::HashMap;
 use std::time::Instant;
+use tokio::net::TcpStream;
+use tokio_native_tls::native_tls::TlsConnector;
+use tokio_native_tls::TlsConnector as AsyncTlsConnector;
+use x509_parser::prelude::*;
+
+/// Extract TLS certificate details from an HTTPS host
+async fn extract_tls_info(host: &str, port: u16) -> Result<serde_json::Value> {
+    let addr = format!("{}:{}", host, port);
+    let tcp = TcpStream::connect(&addr).await?;
+    
+    let connector = TlsConnector::builder()
+        .danger_accept_invalid_certs(true) // Accept self-signed for analysis
+        .build()?;
+    let async_connector = AsyncTlsConnector::from(connector);
+    let tls_stream = async_connector.connect(host, tcp).await?;
+    
+    // Get peer certificate
+    let tls_ref = tls_stream.get_ref();
+    let cert_der = tls_ref
+        .peer_certificate()?
+        .ok_or_else(|| anyhow!("No peer certificate"))?
+        .to_der()?;
+    
+    // Parse with x509-parser
+    let (_, cert) = X509Certificate::from_der(&cert_der)
+        .map_err(|e| anyhow!("Failed to parse certificate: {:?}", e))?;
+    
+    let subject = cert.subject().to_string();
+    let issuer = cert.issuer().to_string();
+    let not_before = cert.validity().not_before.to_datetime().to_string();
+    let not_after = cert.validity().not_after.to_datetime().to_string();
+    
+    // Calculate days until expiry
+    let now = chrono::Utc::now();
+    let expiry = cert.validity().not_after.to_datetime();
+    let days_to_expiry = (expiry.unix_timestamp() - now.timestamp()) / 86400;
+    
+    Ok(serde_json::json!({
+        "subject": subject,
+        "issuer": issuer,
+        "not_before": not_before,
+        "not_after": not_after,
+        "days_to_expiry": days_to_expiry,
+        "serial_number": format!("{:X}", cert.serial),
+        "signature_algorithm": cert.signature_algorithm.algorithm.to_string(),
+    }))
+}
 
 pub struct HttpScanner {
     options: HashMap<String, String>,
@@ -269,12 +316,18 @@ impl Module for HttpScanner {
 
         let scheme = base.scheme().to_string();
         let is_https = scheme.eq_ignore_ascii_case("https");
-
-        // Basic TLS handshake check (best-effort): HEAD base URL if HTTPS
-        let mut tls_handshake_ok = false;
+        let mut tls_info_json: Option<serde_json::Value> = None;
         if is_https {
-            if client_no_redirect.head(base.clone()).send().await.is_ok() {
-                tls_handshake_ok = true;
+            // Extract TLS certificate details
+            let host = base.host_str().ok_or_else(|| anyhow!("No host in URL"))?;
+            let port = base.port().unwrap_or(443);
+            match extract_tls_info(host, port).await {
+                Ok(info) => tls_info_json = Some(info),
+                Err(e) => {
+                    tls_info_json = Some(serde_json::json!({
+                        "error": format!("TLS handshake failed: {}", e)
+                    }));
+                }
             }
         }
 
@@ -392,12 +445,14 @@ impl Module for HttpScanner {
         result = result
             .with_data("base_url", serde_json::json!(base.to_string()))
             .with_data("https", serde_json::json!(is_https))
-            .with_data("tls_handshake_ok", serde_json::json!(tls_handshake_ok))
+            .with_data("tls", serde_json::json!(tls_info_json))
             .with_data("results", serde_json::json!(results));
 
         Ok(result)
     }
 }
+
+// (Detailed TLS parsing removed due to missing build tooling; placeholder retained.)
 
 impl Default for HttpScanner {
     fn default() -> Self {

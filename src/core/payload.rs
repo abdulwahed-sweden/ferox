@@ -76,6 +76,7 @@ impl PayloadConfig {
 
 /// Generated payload
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Payload {
     pub config: PayloadConfig,
     pub data: Vec<u8>,

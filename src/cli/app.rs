@@ -4,28 +4,179 @@ use crate::core::payload::PayloadGenerator;
 use crate::core::session::SessionManager;
 use anyhow::Result;
 use colored::Colorize;
-use rustyline::DefaultEditor;
+use rustyline::{Editor, Config, CompletionType};
+use rustyline::completion::{Completer, Pair};
 use rustyline::error::ReadlineError;
+use rustyline::highlight::Highlighter;
+use rustyline::hint::Hinter;
+use rustyline::validate::Validator;
+use rustyline::Helper;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use uuid::Uuid;
+
+// Command aliases mapping
+fn get_aliases() -> HashMap<&'static str, &'static str> {
+    let mut aliases = HashMap::new();
+    aliases.insert("ls", "modules");
+    aliases.insert("s", "set");
+    aliases.insert("x", "run");
+    aliases.insert("e", "execute");
+    aliases.insert("o", "options");
+    aliases.insert("i", "info");
+    aliases.insert("c", "check");
+    aliases.insert("?", "help");
+    aliases.insert("q", "quit");
+    aliases
+}
+
+// Rustyline completion helper
+struct FeroxHelper {
+    commands: Vec<String>,
+    modules: Arc<Mutex<Vec<String>>>,
+}
+
+impl FeroxHelper {
+    fn new(modules: Arc<Mutex<Vec<String>>>) -> Self {
+        let commands = vec![
+            "help", "?", "modules", "list", "ls", "use", "back", "show",
+            "set", "s", "options", "o", "check", "c", "run", "execute", "exploit",
+            "x", "e", "info", "i", "sessions", "payloads", "clear", "cls",
+            "banner", "version", "exit", "quit", "q"
+        ]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect();
+
+        Self { commands, modules }
+    }
+}
+
+impl Completer for FeroxHelper {
+    type Candidate = Pair;
+
+    fn complete(
+        &self,
+        line: &str,
+        pos: usize,
+        _ctx: &rustyline::Context<'_>,
+    ) -> rustyline::Result<(usize, Vec<Pair>)> {
+        let line_prefix = &line[..pos];
+        let parts: Vec<&str> = line_prefix.split_whitespace().collect();
+
+        // If we're completing the first word (command)
+        if parts.is_empty() || (parts.len() == 1 && !line_prefix.ends_with(' ')) {
+            let prefix = parts.first().unwrap_or(&"");
+            let matches: Vec<Pair> = self
+                .commands
+                .iter()
+                .filter(|cmd| cmd.starts_with(prefix))
+                .map(|cmd| Pair {
+                    display: cmd.clone(),
+                    replacement: cmd.clone(),
+                })
+                .collect();
+
+            let start = line_prefix.len() - prefix.len();
+            return Ok((start, matches));
+        }
+
+        // If we're completing after "use" command, suggest modules
+        if parts.len() >= 1 && (parts[0] == "use") {
+            let prefix = if parts.len() >= 2 {
+                parts[parts.len() - 1]
+            } else {
+                ""
+            };
+
+            // Access modules from Arc<Mutex<>> - need to block on async
+            // For simplicity, we'll just return empty if we can't get lock immediately
+            if let Ok(modules) = self.modules.try_lock() {
+                let matches: Vec<Pair> = modules
+                    .iter()
+                    .filter(|module| module.starts_with(prefix))
+                    .map(|module| Pair {
+                        display: module.clone(),
+                        replacement: module.clone(),
+                    })
+                    .collect();
+
+                let start = line_prefix.len() - prefix.len();
+                return Ok((start, matches));
+            }
+        }
+
+        // If we're completing after "show" command
+        if parts.len() >= 1 && parts[0] == "show" {
+            let show_options = vec!["options", "modules"];
+            let prefix = if parts.len() >= 2 {
+                parts[parts.len() - 1]
+            } else {
+                ""
+            };
+
+            let matches: Vec<Pair> = show_options
+                .into_iter()
+                .filter(|opt| opt.starts_with(prefix))
+                .map(|opt| Pair {
+                    display: opt.to_string(),
+                    replacement: opt.to_string(),
+                })
+                .collect();
+
+            let start = line_prefix.len() - prefix.len();
+            return Ok((start, matches));
+        }
+
+        Ok((0, vec![]))
+    }
+}
+
+impl Hinter for FeroxHelper {
+    type Hint = String;
+
+    fn hint(&self, _line: &str, _pos: usize, _ctx: &rustyline::Context<'_>) -> Option<String> {
+        None
+    }
+}
+
+impl Highlighter for FeroxHelper {}
+impl Validator for FeroxHelper {}
+impl Helper for FeroxHelper {}
 
 pub struct FeroxCli {
     registry: Arc<Mutex<ModuleRegistry>>,
     sessions: SessionManager,
     current_module: Option<String>,
-    editor: DefaultEditor,
+    editor: Editor<FeroxHelper, rustyline::history::DefaultHistory>,
+    aliases: HashMap<&'static str, &'static str>,
 }
 
 // (helpers removed; confirmation will be added later if needed)
 
 impl FeroxCli {
     pub fn new(registry: ModuleRegistry) -> Result<Self> {
+        // Get initial module list for completion
+        let module_list: Vec<String> = registry.list();
+        let modules_arc = Arc::new(Mutex::new(module_list));
+
+        // Configure rustyline with tab completion
+        let config = Config::builder()
+            .completion_type(CompletionType::List)
+            .auto_add_history(true)
+            .build();
+
+        let helper = FeroxHelper::new(modules_arc.clone());
+        let mut editor = Editor::with_config(config)?;
+        editor.set_helper(Some(helper));
+
         Ok(Self {
             registry: Arc::new(Mutex::new(registry)),
             sessions: SessionManager::new(),
             current_module: None,
-            editor: DefaultEditor::new()?,
+            editor,
+            aliases: get_aliases(),
         })
     }
 
@@ -77,11 +228,13 @@ impl FeroxCli {
             return Ok(());
         }
 
-        let command = parts[0];
+        // Resolve aliases
+        let raw_command = parts[0];
+        let command = *self.aliases.get(raw_command).unwrap_or(&raw_command);
         let args = &parts[1..];
 
         match command {
-            "help" | "?" => self.cmd_help().await,
+            "help" | "?" => self.cmd_help_with_args(args).await,
             "modules" | "list" => self.cmd_list_modules().await,
             "use" => self.cmd_use(args).await,
             "back" => self.cmd_back().await,
@@ -112,12 +265,16 @@ impl FeroxCli {
     }
 
     async fn cmd_help(&self) -> Result<()> {
+        // Check if user wants categorized help
         Theme::section("FEROX COMMANDS");
         println!();
 
         println!("  {}", "Core Commands:".bright_yellow().bold());
         Theme::command_help("help, ?", "Show this help message");
-        Theme::command_help("modules, list", "List all available modules");
+        Theme::command_help("help scanners", "Show available scanner modules");
+        Theme::command_help("help exploits", "Show available exploit modules");
+        Theme::command_help("help sessions", "Show session management help");
+        Theme::command_help("modules, list, ls", "List all available modules");
         Theme::command_help("use <module>", "Select a module to use");
         Theme::command_help("back", "Deselect current module");
         println!();
@@ -127,11 +284,11 @@ impl FeroxCli {
             "show <type>",
             "Show information (options, modules, sessions)",
         );
-        Theme::command_help("set <option> <value>", "Set module option");
-        Theme::command_help("options", "Show current module options");
-        Theme::command_help("check", "Run non-destructive check (safe fingerprinting)");
-        Theme::command_help("run, execute", "Execute current module");
-        Theme::command_help("info", "Show current module information");
+        Theme::command_help("set <option> <value>, s", "Set module option");
+        Theme::command_help("options, o", "Show current module options");
+        Theme::command_help("check, c", "Run non-destructive check (safe fingerprinting)");
+        Theme::command_help("run, execute, x, e", "Execute current module");
+        Theme::command_help("info, i", "Show current module information");
         println!();
 
         println!("  {}", "Session Commands:".bright_yellow().bold());
@@ -151,6 +308,13 @@ impl FeroxCli {
         Theme::command_help("exit, quit, q", "Exit the framework");
         println!();
 
+        println!("  {}", "💡 Tip:".bright_cyan().bold());
+        println!(
+            "    {}",
+            "Use TAB for command completion. Type 'help <category>' for focused help.".bright_white()
+        );
+        println!();
+
         println!("  {}", "⚠️  Safety Notice:".bright_red().bold());
         println!(
             "    {}",
@@ -164,6 +328,93 @@ impl FeroxCli {
             "    {}",
             "Only test systems you own or have permission to test".bright_yellow()
         );
+        println!();
+        Ok(())
+    }
+
+    async fn cmd_help_with_args(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            return self.cmd_help().await;
+        }
+
+        let category = args[0];
+        match category {
+            "scanners" | "scanner" => self.cmd_help_category(ModuleType::Scanner).await,
+            "exploits" | "exploit" => self.cmd_help_category(ModuleType::Exploit).await,
+            "auxiliary" | "aux" => self.cmd_help_category(ModuleType::Auxiliary).await,
+            "post" | "postexploit" => self.cmd_help_category(ModuleType::PostExploit).await,
+            "sessions" | "session" => self.cmd_help_sessions().await,
+            _ => {
+                Theme::error(&format!("Unknown help category: {}", category));
+                Theme::info("Available categories: scanners, exploits, auxiliary, post, sessions");
+                Ok(())
+            }
+        }
+    }
+
+    async fn cmd_help_category(&self, module_type: ModuleType) -> Result<()> {
+        let registry = self.registry.lock().await;
+        let modules = registry.list_by_type(module_type.clone());
+
+        let category_name = match module_type {
+            ModuleType::Scanner => "SCANNER MODULES",
+            ModuleType::Exploit => "EXPLOIT MODULES",
+            ModuleType::Auxiliary => "AUXILIARY MODULES",
+            ModuleType::PostExploit => "POST-EXPLOITATION MODULES",
+            _ => "MODULES",
+        };
+
+        Theme::section(category_name);
+        println!();
+
+        if modules.is_empty() {
+            Theme::warning(&format!("No {} modules loaded", category_name.to_lowercase()));
+        } else {
+            let first_module = modules.first().map(|s| s.clone());
+            for module_path in modules {
+                if let Some(module) = registry.get(&module_path) {
+                    let info = module.info();
+                    println!(
+                        "  {} {} - {}",
+                        module_path.bright_green().bold(),
+                        format!("({})", info.version).bright_yellow(),
+                        info.description.bright_white()
+                    );
+                }
+            }
+            println!();
+            if let Some(first) = first_module {
+                Theme::info(&format!("💡 Use 'use {}' to select a module", first));
+            }
+        }
+
+        println!();
+        Ok(())
+    }
+
+    async fn cmd_help_sessions(&self) -> Result<()> {
+        Theme::section("SESSION MANAGEMENT HELP");
+        println!();
+
+        println!("  {}", "Session Commands:".bright_yellow().bold());
+        Theme::command_help("sessions", "List all sessions");
+        Theme::command_help("sessions -a", "List active sessions only");
+        Theme::command_help("sessions -i <id>", "Show session details (refreshes heartbeat)");
+        Theme::command_help("sessions -k <id>", "Kill/mark session as inactive");
+        Theme::command_help("sessions -r <id>", "Remove session from database");
+        Theme::command_help("sessions -c <hours>", "Cleanup stale sessions older than N hours");
+        println!();
+
+        println!("  {}", "Session Lifecycle:".bright_cyan().bold());
+        println!("    • Exploit modules can establish sessions on successful runs");
+        println!("    • Sessions track access to compromised targets");
+        println!("    • Use 'sessions -i <id>' to keep sessions alive via heartbeat");
+        println!("    • Inactive sessions can be cleaned up with 'sessions -c <hours>'");
+        println!();
+
+        let total = self.sessions.count().await;
+        let active = self.sessions.active_count().await;
+        Theme::info(&format!("Current: {} total sessions ({} active)", total, active));
         println!();
         Ok(())
     }

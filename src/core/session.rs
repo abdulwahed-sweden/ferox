@@ -18,6 +18,7 @@ impl SessionManager {
     }
 
     /// Add a new session
+    #[allow(dead_code)]
     pub async fn add(&self, session: Session) -> Uuid {
         let id = session.id;
         let mut sessions = self.sessions.lock().await;

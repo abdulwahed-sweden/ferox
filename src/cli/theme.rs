@@ -1,242 +1,71 @@
-use atty::Stream;
-use colored::{Color, Colorize, control};
-use indicatif::ProgressStyle;
+//! Ferox theming (modernized)
+//! Provides a unified, capability-aware interface for colored output, Unicode symbols,
+//! and plain fallbacks. Maintains backward compatibility with previous Theme API.
+
 use std::env;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{LazyLock, RwLock};
-
+use std::sync::{OnceLock, RwLock};
 use anyhow::Result;
+use atty::Stream as AttyStream;
+use indicatif::ProgressStyle;
+use owo_colors::{OwoColorize, AnsiColors};
 
-#[derive(Copy, Clone)]
-struct ThemeState {
-    colors: bool,
-    unicode: bool,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
+pub enum DisplayProfile { Rich, Minimal, Plain, Compact }
 
-#[cfg(windows)]
-static ANSI_VT_ENABLED: AtomicBool = AtomicBool::new(false);
-#[cfg(not(windows))]
-static ANSI_VT_ENABLED: AtomicBool = AtomicBool::new(true);
+#[derive(Debug, Clone)]
+pub struct Symbols { pub fox:&'static str, pub ok:&'static str, pub warn:&'static str, pub err:&'static str, pub arrow:&'static str, pub line:&'static str }
 
-static THEME_STATE: LazyLock<RwLock<ThemeState>> = LazyLock::new(|| {
-    let state = detect_theme_state();
-    apply_color_settings(state);
-    RwLock::new(state)
-});
+impl Symbols { fn for_profile(p:DisplayProfile)->Self { match p { DisplayProfile::Rich => Self{fox:"🦊",ok:"✓",warn:"⚠",err:"✗",arrow:"→",line:"─"}, DisplayProfile::Minimal=>Self{fox:"[fox]",ok:"[+]",warn:"[!]",err:"[x]",arrow:"->",line:"-"}, DisplayProfile::Plain|DisplayProfile::Compact=>Self{fox:"",ok:"+",warn:"!",err:"x",arrow:"->",line:"-"} } } }
+
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+struct ThemeState { profile:DisplayProfile, use_color:bool, use_unicode:bool, is_tty:bool, symbols:Symbols }
+
+static THEME: OnceLock<RwLock<ThemeState>> = OnceLock::new();
 
 pub struct Theme;
 
 impl Theme {
-    /// Initialize theme capabilities after terminal setup.
-    pub fn init() {
-        let state = detect_theme_state();
-        if let Ok(mut guard) = THEME_STATE.write() {
-            *guard = state;
-        }
-        apply_color_settings(state);
+    pub fn init() { let s = Self::detect(); let _ = THEME.set(RwLock::new(s)); }
+    #[allow(dead_code)]
+    pub fn refresh() { if let Some(lock)=THEME.get(){ *lock.write().unwrap() = Self::detect(); } }
+    fn detect() -> ThemeState {
+        #[cfg(windows)] let _ = enable_ansi_support();
+        let no_color = env::var_os("NO_COLOR").is_some();
+        let no_emoji = env::var_os("NO_EMOJI").is_some();
+        let is_ci = env::var_os("CI").is_some();
+        let is_tty = atty::is(AttyStream::Stdout);
+        let utf8 = env::var("LANG").unwrap_or_default().to_ascii_lowercase().contains("utf-8");
+        let use_color = !no_color && is_tty;
+        let use_unicode = !no_emoji && utf8 && !is_ci;
+        let profile = if !is_tty || no_color || is_ci { DisplayProfile::Plain } else if use_color && use_unicode { DisplayProfile::Rich } else if use_color { DisplayProfile::Minimal } else { DisplayProfile::Plain };
+        ThemeState{ profile, use_color, use_unicode, is_tty, symbols: Symbols::for_profile(profile) }
     }
+    fn state() -> ThemeState { THEME.get().expect("Theme::init not called").read().unwrap().clone() }
 
-    /// Display the main Ferox banner.
-    pub fn banner() {
-        let state = Theme::state();
-        if state.colors {
-            let banner_template = if state.unicode {
-                COLORED_BANNER
-            } else {
-                PLAIN_BANNER
-            };
-            println!("{}", banner_template.bright_red());
+    pub fn banner() { let s=Self::state(); match s.profile { DisplayProfile::Rich => { println!("{} {}", s.symbols.fox, "Ferox Framework".color(AnsiColors::BrightCyan)); println!("{}", "====================".color(AnsiColors::BrightBlack)); } DisplayProfile::Minimal => { println!("[Ferox] Framework"); println!("{}", if s.use_color {"================".color(AnsiColors::BrightBlack).to_string()} else {"================".to_string()}); } _ => println!("Ferox Framework") } }
 
-            let fox = themed_symbol(state, "🦊", "[+]");
-            let bolt = themed_symbol(state, "⚡", "[*]");
+    pub fn success(msg:&str){ Self::print_marker(msg, AnsiColors::Green, "✓", "[+]"); }
+    pub fn error(msg:&str){ Self::print_marker(msg, AnsiColors::Red, "✗", "[-]"); }
+    pub fn warning(msg:&str){ Self::print_marker(msg, AnsiColors::Yellow, "⚠", "[!]"); }
+    pub fn info(msg:&str){ Self::print_marker(msg, AnsiColors::Blue, "ℹ", "[*]"); }
 
-            println!(
-                "    {}   Ferox Framework {}",
-                paint_symbol(fox.as_str(), Color::BrightRed, state, true),
-                paint_text("v2.0.0", Color::BrightYellow, state, true)
-            );
-            println!(
-                "    {}   Fast. Fierce. Fearless.\n",
-                paint_symbol(bolt.as_str(), Color::BrightYellow, state, true)
-            );
-        } else {
-            println!("{}", PLAIN_BANNER);
-            let fox = themed_symbol(state, "🦊", "[+]");
-            let bolt = themed_symbol(state, "⚡", "[*]");
-            println!("{} Ferox Framework v2.0.0", fox);
-            println!("{} Fast. Fierce. Fearless.\n", bolt);
-        }
-    }
+    pub fn module_header(name:&str){ let st=Self::state(); let line = if st.use_unicode {"═"} else {"="}; let border=line.repeat(70); if st.use_color { println!("\n{}\n  {} {}\n{}", border.color(AnsiColors::Blue), st.symbols.fox.color(AnsiColors::Blue), name.color(AnsiColors::White).bold(), border.color(AnsiColors::Blue)); } else { println!("\n{}\n  {} {}\n{}", border, st.symbols.fox, name, border); } }
 
-    /// Success message.
-    pub fn success(msg: &str) {
-        Theme::print_marker(msg, Color::BrightGreen, "✓", "[+]");
-    }
+    pub fn section(title:&str){ let st=Self::state(); let line = st.symbols.line.repeat(18); let text=format!("{}[ {} ]{}", line, title, line); if st.use_color { println!("\n{}", text.color(AnsiColors::Cyan)); } else { println!("\n{}", text); } }
 
-    /// Error message.
-    pub fn error(msg: &str) {
-        Theme::print_marker(msg, Color::BrightRed, "✗", "[-]");
-    }
+    pub fn prompt(context:&str)->String{ let st=Self::state(); let base= if context.is_empty() {"ferox".to_string()} else {format!("ferox({})", context)}; let p=format!("{}>", base); if st.use_color { p.color(AnsiColors::Red).bold().to_string()+" " } else { p+" " } }
 
-    /// Warning message.
-    pub fn warning(msg: &str) {
-        Theme::print_marker(msg, Color::BrightYellow, "⚠", "[!]");
-    }
+    pub fn command_help(cmd:&str, desc:&str){ let st=Self::state(); let arrow=st.symbols.arrow; if st.use_color { println!("    {}  {}  {}", cmd.color(AnsiColors::Green).bold(), arrow.color(AnsiColors::Cyan), desc.color(AnsiColors::White)); } else { println!("    {}  {}  {}", cmd, arrow, desc); } }
 
-    /// Info message.
-    pub fn info(msg: &str) {
-        Theme::print_marker(msg, Color::BrightBlue, "ℹ", "[*]");
-    }
+    pub fn status(kind:&str, message:&str){ let st=Self::state(); let (sym,color)= match kind {"ready"=> (st.symbols.ok, AnsiColors::Green), "running"=> (st.symbols.warn, AnsiColors::Yellow), "error"=> (st.symbols.err, AnsiColors::Red), _=> (st.symbols.arrow, AnsiColors::Blue)}; if st.use_color { println!("  {}  {}: {}", sym.color(color), kind.to_uppercase().color(color).bold(), message.color(AnsiColors::White)); } else { println!("  {}  {}: {}", sym, kind.to_uppercase(), message); } }
 
-    /// Module header.
-    pub fn module_header(name: &str) {
-        let state = Theme::state();
-        let border_char = if state.unicode { "═" } else { "=" };
-        let border = border_char.repeat(70);
-        let box_icon = themed_symbol(state, "📦", "[*]");
+    pub fn spinner_style()->ProgressStyle { let st=Self::state(); if st.use_color { ProgressStyle::default_spinner().template("{spinner:.red} {msg}").unwrap().tick_strings(if st.use_unicode { &["🦊","🔥","⚡","💥","✨","🎯","🚀","⚔️"] } else { &["-","\\","|","/"] }) } else { ProgressStyle::default_spinner().template("{spinner} {msg}").unwrap().tick_strings(&["-","\\","|","/"]) } }
 
-        if state.colors {
-            println!("\n{}", border.bright_blue());
-            println!(
-                "  {} {}",
-                paint_symbol(box_icon.as_str(), Color::BrightBlue, state, false),
-                paint_text(name, Color::BrightWhite, state, true)
-            );
-            println!("{}", border.bright_blue());
-        } else {
-            println!("\n{}", border);
-            println!("  {} {}", box_icon, name);
-            println!("{}", border);
-        }
-    }
-
-    /// Section header.
-    pub fn section(title: &str) {
-        let state = Theme::state();
-        let divider = if state.unicode {
-            "──────────────────"
-        } else {
-            "------------------"
-        };
-        let formatted = format!("  {}[ {} ]{}", divider, title, divider);
-
-        if state.colors {
-            println!("\n{}", formatted.bright_cyan());
-        } else {
-            println!("\n{}", formatted);
-        }
-    }
-
-    /// Prompt with Ferox branding.
-    pub fn prompt(context: &str) -> String {
-        let state = Theme::state();
-        let base = if context.is_empty() {
-            "ferox".to_string()
-        } else {
-            format!("ferox({})", context)
-        };
-
-        let prompt = format!("{}>", base);
-        if state.colors {
-            format!("{} ", prompt.bright_red().bold())
-        } else {
-            format!("{} ", prompt)
-        }
-    }
-
-    /// Command help entry.
-    pub fn command_help(cmd: &str, desc: &str) {
-        let state = Theme::state();
-        let arrow = if state.unicode { "→" } else { "->" };
-
-        if state.colors {
-            println!(
-                "    {}  {}  {}",
-                cmd.bright_green().bold(),
-                arrow.bright_cyan(),
-                desc.bright_white()
-            );
-        } else {
-            println!("    {}  {}  {}", cmd, arrow, desc);
-        }
-    }
-
-    /// Status indicator line.
-    pub fn status(status: &str, message: &str) {
-        let state = Theme::state();
-        let (unicode, ascii, color) = match status {
-            "ready" => ("🟢", "[READY]", Color::BrightGreen),
-            "running" => ("🟡", "[RUN]", Color::BrightYellow),
-            "error" => ("🔴", "[ERR]", Color::BrightRed),
-            _ => ("⚪", "[INFO]", Color::White),
-        };
-
-        let icon = themed_symbol(state, unicode, ascii);
-        let status_text = status.to_uppercase();
-
-        if state.colors {
-            println!(
-                "  {}  {}: {}",
-                paint_symbol(icon.as_str(), color, state, false),
-                status_text.color(color).bold(),
-                paint_text(message, Color::BrightWhite, state, false)
-            );
-        } else {
-            println!("  {}  {}: {}", icon, status_text, message);
-        }
-    }
-
-    /// Spinner style respecting terminal capabilities.
-    pub fn spinner_style() -> ProgressStyle {
-        let state = Theme::state();
-        if state.colors {
-            ProgressStyle::default_spinner()
-                .template("{spinner:.red} {msg}")
-                .unwrap()
-                .tick_strings(if state.unicode {
-                    &["🦊", "🔥", "⚡", "💥", "✨", "🎯", "🚀", "⚔️"]
-                } else {
-                    &["-", "\\", "|", "/"]
-                })
-        } else {
-            ProgressStyle::default_spinner()
-                .template("{spinner} {msg}")
-                .unwrap()
-                .tick_strings(if state.unicode {
-                    &["*", "o", "O", "o"]
-                } else {
-                    &["-", "\\", "|", "/"]
-                })
-        }
-    }
-
-    fn print_marker(message: &str, color: Color, unicode_symbol: &str, ascii_symbol: &str) {
-        let state = Theme::state();
-        let symbol = themed_symbol(state, unicode_symbol, ascii_symbol);
-
-        if state.colors {
-            println!(
-                "{} {}",
-                paint_symbol(symbol.as_str(), color, state, true),
-                paint_text(message, Color::BrightWhite, state, false)
-            );
-        } else {
-            println!("{} {}", symbol, message);
-        }
-    }
-
-    fn state() -> ThemeState {
-        THEME_STATE
-            .read()
-            .map(|state| *state)
-            .unwrap_or(ThemeState {
-                colors: false,
-                unicode: false,
-            })
-    }
+    fn print_marker(message:&str, color:AnsiColors, unicode:&str, ascii:&str){ let st=Self::state(); let sym= if st.use_unicode {unicode} else {ascii}; if st.use_color { println!("{} {}", sym.color(color).bold(), message.color(AnsiColors::White)); } else { println!("{} {}", sym, message); } }
 }
 
-/// Enable ANSI escape support on Windows consoles when available.
 #[cfg(windows)]
 pub fn enable_ansi_support() -> Result<()> {
     use tracing::warn;
@@ -249,141 +78,20 @@ pub fn enable_ansi_support() -> Result<()> {
 
     let handles = [STD_OUTPUT_HANDLE, STD_ERROR_HANDLE];
     let mut any_enabled = false;
-
     unsafe {
         for std_handle in handles {
             let handle = GetStdHandle(std_handle);
-            if handle.is_null() || handle == INVALID_HANDLE_VALUE {
-                continue;
-            }
-
+            if handle.is_null() || handle == INVALID_HANDLE_VALUE { continue; }
             let mut mode: DWORD = 0;
-            if GetConsoleMode(handle, &mut mode) == 0 {
-                continue;
-            }
-
+            if GetConsoleMode(handle, &mut mode) == 0 { continue; }
             if mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING == 0 {
-                if SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0 {
-                    continue;
-                }
+                if SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0 { continue; }
             }
-
             any_enabled = true;
         }
     }
-
-    if any_enabled {
-        ANSI_VT_ENABLED.store(true, Ordering::Relaxed);
-    } else {
-        warn!("ANSI escape sequences not supported; using plain text fallback");
-    }
-
+    if !any_enabled { warn!("ANSI escape sequences not supported; falling back to plain output"); }
     Ok(())
 }
-
-/// No-op on non-Windows platforms.
 #[cfg(not(windows))]
-pub fn enable_ansi_support() -> Result<()> {
-    Ok(())
-}
-
-const COLORED_BANNER: &str = r#"
-   ╔═══════════════════════════════════════════════════════════════════╗
-   ║                                                                   ║
-   ║    ███████╗███████╗██████╗  ██████╗ ██╗  ██╗                     ║
-   ║    ██╔════╝██╔════╝██╔══██╗██╔═══██╗╚██╗██╔╝                     ║
-   ║    █████╗  █████╗  ██████╔╝██║   ██║ ╚███╔╝                      ║
-   ║    ██╔══╝  ██╔══╝  ██╔══██╗██║   ██║ ██╔██╗                      ║
-   ║    ██║     ███████╗██║  ██║╚██████╔╝██╔╝ ██╗                     ║
-   ║    ╚═╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝                     ║
-   ║                                                                   ║
-   ║          🦊  FEROCIOUS SECURITY FRAMEWORK  🦊                     ║
-   ║                                                                   ║
-   ╚═══════════════════════════════════════════════════════════════════╝
-"#;
-
-const PLAIN_BANNER: &str = r#"
-============================================
-   FEROX FRAMEWORK
-   Ferocious Security Framework
-============================================
-"#;
-
-fn themed_symbol(state: ThemeState, unicode_symbol: &str, ascii_symbol: &str) -> String {
-    if state.unicode {
-        unicode_symbol.to_string()
-    } else {
-        ascii_symbol.to_string()
-    }
-}
-
-fn paint_symbol(symbol: &str, color: Color, state: ThemeState, bold: bool) -> String {
-    if state.colors {
-        if bold {
-            symbol.color(color).bold().to_string()
-        } else {
-            symbol.color(color).to_string()
-        }
-    } else {
-        symbol.to_string()
-    }
-}
-
-fn paint_text(text: &str, color: Color, state: ThemeState, bold: bool) -> String {
-    if state.colors {
-        if bold {
-            text.color(color).bold().to_string()
-        } else {
-            text.color(color).to_string()
-        }
-    } else {
-        text.to_string()
-    }
-}
-
-fn detect_theme_state() -> ThemeState {
-    let ansi_enabled = ANSI_VT_ENABLED.load(Ordering::Relaxed);
-    let no_color = env::var_os("NO_COLOR").is_some();
-    let stdout_is_tty = atty::is(Stream::Stdout);
-    let colors = !no_color && stdout_is_tty && ansi_enabled;
-    let unicode = detect_unicode(ansi_enabled);
-
-    ThemeState { colors, unicode }
-}
-
-fn detect_unicode(ansi_enabled: bool) -> bool {
-    if env::var_os("NO_EMOJI").is_some() {
-        return false;
-    }
-
-    if let Ok(term) = env::var("TERM") {
-        if term.eq_ignore_ascii_case("dumb") {
-            return false;
-        }
-    }
-
-    if cfg!(windows) {
-        if env::var_os("WT_SESSION").is_some()
-            || env::var_os("ConEmuANSI").is_some()
-            || env::var("TERM_PROGRAM")
-                .map(|tp| tp.to_ascii_lowercase().contains("vscode"))
-                .unwrap_or(false)
-        {
-            return true;
-        }
-
-        return ansi_enabled;
-    }
-
-    true
-}
-
-fn apply_color_settings(state: ThemeState) {
-    if state.colors {
-        control::unset_override();
-        #[cfg(windows)]
-        let _ = control::set_virtual_terminal(true);
-    } else {
-        control::set_override(false);
-    }
-}
+pub fn enable_ansi_support() -> Result<()> { Ok(()) }

@@ -40,6 +40,7 @@ pub struct Session {
 }
 
 impl Session {
+    #[allow(dead_code)]
     pub fn new(module: String, target: String, platform: Platform) -> Self {
         let now = chrono::Utc::now();
         Self {
@@ -113,6 +114,7 @@ impl ModuleResult {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_session(mut self, session_id: Uuid) -> Self {
         self.session_id = Some(session_id);
         self
@@ -161,11 +163,13 @@ pub trait Module: Send + Sync {
     async fn run(&mut self) -> Result<ModuleResult>;
 
     /// Clean up after execution
+    #[allow(dead_code)]
     async fn cleanup(&mut self) -> Result<()> {
         Ok(())
     }
 
     /// Requires explicit user confirmation (for destructive operations)
+    #[allow(dead_code)]
     fn requires_confirmation(&self) -> bool {
         matches!(self.info().module_type, ModuleType::Exploit)
     }
