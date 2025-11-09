@@ -8,6 +8,9 @@ use cli::theme::Theme;
 use core::module::ModuleRegistry;
 use modules::exploit::example::ExampleExploit;
 use modules::recon::subdomains::SubdomainEnum;
+use modules::recon::dns::DnsEnumerator;
+use modules::recon::whois::WhoisLookup;
+use modules::recon::asn::AsnDiscovery;
 use modules::scanner::port::PortScanner;
 use modules::scanner::http_scanner::HttpScanner;
 
@@ -34,13 +37,12 @@ async fn main() -> Result<()> {
 
     // Register recon modules
     registry.register(Box::new(SubdomainEnum::new()));
+    registry.register(Box::new(DnsEnumerator::new()));
+    registry.register(Box::new(WhoisLookup::new()));
+    registry.register(Box::new(AsnDiscovery::new()));
 
     // Register exploit modules (safe skeletons)
     registry.register(Box::new(ExampleExploit::new()));
-
-    // TODO: Add more modules here as they are developed
-    // registry.register(Box::new(HttpScanner::new()));
-    // registry.register(Box::new(DnsEnum::new()));
 
     // Create and run Ferox CLI
     let mut app = FeroxCli::new(registry)?;
