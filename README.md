@@ -297,10 +297,24 @@ ferox/
 │   │   └── theme.rs         # Styling and colors
 │   ├── core/                # Core framework
 │   │   └── module.rs        # Module system
+│   ├── infra/               # Infrastructure helpers (Phase 3)
+│   │   └── crypto.rs        # AES-GCM, HMAC, HKDF wrappers
 │   └── modules/             # Security modules
-│       └── scanner/
-│           └── port.rs      # Port scanner
+│       ├── scanner/         # Scanners
+│       ├── recon/           # Reconnaissance
+│       ├── exploit/         # Exploit stubs
+│       ├── c2/              # Phase 3 C2 scaffolding
+│       │   ├── http_beacon.rs       # Encrypted, HMAC-authenticated beacon stub
+│       │   ├── relay_manager.rs     # In-memory session routing stub
+│       │   ├── cloud_tunnel.rs      # Provider trait + mock
+│       │   ├── dns_c2.rs            # Base32/64 helpers + DNS stub
+│       │   └── command_scheduler.rs # Minimal scheduler
+│       └── post/
+│           └── browser/
+│               └── deep_session_hijack.rs # Safe mock, test-only
 ├── Cargo.toml               # Dependencies
+├── config/
+│   └── c2.example.toml      # Safe-by-default C2 config sample
 └── README.md                # This file
 ```
 
@@ -403,6 +417,61 @@ cargo clippy
 - [ ] Cloud integration
 - [ ] CI/CD integration
 - [ ] Plugin marketplace
+
+---
+
+## 🔐 Phase 3: C2 Scaffolding (MVP)
+
+This release introduces a conservative, non-destructive C2 scaffolding layer intended for experimentation and future expansion. All components are safe-by-default and tested; there are no live network transports enabled by default.
+
+### What’s included
+
+- infra/crypto
+    - AES-256-GCM authenticated encryption, HMAC-SHA256, HKDF-SHA256
+    - Small, safe wrappers with clear key sizes and deterministic tests
+- modules/c2
+    - http_beacon: Encrypted, HMAC-authenticated beacon client/server model backed by an in-memory test server (no network by default)
+    - relay_manager: In-process session registration and command/result channels (stub)
+    - cloud_tunnel: Provider-agnostic interface with a mock provider for tests
+    - dns_c2: Base32/Base64 helpers and a stub DNS query function
+    - command_scheduler: Minimal in-memory scheduler API
+- modules/post/browser
+    - deep_session_hijack (mock): Safe test-only reader of a local sample profile file
+
+### Configuration
+
+An example C2 configuration is provided at `config/c2.example.toml` with safe defaults:
+
+- Auth token read from env: `FEROX_C2_TOKEN`
+- `tls_verify = true`
+- `allowed_roots = ["./"]`
+- `beacon_poll_interval_ms = 1000`
+- `cloud_provider = "mock"`
+
+Set the token at runtime (example):
+
+```bash
+export FEROX_C2_TOKEN="change_me_for_tests"
+```
+
+### Running tests for the new scaffolding
+
+All new modules are covered by fast, deterministic unit tests and one integration test. CI runs these automatically.
+
+```bash
+# Run everything
+cargo test --all
+
+# Clippy with warnings denied
+cargo clippy --all-targets -- -D warnings
+```
+
+### Safety and scope
+
+- No destructive operations are enabled by default
+- No live C2 network communication is performed in tests (in-memory stubs only)
+- Encryption/HMAC code is minimal and well-scoped; key rotation and replay protection are TODOs
+- Feature gates and provider implementations will be added incrementally in future PRs
 
 ---
 

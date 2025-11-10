@@ -1,0 +1,63 @@
+Commands Executed
+cargo check --all-targets
+Read source: src/core/module.rs, src/modules/mod.rs, Cargo.toml, lib.rs
+Added infra + crypto module, updated Cargo.toml
+cargo check --all-targets (fix crypto compile issues)
+Added c2 and post module scaffolds + mock files
+Created http_beacon, relay_manager, cloud_tunnel, dns_c2, command_scheduler, deep_session_hijack mock
+Added c2.example.toml
+Added integration_c2.rs test
+Added CI workflow (minimal) and cleaned conflicting previous workflow content
+cargo test (iterative runs, isolated failing test, then full suite)
+Fixed relay_manager test failure (channel lifetime)
+Made beacon tick public
+cargo clippy --all-targets -- -D warnings (fixed clippy lints)
+Suppressed AES-GCM deprecation warnings
+Final cargo test --all --quiet and cargo clippy --all-targets -- -D warnings
+All tests: 39 passed; clippy clean; build clean.
+
+
+Test Results Summary
+Unit tests: 39 passed (including new crypto, beacon, relay manager, cloud tunnel, dns_c2, command_scheduler, mock post module).
+Integration tests: Added integration_c2 passed.
+No failures after final fixes.
+Clippy: Clean (no warnings with -D warnings).
+Build: cargo check/build clean.
+Changelog (<=15 lines)
+Added infra::crypto module with AES-GCM, HMAC, HKDF helpers and tests (foundation for secure C2 payloads).
+Introduced modules::c2 namespace and http_beacon scaffold with authenticated encrypted envelope + test.
+Added relay_manager stub for session routing with in-memory channels (prevent premature channel close).
+Implemented cloud_tunnel provider trait + mock for future covert transports.
+Added dns_c2 encode/decode helpers (base32/base64) with tests.
+Added command_scheduler minimal in-memory scheduling API + test.
+Created post::browser::deep_session_hijack mock module (safe, test-only) with Default + Module trait.
+Extended modules::mod.rs to include new c2 and post namespaces (no breaking changes).
+Added c2.example.toml safe-by-default configuration sample.
+Added integration_c2.rs to exercise beacon-client/server interaction.
+Added minimal GitHub Actions CI workflow (check, clippy -D warnings, test).
+Updated Cargo.toml with lightweight RustCrypto dependencies (aes-gcm, hmac, sha2, hkdf, data-encoding).
+Exported tick method in beacon client for integration testing.
+Suppressed deprecated nonce warnings with #[allow(deprecated)] to keep build warning-free.
+Implemented Default for new modules to satisfy clippy lint new_without_default.
+Rationale per Non-Trivial Change (One-liners)
+Crypto module: Establish secure primitives early for consistent key handling in C2.
+HTTP beacon: Provide encrypted, HMAC-authenticated envelope pattern as core C2 loop prototype.
+Relay manager: Session routing abstraction to decouple beacon execution from command distribution.
+Cloud tunnel: Interface for future stealth transport providers with testable mock.
+DNS C2 helpers: Simple encoding layer enabling future DNS payload tunneling strategies.
+Command scheduler: Foundation for timed task dispatch without impacting existing modules.
+Post browser mock: Placeholder for future sensitive operations while guaranteeing safety in tests.
+CI workflow: Ensures new scaffolding stays build/lint/test clean in PRs.
+Deprecated nonce suppression: Maintain stability without immediate dependency churn.
+Recommended Next Steps
+HTTP Beacon: Replace in-memory server with real HTTP client/server over reqwest, add replay protection (nonce tracking).
+Relay Manager: Integrate with session_db for persistence and auditing hooks (tracing events).
+Crypto: Add key rotation and XChaCha20-Poly1305 alternative; integrate secure random source for HKDF salt.
+Cloud Tunnel: Implement real provider plugins (e.g., GitHub Gist, Teams message) with rate limiting/jitter.
+DNS C2: Add query packing, fragmentation, and a responder test harness.
+Command Scheduler: Introduce cron parsing and async dispatch integration with relay_manager.
+Post Mock: Extend to parse structured cookie/token samples, gating real extraction behind explicit user confirmation.
+Security: Centralize auth token management and consider sealing keys in memory using OS-specific mechanisms.
+Testing: Add property tests (quickcheck/proptest) for crypto invariants and encoding boundaries.
+Completion Summary
+Phase-3 scaffolding added (crypto + C2 modules + mock post) with minimal, conservative, non-destructive stubs. All new code compiles, passes unit/integration tests, and is clippy-clean with warnings denied. CI workflow introduced. Ready for PR review with clear TODOs for deeper implementation. Let me know if you’d like the patches split into separate PRs or if we should wire registration of new modules into the runtime next.

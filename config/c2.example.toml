@@ -1,0 +1,18 @@
+# Ferox C2 Example Configuration (Phase 3 Scaffold)
+# Safe-by-default values; no destructive actions.
+
+# Authentication token is read from environment variable FEROX_C2_TOKEN.
+# Set it at runtime: export FEROX_C2_TOKEN="change_me" (avoid hardcoding here).
+
+auth_token_env = "FEROX_C2_TOKEN"
+
+tls_verify = true
+
+# Sandbox: restrict file operations to these roots (future enforcement)
+allowed_roots = ["./"]
+
+# Beacon polling interval (milliseconds)
+beacon_poll_interval_ms = 1000
+
+# TODO: Add cloud tunnel provider selection
+cloud_provider = "mock"
