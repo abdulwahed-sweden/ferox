@@ -1,0 +1,118 @@
+Ferox Framework
+
+------------------[ SYSTEM INITIALIZATION ]------------------
+✓ Core engine initialized
+✓ Module registry loaded
+✓ 7 modules available
+ℹ 0 sessions tracked (0 active)
+  +  READY: Ferox is ready to hunt
+
+ℹ 🦊 Type 'help' for available commands
+ℹ 🔥 Type 'modules' to list all modules
+ℹ ⚡ Fast. Fierce. Fearless.
+
+
+------------------[ FEROX COMMANDS ]------------------
+
+  Core Commands:
+    help, ?  ->  Show this help message
+    help scanners  ->  Show available scanner modules
+    help exploits  ->  Show available exploit modules
+    help sessions  ->  Show session management help
+    modules, list, ls  ->  List all available modules
+    use <module>  ->  Select a module to use
+    back  ->  Deselect current module
+
+  Module Commands:
+    show <type>  ->  Show information (options, modules, sessions)
+    set <option> <value>, s  ->  Set module option
+    options, o  ->  Show current module options
+    check, c  ->  Run non-destructive check (safe fingerprinting)
+    run, execute, x, e  ->  Execute current module
+    info, i  ->  Show current module information
+
+  Session Commands:
+    sessions  ->  List all sessions
+    sessions -a  ->  List active sessions only
+    sessions -i <id>  ->  Show session details
+    sessions -k <id>  ->  Mark session inactive
+    sessions -r <id>  ->  Remove session
+    sessions -c <hours>  ->  Cleanup stale sessions
+
+  Handler Commands:
+    handlers  ->  List all registered handlers
+    handlers -s  ->  Show handler statistics
+    handlers -k <id>  ->  Remove handler by ID
+    handlers -t <type>  ->  List handlers by type
+
+  Shell & Execution:
+    shell  ->  Create new local shell handler
+    shell -i <id>  ->  Select existing shell handler
+    exec <command>  ->  Execute command in current shell
+    sysinfo  ->  Display system information
+    ps  ->  List running processes
+    kill <pid>  ->  Terminate process by PID
+
+  File Operations:
+    upload <src> <dst>  ->  Upload file to target
+    download <src> <dst>  ->  Download file from target
+    pwd  ->  Print current working directory
+    cd <path>  ->  Change working directory
+    cat <file>  ->  Display file contents
+    rm <file>  ->  Delete file
+    mkdir <dir>  ->  Create directory
+
+  Remote Shell:
+    listen <port>  ->  Start reverse shell listener
+    connect <host> <port>  ->  Create bind shell connection
+
+  Report & Export Commands:
+    export <format> <file>  ->  Export results (json, html, pdf)
+    export results  ->  Show stored results summary
+
+  Utility Commands:
+    banner  ->  Display Ferox banner
+    version  ->  Show version information
+    payloads  ->  List available payload blueprints
+    clear, cls  ->  Clear the screen
+    exit, quit, q  ->  Exit the framework
+
+  💡 Tip:
+    Use TAB for command completion. Type 'help <category>' for focused help.
+
+  ⚠️  Safety Notice:
+    Always use 'check' before 'run' for exploit modules
+    Exploits require explicit confirmation
+    Only test systems you own or have permission to test
+
+✓ Local shell handler created: 3446d773-9f04-43b2-b5c3-c63da35476f9
+ℹ Use 'exec <command>' to execute commands
+ℹ Use 'back' to deselect handler
+mansour
+
+------------------[ SYSTEM INFORMATION ]------------------
+
+  Hostname: Mansours-iMac.local
+  OS: Darwin 15.6.1
+  Kernel: 24.6.0
+  CPUs: 4
+  Memory: 17959 MB / 28672 MB used
+  Swap: 0 MB
+
+ℹ Uploading ./README.md -> ./test.md
+✓ Uploaded 12769 bytes
+ℹ Downloading ./test.md -> ./copy_test.md
+✓ Downloaded 12769 bytes
+
+------------------[ REGISTERED HANDLERS ]------------------
+
+ℹ Total handlers: 1
+  Local shells: 1
+  Remote shells: 0
+  File operations: 0
+
+  Local Shell Handlers:
+    3446d773-9f04-43b2-b5c3-c63da35476f9
+
+
+🦊 Stay ferocious! Goodbye!

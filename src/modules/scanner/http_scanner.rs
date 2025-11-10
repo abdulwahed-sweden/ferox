@@ -347,7 +347,7 @@ impl Module for HttpScanner {
                 if p != "/" {
                     url.set_path(&p);
                 }
-                let rate_delay = rate_delay;
+                // rate_delay captured by move; no need to shadow (Clippy redundant_locals)
                 async move {
                     if let Some(d) = rate_delay {
                         tokio::time::sleep(d).await;

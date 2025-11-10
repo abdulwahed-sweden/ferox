@@ -530,7 +530,7 @@ impl FeroxCli {
             }
 
             of_type.sort();
-            Theme::section(heading.as_ref());
+            Theme::section(heading);
             println!();
 
             for module_path in of_type {

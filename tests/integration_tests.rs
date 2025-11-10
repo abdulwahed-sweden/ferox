@@ -7,6 +7,12 @@ mod common {
     // We'll keep tests simple and use direct paths
 }
 
+// Import handler types (required for compilation)
+use ferox::handlers::{
+    FileOperationsHandler, HandlerRegistry, HandlerType, LocalShellHandler, RemoteShellHandler,
+    ShellType,
+};
+
 // For now, mark as ignored until library setup is complete
 #[allow(unused_imports)]
 use std::io::Write;
@@ -135,7 +141,7 @@ async fn test_multiple_handlers_concurrent() {
     let registry = HandlerRegistry::new();
 
     // Create multiple handlers
-    let ids: Vec<_> = tokio::join!(
+    let (id1, id2, id3) = tokio::join!(
         async {
             registry
                 .register_local_shell(LocalShellHandler::new())
@@ -155,9 +161,9 @@ async fn test_multiple_handlers_concurrent() {
 
     // Execute commands concurrently
     let results = tokio::join!(
-        async { registry.execute_local_command(ids.0, "echo test1").await },
-        async { registry.execute_local_command(ids.1, "echo test2").await },
-        async { registry.execute_local_command(ids.2, "echo test3").await }
+        async { registry.execute_local_command(id1, "echo test1").await },
+        async { registry.execute_local_command(id2, "echo test2").await },
+        async { registry.execute_local_command(id3, "echo test3").await }
     );
 
     // Verify all succeeded

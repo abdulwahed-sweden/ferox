@@ -65,6 +65,10 @@ impl FileOperationsHandler {
             .write_all(&contents)
             .await
             .context("Failed to write file contents")?;
+        remote_file
+            .flush()
+            .await
+            .context("Failed to flush written file")?; // TODO: verify behavior
 
         Ok(FileTransferResult {
             local_path: local_path.to_string_lossy().to_string(),
@@ -112,6 +116,10 @@ impl FileOperationsHandler {
             .write_all(&contents)
             .await
             .context("Failed to write file contents")?;
+        local_file
+            .flush()
+            .await
+            .context("Failed to flush written file")?; // TODO: verify behavior
 
         Ok(FileTransferResult {
             local_path: local_path.to_string_lossy().to_string(),
@@ -163,6 +171,9 @@ impl FileOperationsHandler {
         file.write_all(&decoded)
             .await
             .context("Failed to write decoded data")?;
+
+        // Ensure data is persisted for immediate subsequent reads in tests
+        file.flush().await.context("Failed to flush decoded data")?; // TODO: verify behavior
 
         Ok(())
     }

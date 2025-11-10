@@ -193,10 +193,12 @@ impl ModuleRegistry {
         self.modules.insert(key, module);
     }
 
+    #[allow(clippy::borrowed_box)]
     pub fn get(&self, path: &str) -> Option<&Box<dyn Module>> {
         self.modules.get(path)
     }
 
+    #[allow(clippy::borrowed_box)]
     pub fn get_mut(&mut self, path: &str) -> Option<&mut Box<dyn Module>> {
         self.modules.get_mut(path)
     }

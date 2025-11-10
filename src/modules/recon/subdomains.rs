@@ -297,8 +297,6 @@ impl Module for SubdomainEnum {
             let resolver = resolver.clone();
             let client = client.clone();
             let results = results.clone();
-            let timeout_ms = timeout_ms;
-            let probe_http = probe_http;
 
             let handle = tokio::spawn(async move {
                 let _permit = permit;

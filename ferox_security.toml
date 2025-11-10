@@ -1,0 +1,45 @@
+# Ferox v2.0 Security Configuration (Test Override)
+# TODO: verify behavior: this file is tailored for local testing
+
+[file_access]
+sandbox_enabled = false
+max_file_size = 104857600  # 100 MB in bytes
+allowed_roots = ["./"]
+blocked_paths = [
+    "/etc/shadow",
+    "/etc/passwd",
+    "/etc/ssh",
+    "/root/.ssh",
+    "/boot",
+    "/sys",
+    "/proc",
+    "/dev"
+]
+
+[command_execution]
+validation_enabled = true
+max_command_length = 4096
+blocked_commands = [
+    "rm -rf /",
+    ":(){ :|:& };:",  # Fork bomb
+    "dd if=/dev/zero of=/dev/sda",
+]
+blocked_patterns = [
+    "rm -rf /",
+    "dd if=/dev/zero",
+    "mkfs.",
+    "format ",
+    "fdisk",
+]
+
+[audit]
+enabled = true
+log_file = "./ferox_audit.log"
+log_to_stdout = true
+
+[remote_shell]
+require_auth = true
+auth_token = "test_token"
+enable_tls = false
+tls_cert_path = "/etc/ferox/cert.pem"
+tls_key_path = "/etc/ferox/key.pem"
