@@ -7,3 +7,4 @@ pub mod relay_manager;
 pub mod cloud_tunnel;
 pub mod dns_c2;
 pub mod command_scheduler;
+pub mod teams_tunnel;
