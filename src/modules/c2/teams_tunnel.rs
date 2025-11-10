@@ -429,7 +429,7 @@ impl Default for TeamsTunnel {
 impl Module for TeamsTunnel {
     fn info(&self) -> ModuleInfo {
         ModuleInfo {
-            name: "c2/teams_tunnel".to_string(),
+            name: "teams_tunnel".to_string(),
             version: "1.0.0".to_string(),
             author: "Ferox Security Team".to_string(),
             description: "Covert C2 channel using Microsoft Teams meetings and Graph API. \
@@ -620,7 +620,7 @@ mod tests {
     fn test_module_info() {
         let module = TeamsTunnel::new();
         let info = module.info();
-        assert_eq!(info.name, "c2/teams_tunnel");
+    assert_eq!(info.name, "teams_tunnel");
         assert!(info.description.contains("AUTHORIZED"));
     }
 }

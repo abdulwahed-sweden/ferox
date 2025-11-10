@@ -338,6 +338,247 @@ ferox (auxiliary/cloud/onedrive_sync_exfil)> run
 
 ---
 
+## Example 7: Rapid Port Sweep
+
+### Scenario
+Enumerate exposed TCP services on an internal lab host using the async scanner.
+
+```bash
+ferox> use scanner/port_scanner
+[*] Loaded module: scanner/port_scanner v2.0.0
+
+ferox (scanner/port_scanner)> set RHOSTS 10.10.5.23
+ferox (scanner/port_scanner)> set PORTS 1-1024
+ferox (scanner/port_scanner)> set THREADS 200
+
+ferox (scanner/port_scanner)> check
+[*] Validation succeeded — ready to scan 10.10.5.23
+
+ferox (scanner/port_scanner)> run
+[*] Executing module...
+
+[✓] 🎯 Found 3 open ports out of 1024 scanned on 10.10.5.23
+    Results:
+      host: 10.10.5.23
+      open_ports: [22, 80, 443]
+      total_scanned: 1024
+      open_count: 3
+```
+
+> 💡 Tip: Tune `PORTS` and `THREADS` for production engagements to balance speed vs. network noise.
+
+---
+
+## Example 8: HTTP Service Profiling
+
+### Scenario
+Fingerprint a staging web application, capture TLS posture, and follow redirects.
+
+```bash
+ferox> use scanner/http_scanner
+[*] Loaded module: scanner/http_scanner v0.1.0
+
+ferox (scanner/http_scanner)> set RHOSTS https://staging.ferox-labs.local
+ferox (scanner/http_scanner)> set PATHS /,/healthz,/admin
+ferox (scanner/http_scanner)> set FOLLOW_REDIRECTS false
+
+ferox (scanner/http_scanner)> run
+[*] Executing module...
+
+[✓] 🔒 HTTP scan on staging.ferox-labs.local (3 paths)
+    Results:
+      base_url: "https://staging.ferox-labs.local/"
+      https: true
+      tls: {
+        "subject": "CN=staging.ferox-labs.local",
+        "issuer": "CN=Ferox Internal CA",
+        "days_to_expiry": 26
+      }
+      results: [
+        {
+          "path": "/",
+          "status": 200,
+          "technologies": ["Server:nginx", "PoweredBy:Phoenix"]
+        },
+        {
+          "path": "/admin",
+          "status": 302,
+          "redirect_chain": ["https://auth.ferox-labs.local/login"]
+        }
+      ]
+```
+
+---
+
+## Example 9: DNS Footprinting
+
+### Scenario
+Collect authoritative records, try a benign zone-transfer, and enumerate high-value subdomains.
+
+```bash
+ferox> use recon/dns_enum
+[*] Loaded module: recon/dns_enum v1.0.0
+
+ferox (recon/dns_enum)> set TARGET example.com
+ferox (recon/dns_enum)> set SUBDOMAIN_ENUM true
+ferox (recon/dns_enum)> set WORDLIST infra,dev,console,cdn
+ferox (recon/dns_enum)> set ZONE_TRANSFER true
+
+ferox (recon/dns_enum)> run
+[*] Executing module...
+
+[✓] 🔍 DNS enumeration completed for example.com in 1.87s
+    Results:
+      target: "example.com"
+      dns_records: {
+        "A": ["93.184.216.34"],
+        "NS": ["a.iana-servers.net", "b.iana-servers.net"],
+        "TXT": ["v=spf1 -all"]
+      }
+      subdomains: [
+        "infra.example.com => 10.20.30.5",
+        "cdn.example.com => 23.45.67.89"
+      ]
+      zone_transfer: [
+        "Zone transfer attempted against a.iana-servers.net (typically restricted)",
+        "Zone transfer attempted against b.iana-servers.net (typically restricted)"
+      ]
+```
+
+---
+
+## Example 10: Subdomain Discovery Sprint
+
+### Scenario
+Use the async resolver with HTTP probing to map managed assets swiftly.
+
+```bash
+ferox> use recon/subdomain_enum
+[*] Loaded module: recon/subdomain_enum v1.0.0
+
+ferox (recon/subdomain_enum)> set RHOSTS example.com
+ferox (recon/subdomain_enum)> set WORDLIST ./wordlist.txt
+ferox (recon/subdomain_enum)> set THREADS 100
+ferox (recon/subdomain_enum)> set PROBE_HTTP true
+
+ferox (recon/subdomain_enum)> check
+[✓] Base domain example.com resolves to 1 IP(s)
+
+ferox (recon/subdomain_enum)> run
+[*] Executing module...
+
+[✓] Found 8 subdomains for example.com
+    Results:
+      total_found: 8
+      subdomains: [
+        {
+          "subdomain": "app.example.com",
+          "ips": ["203.0.113.15"],
+          "http_status": 200,
+          "title": "Example Customer Portal",
+          "resolved": true
+        }
+      ]
+```
+
+---
+
+## Example 11: ASN & BGP Intelligence
+
+### Scenario
+Map an IP range to its owning organization and advertised prefixes.
+
+```bash
+ferox> use recon/asn_discovery
+[*] Loaded module: recon/asn_discovery v1.0.0
+
+ferox (recon/asn_discovery)> set TARGET 8.8.8.8
+
+ferox (recon/asn_discovery)> check
+[✓] IP 8.8.8.8 belongs to ASN AS15169
+
+ferox (recon/asn_discovery)> run
+[✓] 🌐 ASN discovery completed for 8.8.8.8 in 0.92s
+    Results:
+      target: "8.8.8.8"
+      asn_info: {
+        "asn": "AS15169",
+        "ip": "8.8.8.8",
+        "bgp_prefix": "8.8.8.0/24",
+        "country_code": "US"
+      }
+      asn_details: {
+        "asn": "AS15169",
+        "as_name": "GOOGLE",
+        "allocated_date": "1992-12-01"
+      }
+      bgp_prefixes: ["8.8.8.0/24", "8.34.208.0/20", "8.35.192.0/20"]
+```
+
+---
+
+## Example 12: WHOIS Ownership Trace
+
+### Scenario
+Collect registrar contacts and lifecycle data for scoping and escalation planning.
+
+```bash
+ferox> use recon/whois_lookup
+[*] Loaded module: recon/whois_lookup v1.0.0
+
+ferox (recon/whois_lookup)> set TARGET example.com
+ferox (recon/whois_lookup)> set FOLLOW_REFERRAL true
+
+ferox (recon/whois_lookup)> run
+[✓] 📋 WHOIS lookup completed for example.com in 0.64s
+    Results:
+      target: "example.com"
+      whois_servers: ["whois.verisign-grs.com", "whois.iana.org"]
+      whois_data: {
+        "domain_status": "clientTransferProhibited",
+        "registrar": "IANA",
+        "name_server": "a.iana-servers.net",
+        "created_date": "1995-08-13T04:00:00Z",
+        "expiry_date": "2030-08-13T04:00:00Z"
+      }
+```
+
+---
+
+## Example 13: Safe Exploit Payload Blueprint
+
+### Scenario
+Generate a payload plan without executing any destructive action.
+
+```bash
+ferox> use exploit/example/example_exploit
+[*] Loaded module: exploit/example/example_exploit v1.0.0
+
+ferox (exploit/example/example_exploit)> set RHOSTS demo-victim.internal
+ferox (exploit/example/example_exploit)> set LHOST 10.0.0.42
+ferox (exploit/example/example_exploit)> set PAYLOAD payload/reverse_https
+
+ferox (exploit/example/example_exploit)> check
+[✓] Safe fingerprint check completed for demo-victim.internal:80. This is a non-functional skeleton.
+
+ferox (exploit/example/example_exploit)> run
+[!] This module requires explicit confirmation (exploit operation)
+[?] Continue? (yes/no): yes
+
+[✓] Safe payload blueprint generated. No exploit has been executed.
+    Results:
+      target: {
+        "rhosts": "demo-victim.internal",
+        "rport": "80",
+        "uri": "/"
+      }
+      payload_type: "payload/reverse_https"
+      payload_size: 342
+      payload_preview: "#!/bin/sh\n# reverse HTTPS stub..."
+```
+
+---
+
 ## Command Reference
 
 ### Global Commands

@@ -238,7 +238,7 @@ impl Default for SilentShadow {
 impl Module for SilentShadow {
     fn info(&self) -> ModuleInfo {
         ModuleInfo {
-            name: "evasion/edr/silent_shadow".to_string(),
+            name: "silent_shadow".to_string(),
             version: "1.0.0".to_string(),
             author: "Ferox Security Team".to_string(),
             description: "EDR evasion via direct syscalls and memory unhooking. \
@@ -481,7 +481,7 @@ mod tests {
     fn test_module_info() {
         let module = SilentShadow::new();
         let info = module.info();
-        assert_eq!(info.name, "evasion/edr/silent_shadow");
+    assert_eq!(info.name, "silent_shadow");
         assert!(info.description.contains("AUTHORIZED"));
     }
 }

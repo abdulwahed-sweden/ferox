@@ -305,7 +305,7 @@ impl Default for OneDriveSyncExfil {
 impl Module for OneDriveSyncExfil {
     fn info(&self) -> ModuleInfo {
         ModuleInfo {
-            name: "auxiliary/cloud/onedrive_sync_exfil".to_string(),
+            name: "onedrive_sync_exfil".to_string(),
             version: "1.0.0".to_string(),
             author: "Ferox Security Team".to_string(),
             description: "Exfiltrate files via OneDrive using victim's OAuth token. \
@@ -521,7 +521,7 @@ mod tests {
     fn test_module_info() {
         let module = OneDriveSyncExfil::new();
         let info = module.info();
-        assert_eq!(info.name, "auxiliary/cloud/onedrive_sync_exfil");
+    assert_eq!(info.name, "onedrive_sync_exfil");
         assert!(info.description.contains("AUTHORIZED"));
     }
 

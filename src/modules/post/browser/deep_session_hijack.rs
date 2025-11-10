@@ -287,7 +287,7 @@ impl Default for DeepSessionHijack {
 impl Module for DeepSessionHijack {
     fn info(&self) -> ModuleInfo {
         ModuleInfo {
-            name: "post/browser/deep_session_hijack".to_string(),
+            name: "deep_session_hijack".to_string(),
             version: "1.0.0".to_string(),
             author: "Ferox Security Team".to_string(),
             description: "Extract browser session data (cookies, tokens) from Chrome/Edge/Firefox. \
@@ -526,7 +526,7 @@ mod tests {
     fn test_module_info() {
         let module = DeepSessionHijack::new();
         let info = module.info();
-        assert_eq!(info.name, "post/browser/deep_session_hijack");
+    assert_eq!(info.name, "deep_session_hijack");
         assert!(info.description.contains("AUTHORIZED"));
     }
 }
