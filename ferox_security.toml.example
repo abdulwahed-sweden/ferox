@@ -1,0 +1,60 @@
+# Ferox v2.0 Security Configuration
+# Copy this file to ferox_security.toml and customize for your environment
+
+[file_access]
+sandbox_enabled = true
+max_file_size = 104857600  # 100 MB in bytes
+
+# Whitelist: Only these root directories are accessible
+allowed_roots = [
+    "/tmp",
+    "/home",
+    "/var/tmp"
+]
+
+# Blacklist: These paths are always blocked
+blocked_paths = [
+    "/etc/shadow",
+    "/etc/passwd",
+    "/etc/ssh",
+    "/root/.ssh",
+    "/boot",
+    "/sys",
+    "/proc",
+    "/dev"
+]
+
+[command_execution]
+validation_enabled = true
+max_command_length = 4096
+
+# Explicitly blocked commands (exact match)
+blocked_commands = [
+    "rm -rf /",
+    ":(){ :|:& };:",  # Fork bomb
+    "dd if=/dev/zero of=/dev/sda",
+]
+
+# Blocked command patterns (substring match)
+blocked_patterns = [
+    "rm -rf /",
+    "dd if=/dev/zero",
+    "mkfs.",
+    "format ",
+    "fdisk",
+]
+
+[audit]
+enabled = true
+log_file = "/var/log/ferox_audit.log"
+log_to_stdout = true
+
+[remote_shell]
+# WARNING: Change auth_token before production use!
+require_auth = true
+auth_token = "CHANGE_ME_IN_PRODUCTION_abc123"
+
+# TLS configuration (recommended for remote shells)
+enable_tls = false
+tls_cert_path = "/etc/ferox/cert.pem"
+tls_key_path = "/etc/ferox/key.pem"

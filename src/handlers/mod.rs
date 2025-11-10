@@ -1,10 +1,12 @@
 pub mod shell_local;
 pub mod shell_remote;
 pub mod file_ops;
+pub mod security;
 
 pub use shell_local::{LocalShellHandler, CommandOutput, ProcessInfo, SystemInfo};
 pub use shell_remote::{RemoteShellHandler, ReverseShellListener, ShellType, ConnectionInfo};
 pub use file_ops::{FileOperationsHandler, FileTransferResult, FileInfo, FileType};
+pub use security::{FileAccessPolicy, CommandExecutionPolicy, AuditLogger, RateLimiter, SecurityConfig};
 
 use std::collections::HashMap;
 use std::sync::Arc;
