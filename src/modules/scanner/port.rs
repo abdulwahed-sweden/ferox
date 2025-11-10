@@ -148,10 +148,8 @@ impl Module for PortScanner {
 
             let results = futures::future::join_all(futures).await;
 
-            for result in results {
-                if let Some(port) = result {
-                    open_ports.push(port);
-                }
+            for port in results.into_iter().flatten() {
+                open_ports.push(port);
             }
         }
 

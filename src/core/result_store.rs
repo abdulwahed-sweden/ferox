@@ -68,27 +68,19 @@ impl ResultStore {
 
     /// Get successful results only
     pub fn get_successful(&self) -> Vec<&StoredResult> {
-        self.results
-            .iter()
-            .filter(|r| r.result.success)
-            .collect()
+        self.results.iter().filter(|r| r.result.success).collect()
     }
 
     /// Get failed results only
     pub fn get_failed(&self) -> Vec<&StoredResult> {
-        self.results
-            .iter()
-            .filter(|r| !r.result.success)
-            .collect()
+        self.results.iter().filter(|r| !r.result.success).collect()
     }
 
     /// Get results by module type
     pub fn get_by_module(&self, module_path: &str) -> Vec<&StoredResult> {
         self.results
             .iter()
-            .filter(|r| {
-                format!("{}/{}", r.module_info.category, r.module_info.name) == module_path
-            })
+            .filter(|r| format!("{}/{}", r.module_info.category, r.module_info.name) == module_path)
             .collect()
     }
 

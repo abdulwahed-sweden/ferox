@@ -1,5 +1,5 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::time::Instant;
@@ -69,7 +69,7 @@ impl WhoisLookup {
             .unwrap_or(10);
 
         let addr = format!("{}:{}", server, port);
-        
+
         let stream = tokio::time::timeout(
             std::time::Duration::from_secs(timeout),
             TcpStream::connect(&addr),
@@ -86,7 +86,7 @@ impl WhoisLookup {
         // Read response
         let mut response = String::new();
         let mut line = String::new();
-        
+
         while reader.read_line(&mut line).await? > 0 {
             response.push_str(&line);
             line.clear();
@@ -97,7 +97,7 @@ impl WhoisLookup {
 
     fn parse_whois_response(&self, raw: &str) -> HashMap<String, String> {
         let mut parsed = HashMap::new();
-        
+
         for line in raw.lines() {
             let line = line.trim();
             if line.is_empty() || line.starts_with('%') || line.starts_with('#') {
@@ -107,7 +107,7 @@ impl WhoisLookup {
             if let Some(pos) = line.find(':') {
                 let key = line[..pos].trim().to_lowercase().replace(' ', "_");
                 let value = line[pos + 1..].trim().to_string();
-                
+
                 if !value.is_empty() {
                     // Collect interesting fields
                     if key.contains("domain")
@@ -142,12 +142,12 @@ impl WhoisLookup {
         // Look for referral WHOIS server in response
         for line in response.lines() {
             let lower = line.to_lowercase();
-            if lower.contains("whois server:") || lower.contains("referral url:") {
-                if let Some(server) = line.split(':').nth(1) {
-                    let server = server.trim().replace("http://", "").replace("https://", "");
-                    if server.contains("whois") {
-                        return Some(server);
-                    }
+            if (lower.contains("whois server:") || lower.contains("referral url:"))
+                && let Some(server) = line.split(':').nth(1)
+            {
+                let server = server.trim().replace("http://", "").replace("https://", "");
+                if server.contains("whois") {
+                    return Some(server);
                 }
             }
         }
@@ -230,7 +230,8 @@ impl Module for WhoisLookup {
 
     async fn check(&self) -> Result<CheckResult> {
         let target = self.get_option("TARGET").unwrap_or_default();
-        let server = if let Some(custom) = self.get_option("WHOIS_SERVER").filter(|s| !s.is_empty()) {
+        let server = if let Some(custom) = self.get_option("WHOIS_SERVER").filter(|s| !s.is_empty())
+        {
             custom
         } else {
             self.get_whois_server_for_tld(&target)
@@ -247,13 +248,18 @@ impl Module for WhoisLookup {
                 fp.insert("response_time_ms".to_string(), elapsed_ms.to_string());
                 fp.insert("response_length".to_string(), response.len().to_string());
 
-                let has_data = !response.is_empty() && !response.to_lowercase().contains("no match");
-                
+                let has_data =
+                    !response.is_empty() && !response.to_lowercase().contains("no match");
+
                 Ok(CheckResult {
                     vulnerable: false,
                     confidence: if has_data { 1.0 } else { 0.0 },
                     details: if has_data {
-                        format!("WHOIS data available for {} ({} bytes)", target, response.len())
+                        format!(
+                            "WHOIS data available for {} ({} bytes)",
+                            target,
+                            response.len()
+                        )
                     } else {
                         format!("No WHOIS data found for {}", target)
                     },
@@ -274,7 +280,8 @@ impl Module for WhoisLookup {
         let target = self.get_option("TARGET").unwrap_or_default();
         let start = Instant::now();
 
-        let server = if let Some(custom) = self.get_option("WHOIS_SERVER").filter(|s| !s.is_empty()) {
+        let server = if let Some(custom) = self.get_option("WHOIS_SERVER").filter(|s| !s.is_empty())
+        {
             custom
         } else {
             self.get_whois_server_for_tld(&target)
@@ -288,22 +295,21 @@ impl Module for WhoisLookup {
         let mut servers_queried = vec![server.clone()];
 
         // Follow referral if enabled
-        if self.get_option("FOLLOW_REFERRAL").unwrap_or_default() == "true" {
-            if let Some(referral) = self.extract_referral_server(&raw_response) {
-                if referral != server {
-                    match self.query_whois(&target, &referral).await {
-                        Ok(ref_response) => {
-                            let ref_parsed = self.parse_whois_response(&ref_response);
-                            // Merge results, preferring referral data
-                            for (k, v) in ref_parsed {
-                                final_parsed.insert(k, v);
-                            }
-                            servers_queried.push(referral);
-                        }
-                        Err(_) => {
-                            // Referral failed, continue with initial results
-                        }
+        if self.get_option("FOLLOW_REFERRAL").unwrap_or_default() == "true"
+            && let Some(referral) = self.extract_referral_server(&raw_response)
+            && referral != server
+        {
+            match self.query_whois(&target, &referral).await {
+                Ok(ref_response) => {
+                    let ref_parsed = self.parse_whois_response(&ref_response);
+                    // Merge results, preferring referral data
+                    for (k, v) in ref_parsed {
+                        final_parsed.insert(k, v);
                     }
+                    servers_queried.push(referral);
+                }
+                Err(_) => {
+                    // Referral failed, continue with initial results
                 }
             }
         }

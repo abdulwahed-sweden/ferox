@@ -108,15 +108,13 @@ impl SubdomainEnum {
                 let status = resp.status().as_u16();
 
                 // If successful, try GET for title
-                if resp.status().is_success() {
-                    if let Ok(Ok(get_resp)) =
+                if resp.status().is_success()
+                    && let Ok(Ok(get_resp)) =
                         timeout(Duration::from_millis(timeout_ms), client.get(&url).send()).await
-                    {
-                        if let Ok(text) = get_resp.text().await {
-                            let title = Self::extract_title(&text);
-                            return (Some(status), title);
-                        }
-                    }
+                    && let Ok(text) = get_resp.text().await
+                {
+                    let title = Self::extract_title(&text);
+                    return (Some(status), title);
                 }
 
                 (Some(status), None)
@@ -126,12 +124,12 @@ impl SubdomainEnum {
     }
 
     fn extract_title(html: &str) -> Option<String> {
-        if let Some(start) = html.find("<title>") {
-            if let Some(end) = html[start..].find("</title>") {
-                let title = html[start + 7..start + end].trim().to_string();
-                if !title.is_empty() {
-                    return Some(title);
-                }
+        if let Some(start) = html.find("<title>")
+            && let Some(end) = html[start..].find("</title>")
+        {
+            let title = html[start + 7..start + end].trim().to_string();
+            if !title.is_empty() {
+                return Some(title);
             }
         }
         None

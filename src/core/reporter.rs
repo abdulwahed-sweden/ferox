@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
+#[cfg(feature = "pdf-export")]
 use printpdf::*;
 use serde::Serialize;
 use std::fs::File;
@@ -482,8 +483,10 @@ impl Reporter for HtmlReporter {
 }
 
 /// PDF Reporter - exports data as PDF document
+#[cfg(feature = "pdf-export")]
 pub struct PdfReporter;
 
+#[cfg(feature = "pdf-export")]
 impl PdfReporter {
     const PAGE_WIDTH: f32 = 210.0; // A4 width in mm
     const PAGE_HEIGHT: f32 = 297.0; // A4 height in mm
@@ -502,10 +505,15 @@ impl PdfReporter {
     }
 }
 
+#[cfg(feature = "pdf-export")]
 impl Reporter for PdfReporter {
     fn export(&self, data: &ReportData, output_path: &Path) -> Result<()> {
-        let (doc, page1, layer1) =
-            PdfDocument::new("Ferox Framework Report", Mm(Self::PAGE_WIDTH), Mm(Self::PAGE_HEIGHT), "Layer 1");
+        let (doc, page1, layer1) = PdfDocument::new(
+            "Ferox Framework Report",
+            Mm(Self::PAGE_WIDTH),
+            Mm(Self::PAGE_HEIGHT),
+            "Layer 1",
+        );
 
         let current_layer = doc.get_page(page1).get_layer(layer1);
 
@@ -529,7 +537,10 @@ impl Reporter for PdfReporter {
         // Metadata
         Self::add_text(
             &current_layer,
-            &format!("Generated: {}", data.generated_at.format("%Y-%m-%d %H:%M:%S UTC")),
+            &format!(
+                "Generated: {}",
+                data.generated_at.format("%Y-%m-%d %H:%M:%S UTC")
+            ),
             Self::MARGIN,
             y_pos,
             &font,
@@ -614,7 +625,14 @@ impl Reporter for PdfReporter {
             y_pos -= Self::LINE_HEIGHT * 1.5;
 
             for module in &data.summary.modules_used {
-                Self::add_text(&current_layer, &format!("• {}", module), Self::MARGIN, y_pos, &font, 10.0);
+                Self::add_text(
+                    &current_layer,
+                    &format!("• {}", module),
+                    Self::MARGIN,
+                    y_pos,
+                    &font,
+                    10.0,
+                );
                 y_pos -= Self::LINE_HEIGHT;
             }
             y_pos -= Self::LINE_HEIGHT;
@@ -634,8 +652,15 @@ impl Reporter for PdfReporter {
 
             let max_results = 5.min(data.results.len());
             for result in data.results.iter().take(max_results) {
-                let status = if result.result.success { "SUCCESS" } else { "FAILED" };
-                let module = format!("{}/{}", result.module_info.category, result.module_info.name);
+                let status = if result.result.success {
+                    "SUCCESS"
+                } else {
+                    "FAILED"
+                };
+                let module = format!(
+                    "{}/{}",
+                    result.module_info.category, result.module_info.name
+                );
 
                 Self::add_text(
                     &current_layer,

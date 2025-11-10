@@ -1,8 +1,8 @@
 use anyhow::{Context, Result, anyhow};
 use base64::{Engine as _, engine::general_purpose};
+use std::path::{Path, PathBuf};
 use tokio::fs::{self, File};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use std::path::{Path, PathBuf};
 
 /// File operations handler for upload/download and file management
 #[derive(Clone, Debug)]
@@ -28,7 +28,11 @@ impl FileOperationsHandler {
     }
 
     /// Upload a file from local system to target
-    pub async fn upload<P: AsRef<Path>>(&self, local_path: P, remote_path: P) -> Result<FileTransferResult> {
+    pub async fn upload<P: AsRef<Path>>(
+        &self,
+        local_path: P,
+        remote_path: P,
+    ) -> Result<FileTransferResult> {
         let local_path = local_path.as_ref();
         let remote_path = self.resolve_path(remote_path.as_ref())?;
 
@@ -47,7 +51,8 @@ impl FileOperationsHandler {
 
         // Create parent directories if they don't exist
         if let Some(parent) = remote_path.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -56,7 +61,8 @@ impl FileOperationsHandler {
             .await
             .context(format!("Failed to create remote file: {:?}", remote_path))?;
 
-        remote_file.write_all(&contents)
+        remote_file
+            .write_all(&contents)
             .await
             .context("Failed to write file contents")?;
 
@@ -69,7 +75,11 @@ impl FileOperationsHandler {
     }
 
     /// Download a file from target to local system
-    pub async fn download<P: AsRef<Path>>(&self, remote_path: P, local_path: P) -> Result<FileTransferResult> {
+    pub async fn download<P: AsRef<Path>>(
+        &self,
+        remote_path: P,
+        local_path: P,
+    ) -> Result<FileTransferResult> {
         let remote_path = self.resolve_path(remote_path.as_ref())?;
         let local_path = local_path.as_ref();
 
@@ -88,7 +98,8 @@ impl FileOperationsHandler {
 
         // Create parent directories if they don't exist
         if let Some(parent) = local_path.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -97,7 +108,8 @@ impl FileOperationsHandler {
             .await
             .context(format!("Failed to create local file: {:?}", local_path))?;
 
-        local_file.write_all(&contents)
+        local_file
+            .write_all(&contents)
             .await
             .context("Failed to write file contents")?;
 
@@ -126,15 +138,21 @@ impl FileOperationsHandler {
     }
 
     /// Decode base64 and write to file
-    pub async fn decode_file_base64<P: AsRef<Path>>(&self, base64_data: &str, output_path: P) -> Result<()> {
+    pub async fn decode_file_base64<P: AsRef<Path>>(
+        &self,
+        base64_data: &str,
+        output_path: P,
+    ) -> Result<()> {
         let output_path = self.resolve_path(output_path.as_ref())?;
 
-        let decoded = general_purpose::STANDARD.decode(base64_data)
+        let decoded = general_purpose::STANDARD
+            .decode(base64_data)
             .context("Failed to decode base64 data")?;
 
         // Create parent directories if they don't exist
         if let Some(parent) = output_path.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -216,7 +234,8 @@ impl FileOperationsHandler {
 
         // Create parent directories if they don't exist
         if let Some(parent) = dst.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -233,7 +252,8 @@ impl FileOperationsHandler {
 
         // Create parent directories if they don't exist
         if let Some(parent) = dst.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -257,7 +277,8 @@ impl FileOperationsHandler {
 
         // Create parent directories if they don't exist
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).await
+            fs::create_dir_all(parent)
+                .await
                 .context("Failed to create parent directories")?;
         }
 
@@ -291,7 +312,8 @@ impl FileOperationsHandler {
         };
 
         Ok(FileInfo {
-            name: path.file_name()
+            name: path
+                .file_name()
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_string(),

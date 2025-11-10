@@ -9,11 +9,9 @@ mod common {
 
 // For now, mark as ignored until library setup is complete
 #[allow(unused_imports)]
-use tempfile::TempDir;
+use std::io::Write;
 #[allow(unused_imports)]
-use std::io::Write;
 use tempfile::TempDir;
-use std::io::Write;
 
 // Test 1: End-to-End Local Shell Execution
 #[tokio::test]
@@ -38,8 +36,8 @@ async fn test_e2e_local_shell_execution() {
 // Test 2: Session Creation and Command Execution
 #[tokio::test]
 async fn test_session_creation_with_handler() {
+    use ferox::core::module::{Platform, Session};
     use ferox::core::session::SessionManager;
-    use ferox::core::module::{Session, Platform};
 
     let session_mgr = SessionManager::new();
     let handler_registry = HandlerRegistry::new();
@@ -48,7 +46,7 @@ async fn test_session_creation_with_handler() {
     let session = Session::new(
         "test/module".to_string(),
         "127.0.0.1".to_string(),
-        Platform::Linux
+        Platform::Linux,
     );
     let session_id = session_mgr.add(session).await;
 
@@ -57,7 +55,9 @@ async fn test_session_creation_with_handler() {
     let handler_id = handler_registry.register_local_shell(handler).await;
 
     // Execute command
-    let result = handler_registry.execute_local_command(handler_id, "whoami").await;
+    let result = handler_registry
+        .execute_local_command(handler_id, "whoami")
+        .await;
     assert!(result.is_some());
 
     // Verify session is active
@@ -87,7 +87,10 @@ async fn test_file_upload_download_roundtrip() {
 
     // Download back
     let download_path = temp_dir.path().join("downloaded.txt");
-    let download_result = handler.download(&upload_path, &download_path).await.unwrap();
+    let download_result = handler
+        .download(&upload_path, &download_path)
+        .await
+        .unwrap();
     assert_eq!(download_result.bytes_transferred, test_data.len() as u64);
 
     // Verify contents
@@ -116,7 +119,10 @@ async fn test_base64_exfiltration() {
 
     // Decode on attacker machine
     let decoded_path = temp_dir.path().join("decoded.txt");
-    handler.decode_file_base64(&encoded, &decoded_path).await.unwrap();
+    handler
+        .decode_file_base64(&encoded, &decoded_path)
+        .await
+        .unwrap();
 
     // Verify
     let decoded_data = std::fs::read(&decoded_path).unwrap();
@@ -130,9 +136,21 @@ async fn test_multiple_handlers_concurrent() {
 
     // Create multiple handlers
     let ids: Vec<_> = tokio::join!(
-        async { registry.register_local_shell(LocalShellHandler::new()).await },
-        async { registry.register_local_shell(LocalShellHandler::new()).await },
-        async { registry.register_local_shell(LocalShellHandler::new()).await }
+        async {
+            registry
+                .register_local_shell(LocalShellHandler::new())
+                .await
+        },
+        async {
+            registry
+                .register_local_shell(LocalShellHandler::new())
+                .await
+        },
+        async {
+            registry
+                .register_local_shell(LocalShellHandler::new())
+                .await
+        }
     );
 
     // Execute commands concurrently
@@ -154,12 +172,24 @@ async fn test_handler_lifecycle() {
     let registry = HandlerRegistry::new();
 
     // Register handlers
-    let local_id = registry.register_local_shell(LocalShellHandler::new()).await;
-    let file_id = registry.register_file_ops(FileOperationsHandler::new()).await;
+    let local_id = registry
+        .register_local_shell(LocalShellHandler::new())
+        .await;
+    let file_id = registry
+        .register_file_ops(FileOperationsHandler::new())
+        .await;
 
     // Verify registration
-    assert!(registry.has_handler(local_id, HandlerType::LocalShell).await);
-    assert!(registry.has_handler(file_id, HandlerType::FileOperations).await);
+    assert!(
+        registry
+            .has_handler(local_id, HandlerType::LocalShell)
+            .await
+    );
+    assert!(
+        registry
+            .has_handler(file_id, HandlerType::FileOperations)
+            .await
+    );
 
     let stats = registry.get_stats().await;
     assert_eq!(stats.local_shells, 1);
@@ -167,8 +197,16 @@ async fn test_handler_lifecycle() {
     assert_eq!(stats.total, 2);
 
     // Remove handlers
-    assert!(registry.remove_handler(local_id, HandlerType::LocalShell).await);
-    assert!(!registry.has_handler(local_id, HandlerType::LocalShell).await);
+    assert!(
+        registry
+            .remove_handler(local_id, HandlerType::LocalShell)
+            .await
+    );
+    assert!(
+        !registry
+            .has_handler(local_id, HandlerType::LocalShell)
+            .await
+    );
 
     let stats = registry.get_stats().await;
     assert_eq!(stats.total, 1);
@@ -187,7 +225,9 @@ async fn test_error_handling_invalid_command() {
     let id = registry.register_local_shell(handler).await;
 
     // Execute non-existent command
-    let result = registry.execute_local_command(id, "nonexistent_command_xyz_12345").await;
+    let result = registry
+        .execute_local_command(id, "nonexistent_command_xyz_12345")
+        .await;
     assert!(result.is_some());
 
     let output = result.unwrap().unwrap();
@@ -215,11 +255,7 @@ async fn test_process_management() {
 // Test 9: Remote Shell Handler Creation
 #[tokio::test]
 async fn test_remote_shell_handler_creation() {
-    let handler = RemoteShellHandler::new(
-        ShellType::Reverse,
-        "127.0.0.1".to_string(),
-        4444
-    );
+    let handler = RemoteShellHandler::new(ShellType::Reverse, "127.0.0.1".to_string(), 4444);
 
     assert!(!handler.is_connected().await);
 }

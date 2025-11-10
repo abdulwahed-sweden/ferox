@@ -1,9 +1,9 @@
 use anyhow::{Context, Result, anyhow};
+use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::mpsc;
-use std::sync::Arc;
 use tokio::sync::Mutex;
+use tokio::sync::mpsc;
 
 /// Shell type for remote connections
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -50,7 +50,9 @@ impl RemoteShellHandler {
 
         println!("[*] Listening for reverse shell on {}", addr);
 
-        let (stream, peer_addr) = listener.accept().await
+        let (stream, peer_addr) = listener
+            .accept()
+            .await
             .context("Failed to accept connection")?;
 
         println!("[+] Received connection from {}", peer_addr);
@@ -84,12 +86,15 @@ impl RemoteShellHandler {
         let mut conn = self.connection.lock().await;
 
         if let Some(stream) = conn.as_mut() {
-            stream.write_all(command.as_bytes()).await
+            stream
+                .write_all(command.as_bytes())
+                .await
                 .context("Failed to send command")?;
-            stream.write_all(b"\n").await
+            stream
+                .write_all(b"\n")
+                .await
                 .context("Failed to send newline")?;
-            stream.flush().await
-                .context("Failed to flush stream")?;
+            stream.flush().await.context("Failed to flush stream")?;
             Ok(())
         } else {
             Err(anyhow!("No active connection"))
@@ -106,8 +111,10 @@ impl RemoteShellHandler {
 
             match tokio::time::timeout(
                 std::time::Duration::from_millis(timeout_ms),
-                reader.read_line(&mut output)
-            ).await {
+                reader.read_line(&mut output),
+            )
+            .await
+            {
                 Ok(Ok(_)) => Ok(output),
                 Ok(Err(e)) => Err(anyhow!("Failed to read output: {}", e)),
                 Err(_) => Ok(String::new()), // Timeout, return empty string
@@ -184,16 +191,18 @@ impl RemoteShellHandler {
 
                     match tokio::time::timeout(
                         std::time::Duration::from_millis(100),
-                        reader.read_line(&mut line)
-                    ).await {
+                        reader.read_line(&mut line),
+                    )
+                    .await
+                    {
                         Ok(Ok(n)) if n > 0 => {
                             if output_tx.send(line).await.is_err() {
                                 break;
                             }
                         }
-                        Ok(Ok(_)) => break, // EOF
+                        Ok(Ok(_)) => break,  // EOF
                         Ok(Err(_)) => break, // Error
-                        Err(_) => continue, // Timeout
+                        Err(_) => continue,  // Timeout
                     }
                 } else {
                     break;
@@ -216,7 +225,9 @@ impl RemoteShellHandler {
     pub async fn close(&self) -> Result<()> {
         let mut conn = self.connection.lock().await;
         if let Some(mut stream) = conn.take() {
-            stream.shutdown().await
+            stream
+                .shutdown()
+                .await
                 .context("Failed to shutdown connection")?;
         }
         Ok(())
@@ -225,14 +236,14 @@ impl RemoteShellHandler {
     /// Get connection information
     pub async fn get_connection_info(&self) -> Option<ConnectionInfo> {
         let conn = self.connection.lock().await;
-        if let Some(stream) = conn.as_ref() {
-            if let (Ok(local), Ok(peer)) = (stream.local_addr(), stream.peer_addr()) {
-                return Some(ConnectionInfo {
-                    shell_type: self.shell_type,
-                    local_addr: local.to_string(),
-                    peer_addr: peer.to_string(),
-                });
-            }
+        if let Some(stream) = conn.as_ref()
+            && let (Ok(local), Ok(peer)) = (stream.local_addr(), stream.peer_addr())
+        {
+            return Some(ConnectionInfo {
+                shell_type: self.shell_type,
+                local_addr: local.to_string(),
+                peer_addr: peer.to_string(),
+            });
         }
         None
     }
@@ -260,11 +271,7 @@ impl ReverseShellListener {
 
     /// Start listening for connections and return handler for each connection
     pub async fn listen(&self) -> Result<RemoteShellHandler> {
-        let handler = RemoteShellHandler::new(
-            ShellType::Reverse,
-            self.host.clone(),
-            self.port,
-        );
+        let handler = RemoteShellHandler::new(ShellType::Reverse, self.host.clone(), self.port);
         handler.start().await?;
         Ok(handler)
     }
@@ -282,7 +289,9 @@ impl ReverseShellListener {
         println!("[*] Listening for reverse shells on {}", addr);
 
         loop {
-            let (stream, peer_addr) = listener.accept().await
+            let (stream, peer_addr) = listener
+                .accept()
+                .await
                 .context("Failed to accept connection")?;
 
             println!("[+] Received connection from {}", peer_addr);
@@ -305,11 +314,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_remote_shell_handler_creation() {
-        let handler = RemoteShellHandler::new(
-            ShellType::Reverse,
-            "127.0.0.1".to_string(),
-            4444,
-        );
+        let handler = RemoteShellHandler::new(ShellType::Reverse, "127.0.0.1".to_string(), 4444);
         assert!(!handler.is_connected().await);
     }
 

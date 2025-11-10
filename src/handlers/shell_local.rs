@@ -1,8 +1,8 @@
 use anyhow::{Context, Result};
-use sysinfo::System;
-use tokio::process::Command;
-use tokio::io::{AsyncBufReadExt, BufReader};
 use std::process::Stdio;
+use sysinfo::System;
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Command;
 
 /// Local shell handler for executing commands on the local system
 /// This handler manages local process execution with async I/O
@@ -101,27 +101,26 @@ impl LocalShellHandler {
 
     /// Get current working directory
     pub fn get_cwd(&self) -> Result<String> {
-        let cwd = std::env::current_dir()
-            .context("Failed to get current directory")?;
+        let cwd = std::env::current_dir().context("Failed to get current directory")?;
         Ok(cwd.to_string_lossy().to_string())
     }
 
     /// Change working directory
     pub fn change_directory(&self, path: &str) -> Result<()> {
-        std::env::set_current_dir(path)
-            .context("Failed to change directory")?;
+        std::env::set_current_dir(path).context("Failed to change directory")?;
         Ok(())
     }
 
     /// List running processes
     pub fn list_processes(&mut self) -> Vec<ProcessInfo> {
-        self.system.refresh_processes();
+        self.system
+            .refresh_processes(sysinfo::ProcessesToUpdate::All, true);
         self.system
             .processes()
             .iter()
             .map(|(pid, process)| ProcessInfo {
                 pid: pid.as_u32() as i32,
-                name: process.name().to_string(),
+                name: process.name().to_string_lossy().to_string(),
                 cpu_usage: process.cpu_usage(),
                 memory: process.memory(),
             })
@@ -150,7 +149,7 @@ impl LocalShellHandler {
 
         #[cfg(unix)]
         {
-            use nix::sys::signal::{kill, Signal};
+            use nix::sys::signal::{Signal, kill};
             use nix::unistd::Pid;
             kill(Pid::from_raw(pid.as_u32() as i32), Signal::SIGKILL)
                 .context("Failed to kill process")?;

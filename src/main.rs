@@ -1,19 +1,14 @@
-mod cli;
-mod core;
-mod modules;
-mod handlers;
-
 use anyhow::Result;
-use cli::app::FeroxCli;
-use cli::theme::Theme;
-use core::module::ModuleRegistry;
-use modules::exploit::example::ExampleExploit;
-use modules::recon::subdomains::SubdomainEnum;
-use modules::recon::dns::DnsEnumerator;
-use modules::recon::whois::WhoisLookup;
-use modules::recon::asn::AsnDiscovery;
-use modules::scanner::port::PortScanner;
-use modules::scanner::http_scanner::HttpScanner;
+use ferox::cli::app::FeroxCli;
+use ferox::cli::theme::Theme;
+use ferox::core::module::ModuleRegistry;
+use ferox::modules::exploit::example::ExampleExploit;
+use ferox::modules::recon::asn::AsnDiscovery;
+use ferox::modules::recon::dns::DnsEnumerator;
+use ferox::modules::recon::subdomains::SubdomainEnum;
+use ferox::modules::recon::whois::WhoisLookup;
+use ferox::modules::scanner::http_scanner::HttpScanner;
+use ferox::modules::scanner::port::PortScanner;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -24,7 +19,7 @@ async fn main() -> Result<()> {
 
     #[cfg(windows)]
     {
-        cli::theme::enable_ansi_support()?;
+        Theme::enable_ansi_support()?;
     }
 
     Theme::init();

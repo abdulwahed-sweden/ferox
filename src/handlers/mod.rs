@@ -1,12 +1,11 @@
-pub mod shell_local;
-pub mod shell_remote;
 pub mod file_ops;
 pub mod security;
+pub mod shell_local;
+pub mod shell_remote;
 
-pub use shell_local::{LocalShellHandler, CommandOutput, ProcessInfo, SystemInfo};
-pub use shell_remote::{RemoteShellHandler, ReverseShellListener, ShellType, ConnectionInfo};
-pub use file_ops::{FileOperationsHandler, FileTransferResult, FileInfo, FileType};
-pub use security::{FileAccessPolicy, CommandExecutionPolicy, AuditLogger, RateLimiter, SecurityConfig};
+pub use file_ops::FileOperationsHandler;
+pub use shell_local::{CommandOutput, LocalShellHandler};
+pub use shell_remote::{RemoteShellHandler, ShellType};
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -63,7 +62,11 @@ impl HandlerRegistry {
     }
 
     /// Execute a command on a local shell handler by ID
-    pub async fn execute_local_command(&self, id: Uuid, command: &str) -> Option<Result<CommandOutput, anyhow::Error>> {
+    pub async fn execute_local_command(
+        &self,
+        id: Uuid,
+        command: &str,
+    ) -> Option<Result<CommandOutput, anyhow::Error>> {
         let shells = self.local_shells.lock().await;
         if let Some(handler) = shells.get(&id) {
             Some(handler.execute(command).await)
@@ -208,13 +211,19 @@ mod tests {
     async fn test_handler_stats() {
         let registry = HandlerRegistry::new();
 
-        registry.register_local_shell(LocalShellHandler::new()).await;
-        registry.register_remote_shell(RemoteShellHandler::new(
-            ShellType::Reverse,
-            "127.0.0.1".to_string(),
-            4444,
-        )).await;
-        registry.register_file_ops(FileOperationsHandler::new()).await;
+        registry
+            .register_local_shell(LocalShellHandler::new())
+            .await;
+        registry
+            .register_remote_shell(RemoteShellHandler::new(
+                ShellType::Reverse,
+                "127.0.0.1".to_string(),
+                4444,
+            ))
+            .await;
+        registry
+            .register_file_ops(FileOperationsHandler::new())
+            .await;
 
         let stats = registry.get_stats().await;
         assert_eq!(stats.local_shells, 1);

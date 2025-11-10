@@ -1,11 +1,11 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Instant;
-use trust_dns_resolver::config::*;
 use trust_dns_resolver::TokioAsyncResolver;
+use trust_dns_resolver::config::*;
 use trust_dns_resolver::proto::rr::RecordType;
 
 pub struct DnsEnumerator {
@@ -16,11 +16,17 @@ impl DnsEnumerator {
     pub fn new() -> Self {
         let mut options = HashMap::new();
         options.insert("TARGET".to_string(), String::new());
-        options.insert("RECORD_TYPES".to_string(), "A,AAAA,MX,NS,TXT,SOA,CNAME".to_string());
+        options.insert(
+            "RECORD_TYPES".to_string(),
+            "A,AAAA,MX,NS,TXT,SOA,CNAME".to_string(),
+        );
         options.insert("NAMESERVER".to_string(), String::new()); // Empty = use system default
         options.insert("TIMEOUT".to_string(), "5".to_string());
         options.insert("SUBDOMAIN_ENUM".to_string(), "false".to_string());
-        options.insert("WORDLIST".to_string(), "common,www,mail,ftp,admin,dev,staging".to_string());
+        options.insert(
+            "WORDLIST".to_string(),
+            "common,www,mail,ftp,admin,dev,staging".to_string(),
+        );
         options.insert("ZONE_TRANSFER".to_string(), "true".to_string());
         options.insert("REVERSE_DNS".to_string(), "false".to_string());
         Self { options }
@@ -37,16 +43,15 @@ impl DnsEnumerator {
         opts.timeout = std::time::Duration::from_secs(timeout);
 
         // Custom nameserver if specified
-        if let Some(ns) = self.get_option("NAMESERVER") {
-            if !ns.is_empty() {
-                if let Ok(ip) = ns.parse::<IpAddr>() {
-                    config = ResolverConfig::from_parts(
-                        None,
-                        vec![],
-                        trust_dns_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
-                    );
-                }
-            }
+        if let Some(ns) = self.get_option("NAMESERVER")
+            && !ns.is_empty()
+            && let Ok(ip) = ns.parse::<IpAddr>()
+        {
+            config = ResolverConfig::from_parts(
+                None,
+                vec![],
+                trust_dns_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
+            );
         }
 
         Ok(TokioAsyncResolver::tokio(config, opts))
@@ -84,13 +89,10 @@ impl DnsEnumerator {
 
         for rtype in record_types {
             let lookup = resolver.lookup(domain, rtype).await;
-            
+
             if let Ok(response) = lookup {
-                let records: Vec<String> = response
-                    .iter()
-                    .map(|r| format!("{}", r))
-                    .collect();
-                
+                let records: Vec<String> = response.iter().map(|r| format!("{}", r)).collect();
+
                 if !records.is_empty() {
                     results.insert(format!("{:?}", rtype), records);
                 }
@@ -100,18 +102,17 @@ impl DnsEnumerator {
         results
     }
 
-    async fn attempt_zone_transfer(
-        &self,
-        domain: &str,
-        nameservers: &[String],
-    ) -> Vec<String> {
+    async fn attempt_zone_transfer(&self, _domain: &str, nameservers: &[String]) -> Vec<String> {
         // Zone transfer is typically restricted, but we'll note the attempt
         let mut results = Vec::new();
-        
+
         for ns in nameservers {
-            results.push(format!("Zone transfer attempted against {} (typically restricted)", ns));
+            results.push(format!(
+                "Zone transfer attempted against {} (typically restricted)",
+                ns
+            ));
         }
-        
+
         results
     }
 
@@ -133,7 +134,7 @@ impl DnsEnumerator {
 
         for subdomain in subdomains {
             let fqdn = format!("{}.{}", subdomain, domain);
-            
+
             if let Ok(lookup) = resolver.lookup_ip(&fqdn).await {
                 let ips: Vec<String> = lookup.iter().map(|ip| ip.to_string()).collect();
                 if !ips.is_empty() {
@@ -182,7 +183,9 @@ impl Module for DnsEnumerator {
             },
             ModuleOption {
                 name: "RECORD_TYPES".to_string(),
-                description: "Comma-separated DNS record types (A,AAAA,MX,NS,TXT,SOA,CNAME,PTR,SRV)".to_string(),
+                description:
+                    "Comma-separated DNS record types (A,AAAA,MX,NS,TXT,SOA,CNAME,PTR,SRV)"
+                        .to_string(),
                 required: false,
                 default_value: Some("A,AAAA,MX,NS,TXT,SOA,CNAME".to_string()),
                 current_value: self.get_option("RECORD_TYPES"),
@@ -268,7 +271,7 @@ impl Module for DnsEnumerator {
             Ok(ips) => {
                 let ip_list: Vec<String> = ips.iter().map(|ip| ip.to_string()).collect();
                 fp.insert("resolved_ips".to_string(), ip_list.join(", "));
-                
+
                 Ok(CheckResult {
                     vulnerable: false,
                     confidence: 1.0,
@@ -316,16 +319,19 @@ impl Module for DnsEnumerator {
             }
 
             // Zone transfer attempt
-            if self.get_option("ZONE_TRANSFER").unwrap_or_default() == "true" {
-                if let Some(ns_records) = records.get("NS") {
-                    let zt_results = self.attempt_zone_transfer(&target, ns_records).await;
-                    result_data.insert("zone_transfer".to_string(), serde_json::json!(zt_results));
-                }
+            if self.get_option("ZONE_TRANSFER").unwrap_or_default() == "true"
+                && let Some(ns_records) = records.get("NS")
+            {
+                let zt_results = self.attempt_zone_transfer(&target, ns_records).await;
+                result_data.insert("zone_transfer".to_string(), serde_json::json!(zt_results));
             }
         }
 
         let elapsed = start.elapsed();
-        result_data.insert("scan_time_ms".to_string(), serde_json::json!(elapsed.as_millis()));
+        result_data.insert(
+            "scan_time_ms".to_string(),
+            serde_json::json!(elapsed.as_millis()),
+        );
 
         let mut result = ModuleResult::success(format!(
             "🔍 DNS enumeration completed for {} in {:.2}s",

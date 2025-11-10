@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -210,18 +210,15 @@ impl AuditLogger {
         }
 
         // Log to file if configured
-        if let Some(log_path) = &self.log_file {
-            if let Ok(mut file) = tokio::fs::OpenOptions::new()
+        if let Some(log_path) = &self.log_file
+            && let Ok(mut file) = tokio::fs::OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(log_path)
                 .await
-            {
-                use tokio::io::AsyncWriteExt;
-                let _ = file
-                    .write_all(format!("{}\n", entry).as_bytes())
-                    .await;
-            }
+        {
+            use tokio::io::AsyncWriteExt;
+            let _ = file.write_all(format!("{}\n", entry).as_bytes()).await;
         }
     }
 }
@@ -323,10 +320,9 @@ pub struct RemoteShellConfig {
 impl SecurityConfig {
     /// Load configuration from TOML file
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let contents = std::fs::read_to_string(path)
-            .context("Failed to read security configuration file")?;
-        let config = toml::from_str(&contents)
-            .context("Failed to parse security configuration")?;
+        let contents =
+            std::fs::read_to_string(path).context("Failed to read security configuration file")?;
+        let config = toml::from_str(&contents).context("Failed to parse security configuration")?;
         Ok(config)
     }
 

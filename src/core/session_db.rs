@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{Connection, OptionalExtension, params};
 use serde_json;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
@@ -26,8 +26,7 @@ pub struct SessionDB {
 impl SessionDB {
     /// Create a new session database
     pub fn new<P: AsRef<Path>>(db_path: P) -> Result<Self> {
-        let conn = Connection::open(db_path)
-            .with_context(|| "Failed to open session database")?;
+        let conn = Connection::open(db_path).with_context(|| "Failed to open session database")?;
 
         let db = Self {
             conn: Arc::new(Mutex::new(conn)),
@@ -39,8 +38,8 @@ impl SessionDB {
 
     /// Create an in-memory database (for testing)
     pub fn new_in_memory() -> Result<Self> {
-        let conn = Connection::open_in_memory()
-            .with_context(|| "Failed to create in-memory database")?;
+        let conn =
+            Connection::open_in_memory().with_context(|| "Failed to create in-memory database")?;
 
         let db = Self {
             conn: Arc::new(Mutex::new(conn)),

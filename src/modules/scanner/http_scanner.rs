@@ -1,48 +1,48 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
+use futures::{StreamExt, stream};
 use reqwest::redirect::Policy;
 use reqwest::{Client, Url};
-use futures::{stream, StreamExt};
 use std::collections::HashMap;
 use std::time::Instant;
 use tokio::net::TcpStream;
-use tokio_native_tls::native_tls::TlsConnector;
 use tokio_native_tls::TlsConnector as AsyncTlsConnector;
+use tokio_native_tls::native_tls::TlsConnector;
 use x509_parser::prelude::*;
 
 /// Extract TLS certificate details from an HTTPS host
 async fn extract_tls_info(host: &str, port: u16) -> Result<serde_json::Value> {
     let addr = format!("{}:{}", host, port);
     let tcp = TcpStream::connect(&addr).await?;
-    
+
     let connector = TlsConnector::builder()
         .danger_accept_invalid_certs(true) // Accept self-signed for analysis
         .build()?;
     let async_connector = AsyncTlsConnector::from(connector);
     let tls_stream = async_connector.connect(host, tcp).await?;
-    
+
     // Get peer certificate
     let tls_ref = tls_stream.get_ref();
     let cert_der = tls_ref
         .peer_certificate()?
         .ok_or_else(|| anyhow!("No peer certificate"))?
         .to_der()?;
-    
+
     // Parse with x509-parser
     let (_, cert) = X509Certificate::from_der(&cert_der)
         .map_err(|e| anyhow!("Failed to parse certificate: {:?}", e))?;
-    
+
     let subject = cert.subject().to_string();
     let issuer = cert.issuer().to_string();
     let not_before = cert.validity().not_before.to_datetime().to_string();
     let not_after = cert.validity().not_after.to_datetime().to_string();
-    
+
     // Calculate days until expiry
     let now = chrono::Utc::now();
     let expiry = cert.validity().not_after.to_datetime();
     let days_to_expiry = (expiry.unix_timestamp() - now.timestamp()) / 86400;
-    
+
     Ok(serde_json::json!({
         "subject": subject,
         "issuer": issuer,
@@ -65,7 +65,10 @@ impl HttpScanner {
         options.insert("THREADS".to_string(), "10".to_string());
         options.insert("TIMEOUT".to_string(), "5000".to_string());
         options.insert("FOLLOW_REDIRECTS".to_string(), "true".to_string());
-        options.insert("USER_AGENT".to_string(), "Ferox/2.0 (HTTP Scanner)".to_string());
+        options.insert(
+            "USER_AGENT".to_string(),
+            "Ferox/2.0 (HTTP Scanner)".to_string(),
+        );
         options.insert("RATE_LIMIT".to_string(), "0".to_string()); // req/sec, 0 = unlimited
         options.insert("PATHS".to_string(), "/".to_string()); // comma-separated paths
         Self { options }
@@ -117,13 +120,13 @@ impl HttpScanner {
     fn detect_technologies(&self, headers: &reqwest::header::HeaderMap, body: &str) -> Vec<String> {
         let mut techs = Vec::new();
         // Header-based hints
-        if let Some(server) = headers.get(reqwest::header::SERVER).and_then(|v| v.to_str().ok()) {
-            techs.push(format!("Server:{}", server));
-        }
-        if let Some(xpb) = headers
-            .get("x-powered-by")
+        if let Some(server) = headers
+            .get(reqwest::header::SERVER)
             .and_then(|v| v.to_str().ok())
         {
+            techs.push(format!("Server:{}", server));
+        }
+        if let Some(xpb) = headers.get("x-powered-by").and_then(|v| v.to_str().ok()) {
             techs.push(format!("PoweredBy:{}", xpb));
         }
         if headers.contains_key("x-akamai-transformed") {
@@ -167,7 +170,8 @@ impl Module for HttpScanner {
             name: "http_scanner".to_string(),
             version: "0.1.0".to_string(),
             author: "Ferox Team".to_string(),
-            description: "HTTP/HTTPS fingerprinting, headers, status, and simple tech detection".to_string(),
+            description: "HTTP/HTTPS fingerprinting, headers, status, and simple tech detection"
+                .to_string(),
             module_type: ModuleType::Scanner,
             category: "scanner".to_string(),
         }
@@ -259,10 +263,10 @@ impl Module for HttpScanner {
         fp.insert("url".to_string(), base.to_string());
         fp.insert("scheme".to_string(), base.scheme().to_string());
         fp.insert("status".to_string(), status.to_string());
-        if let Some(server) = resp.headers().get(reqwest::header::SERVER) {
-            if let Ok(s) = server.to_str() {
-                fp.insert("server".to_string(), s.to_string());
-            }
+        if let Some(server) = resp.headers().get(reqwest::header::SERVER)
+            && let Ok(s) = server.to_str()
+        {
+            fp.insert("server".to_string(), s.to_string());
         }
 
         Ok(CheckResult {
@@ -307,9 +311,14 @@ impl Module for HttpScanner {
         // Always handle redirects manually to capture chain
         // Build a second client without automatic redirects (reqwest doesn't expose getters for UA/timeout)
         let client_no_redirect = reqwest::Client::builder()
-            .user_agent(self.get_option("USER_AGENT").unwrap_or_else(|| "Ferox/2.0 (HTTP Scanner)".to_string()))
+            .user_agent(
+                self.get_option("USER_AGENT")
+                    .unwrap_or_else(|| "Ferox/2.0 (HTTP Scanner)".to_string()),
+            )
             .timeout(std::time::Duration::from_millis(
-                self.get_option("TIMEOUT").and_then(|v| v.parse::<u64>().ok()).unwrap_or(5000)
+                self.get_option("TIMEOUT")
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(5000),
             ))
             .redirect(Policy::none())
             .build()?;
@@ -338,9 +347,11 @@ impl Module for HttpScanner {
                 if p != "/" {
                     url.set_path(&p);
                 }
-                let rate_delay = rate_delay.clone();
+                let rate_delay = rate_delay;
                 async move {
-                    if let Some(d) = rate_delay { tokio::time::sleep(d).await; }
+                    if let Some(d) = rate_delay {
+                        tokio::time::sleep(d).await;
+                    }
 
                     let mut current = url.clone();
                     let mut chain: Vec<serde_json::Value> = Vec::new();
@@ -363,10 +374,14 @@ impl Module for HttpScanner {
                                                         "location": next_url.to_string()
                                                     }));
                                                     current = next_url;
-                                                    if chain.len() > 10 { break Ok(r); }
+                                                    if chain.len() > 10 {
+                                                        break Ok(r);
+                                                    }
                                                     continue;
                                                 }
-                                                Err(_) => { break Ok(r); }
+                                                Err(_) => {
+                                                    break Ok(r);
+                                                }
                                             }
                                         } else {
                                             break Ok(r);
@@ -404,7 +419,9 @@ impl Module for HttpScanner {
                                 .and_then(|v| v.to_str().ok())
                                 .and_then(|s| s.parse::<u64>().ok())
                                 .unwrap_or(body.len() as u64);
-                            let technologies = crate::modules::scanner::http_scanner::HttpScanner::default().detect_technologies(&headers, &body);
+                            let technologies =
+                                crate::modules::scanner::http_scanner::HttpScanner::default()
+                                    .detect_technologies(&headers, &body);
 
                             serde_json::json!({
                                 "path": p,

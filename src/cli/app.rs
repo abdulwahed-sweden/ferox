@@ -1,20 +1,24 @@
 use crate::cli::theme::Theme;
 use crate::core::module::{ModuleRegistry, ModuleResult, ModuleType};
 use crate::core::payload::PayloadGenerator;
-use crate::core::session::SessionManager;
+#[cfg(feature = "pdf-export")]
+use crate::core::reporter::PdfReporter;
+use crate::core::reporter::{HtmlReporter, JsonReporter, ReportData, Reporter};
 use crate::core::result_store::ResultStore;
-use crate::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
-use crate::handlers::{HandlerRegistry, LocalShellHandler, RemoteShellHandler,
-                      FileOperationsHandler, ShellType, HandlerType};
+use crate::core::session::SessionManager;
+use crate::handlers::{
+    FileOperationsHandler, HandlerRegistry, HandlerType, LocalShellHandler, RemoteShellHandler,
+    ShellType,
+};
 use anyhow::Result;
 use colored::Colorize;
-use rustyline::{Editor, Config, CompletionType};
+use rustyline::Helper;
 use rustyline::completion::{Completer, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::highlight::Highlighter;
 use rustyline::hint::Hinter;
 use rustyline::validate::Validator;
-use rustyline::Helper;
+use rustyline::{CompletionType, Config, Editor};
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Arc;
@@ -45,13 +49,12 @@ struct FeroxHelper {
 impl FeroxHelper {
     fn new(modules: Arc<Mutex<Vec<String>>>) -> Self {
         let commands = vec![
-            "help", "?", "modules", "list", "ls", "use", "back", "show",
-            "set", "s", "options", "o", "check", "c", "run", "execute", "exploit",
-            "x", "e", "info", "i", "sessions", "payloads", "export", "clear", "cls",
-            "banner", "version", "exit", "quit", "q",
+            "help", "?", "modules", "list", "ls", "use", "back", "show", "set", "s", "options",
+            "o", "check", "c", "run", "execute", "exploit", "x", "e", "info", "i", "sessions",
+            "payloads", "export", "clear", "cls", "banner", "version", "exit", "quit", "q",
             // Handler commands
-            "handlers", "shell", "exec", "upload", "download", "listen", "connect",
-            "sysinfo", "ps", "kill", "pwd", "cd", "cat", "rm", "mkdir"
+            "handlers", "shell", "exec", "upload", "download", "listen", "connect", "sysinfo", "ps",
+            "kill", "pwd", "cd", "cat", "rm", "mkdir",
         ]
         .into_iter()
         .map(|s| s.to_string())
@@ -91,7 +94,7 @@ impl Completer for FeroxHelper {
         }
 
         // If we're completing after "use" command, suggest modules
-        if parts.len() >= 1 && (parts[0] == "use") {
+        if !parts.is_empty() && (parts[0] == "use") {
             let prefix = if parts.len() >= 2 {
                 parts[parts.len() - 1]
             } else {
@@ -116,7 +119,7 @@ impl Completer for FeroxHelper {
         }
 
         // If we're completing after "show" command
-        if parts.len() >= 1 && parts[0] == "show" {
+        if !parts.is_empty() && parts[0] == "show" {
             let show_options = vec!["options", "modules"];
             let prefix = if parts.len() >= 2 {
                 parts[parts.len() - 1]
@@ -199,12 +202,7 @@ impl FeroxCli {
         self.print_welcome().await;
 
         loop {
-            let prompt = Theme::prompt(
-                self.current_module
-                    .as_ref()
-                    .map(|s| s.as_str())
-                    .unwrap_or(""),
-            );
+            let prompt = Theme::prompt(self.current_module.as_deref().unwrap_or(""));
 
             match self.editor.readline(&prompt) {
                 Ok(line) => {
@@ -318,7 +316,10 @@ impl FeroxCli {
         );
         Theme::command_help("set <option> <value>, s", "Set module option");
         Theme::command_help("options, o", "Show current module options");
-        Theme::command_help("check, c", "Run non-destructive check (safe fingerprinting)");
+        Theme::command_help(
+            "check, c",
+            "Run non-destructive check (safe fingerprinting)",
+        );
         Theme::command_help("run, execute, x, e", "Execute current module");
         Theme::command_help("info, i", "Show current module information");
         println!();
@@ -379,7 +380,8 @@ impl FeroxCli {
         println!("  {}", "💡 Tip:".bright_cyan().bold());
         println!(
             "    {}",
-            "Use TAB for command completion. Type 'help <category>' for focused help.".bright_white()
+            "Use TAB for command completion. Type 'help <category>' for focused help."
+                .bright_white()
         );
         println!();
 
@@ -436,9 +438,12 @@ impl FeroxCli {
         println!();
 
         if modules.is_empty() {
-            Theme::warning(&format!("No {} modules loaded", category_name.to_lowercase()));
+            Theme::warning(&format!(
+                "No {} modules loaded",
+                category_name.to_lowercase()
+            ));
         } else {
-            let first_module = modules.first().map(|s| s.clone());
+            let first_module = modules.first().cloned();
             for module_path in modules {
                 if let Some(module) = registry.get(&module_path) {
                     let info = module.info();
@@ -467,10 +472,16 @@ impl FeroxCli {
         println!("  {}", "Session Commands:".bright_yellow().bold());
         Theme::command_help("sessions", "List all sessions");
         Theme::command_help("sessions -a", "List active sessions only");
-        Theme::command_help("sessions -i <id>", "Show session details (refreshes heartbeat)");
+        Theme::command_help(
+            "sessions -i <id>",
+            "Show session details (refreshes heartbeat)",
+        );
         Theme::command_help("sessions -k <id>", "Kill/mark session as inactive");
         Theme::command_help("sessions -r <id>", "Remove session from database");
-        Theme::command_help("sessions -c <hours>", "Cleanup stale sessions older than N hours");
+        Theme::command_help(
+            "sessions -c <hours>",
+            "Cleanup stale sessions older than N hours",
+        );
         println!();
 
         println!("  {}", "Session Lifecycle:".bright_cyan().bold());
@@ -482,7 +493,10 @@ impl FeroxCli {
 
         let total = self.sessions.count().await;
         let active = self.sessions.active_count().await;
-        Theme::info(&format!("Current: {} total sessions ({} active)", total, active));
+        Theme::info(&format!(
+            "Current: {} total sessions ({} active)",
+            total, active
+        ));
         println!();
         Ok(())
     }
@@ -516,7 +530,7 @@ impl FeroxCli {
             }
 
             of_type.sort();
-            Theme::section(&format!("{}", heading));
+            Theme::section(heading.as_ref());
             println!();
 
             for module_path in of_type {
@@ -855,7 +869,10 @@ impl FeroxCli {
                     self.render_result(&result)?;
 
                     // Notify user about stored result
-                    Theme::info(&format!("Result stored (ID: {}). Use 'export' to save reports.", result_id));
+                    Theme::info(&format!(
+                        "Result stored (ID: {}). Use 'export' to save reports.",
+                        result_id
+                    ));
                 }
                 Err(e) => {
                     spinner.finish_and_clear();
@@ -882,9 +899,21 @@ impl FeroxCli {
 
             Theme::module_header(&info.name);
             println!();
-            println!("  {}: {}", "Name".bright_cyan(), info.name.bright_white().bold());
-            println!("  {}: {}", "Version".bright_cyan(), info.version.bright_yellow());
-            println!("  {}: {}", "Author".bright_cyan(), info.author.bright_white());
+            println!(
+                "  {}: {}",
+                "Name".bright_cyan(),
+                info.name.bright_white().bold()
+            );
+            println!(
+                "  {}: {}",
+                "Version".bright_cyan(),
+                info.version.bright_yellow()
+            );
+            println!(
+                "  {}: {}",
+                "Author".bright_cyan(),
+                info.author.bright_white()
+            );
             println!("  {}: {:?}", "Type".bright_cyan(), info.module_type);
             println!(
                 "  {}: {}",
@@ -1018,7 +1047,11 @@ impl FeroxCli {
             return Ok(());
         }
 
-        Theme::info(&format!("Exporting {} results to {} format...", results.len(), format));
+        Theme::info(&format!(
+            "Exporting {} results to {} format...",
+            results.len(),
+            format
+        ));
 
         // Get all sessions
         let sessions = self.sessions.list_all().await;
@@ -1038,8 +1071,16 @@ impl FeroxCli {
                 reporter.export(&report_data, Path::new(filename))
             }
             "pdf" => {
-                let reporter = PdfReporter;
-                reporter.export(&report_data, Path::new(filename))
+                #[cfg(feature = "pdf-export")]
+                {
+                    let reporter = PdfReporter;
+                    reporter.export(&report_data, Path::new(filename))
+                }
+                #[cfg(not(feature = "pdf-export"))]
+                {
+                    Theme::error("PDF export not available. Rebuild with --features pdf-export");
+                    return Ok(());
+                }
             }
             _ => unreachable!(),
         };
@@ -1047,8 +1088,14 @@ impl FeroxCli {
         match result {
             Ok(_) => {
                 Theme::success(&format!("✓ Report exported successfully to: {}", filename));
-                Theme::info(&format!("Total results: {}", report_data.summary.total_results));
-                Theme::info(&format!("Successful: {}", report_data.summary.successful_results));
+                Theme::info(&format!(
+                    "Total results: {}",
+                    report_data.summary.total_results
+                ));
+                Theme::info(&format!(
+                    "Successful: {}",
+                    report_data.summary.successful_results
+                ));
                 Theme::info(&format!("Failed: {}", report_data.summary.failed_results));
             }
             Err(e) => {
@@ -1092,7 +1139,10 @@ impl FeroxCli {
                 "FAILED".bright_red()
             };
 
-            let module = format!("{}/{}", result.module_info.category, result.module_info.name);
+            let module = format!(
+                "{}/{}",
+                result.module_info.category, result.module_info.name
+            );
             let time = result.result.timestamp.format("%H:%M:%S").to_string();
             let message = if result.result.message.len() > 40 {
                 format!("{}...", &result.result.message[..37])
@@ -1175,7 +1225,11 @@ impl FeroxCli {
             }
             ["-k", id_str] => {
                 if let Ok(id) = Uuid::parse_str(id_str) {
-                    for handler_type in &[HandlerType::LocalShell, HandlerType::RemoteShell, HandlerType::FileOperations] {
+                    for handler_type in &[
+                        HandlerType::LocalShell,
+                        HandlerType::RemoteShell,
+                        HandlerType::FileOperations,
+                    ] {
                         if handlers.remove_handler(id, *handler_type).await {
                             Theme::success(&format!("Handler {} removed", id));
                             if self.current_handler == Some(id) {
@@ -1237,8 +1291,9 @@ impl FeroxCli {
                 if let Ok(id) = Uuid::parse_str(id_str) {
                     let handlers = self.handlers.lock().await;
 
-                    if handlers.has_handler(id, HandlerType::LocalShell).await ||
-                       handlers.has_handler(id, HandlerType::RemoteShell).await {
+                    if handlers.has_handler(id, HandlerType::LocalShell).await
+                        || handlers.has_handler(id, HandlerType::RemoteShell).await
+                    {
                         drop(handlers);
                         self.current_handler = Some(id);
                         Theme::success(&format!("Handler {} selected", id));
@@ -1307,9 +1362,11 @@ impl FeroxCli {
         println!("  OS: {} {}", info.os_name, info.os_version);
         println!("  Kernel: {}", info.kernel_version);
         println!("  CPUs: {}", info.cpu_count);
-        println!("  Memory: {} MB / {} MB used",
-                 info.used_memory / 1024 / 1024,
-                 info.total_memory / 1024 / 1024);
+        println!(
+            "  Memory: {} MB / {} MB used",
+            info.used_memory / 1024 / 1024,
+            info.total_memory / 1024 / 1024
+        );
         println!("  Swap: {} MB", info.total_swap / 1024 / 1024);
         println!();
 
@@ -1322,11 +1379,13 @@ impl FeroxCli {
 
         Theme::section("RUNNING PROCESSES");
         println!();
-        println!("  {:<8} {:<30} {:<10} {:<10}",
-                 "PID".bright_yellow(),
-                 "NAME".bright_yellow(),
-                 "CPU%".bright_yellow(),
-                 "MEMORY".bright_yellow());
+        println!(
+            "  {:<8} {:<30} {:<10} {:<10}",
+            "PID".bright_yellow(),
+            "NAME".bright_yellow(),
+            "CPU%".bright_yellow(),
+            "MEMORY".bright_yellow()
+        );
         println!("  {}", "-".repeat(70));
 
         let mut sorted = processes;
@@ -1334,11 +1393,13 @@ impl FeroxCli {
 
         for (i, proc) in sorted.iter().take(20).enumerate() {
             let mem_mb = proc.memory / 1024 / 1024;
-            println!("  {:<8} {:<30} {:<10.2} {:<10} MB",
-                     proc.pid,
-                     &proc.name[..proc.name.len().min(30)],
-                     proc.cpu_usage,
-                     mem_mb);
+            println!(
+                "  {:<8} {:<30} {:<10.2} {:<10} MB",
+                proc.pid,
+                &proc.name[..proc.name.len().min(30)],
+                proc.cpu_usage,
+                mem_mb
+            );
 
             if i >= 19 {
                 println!("\n  ... showing top 20 processes");
@@ -1379,7 +1440,10 @@ impl FeroxCli {
             }
         };
 
-        Theme::info(&format!("Starting reverse shell listener on {}:{}", host, port));
+        Theme::info(&format!(
+            "Starting reverse shell listener on {}:{}",
+            host, port
+        ));
 
         let handler = RemoteShellHandler::new(ShellType::Reverse, host.clone(), port);
 

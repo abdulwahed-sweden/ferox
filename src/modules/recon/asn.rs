@@ -1,5 +1,5 @@
 use crate::core::module::*;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::net::IpAddr;
@@ -35,7 +35,7 @@ impl AsnDiscovery {
             .unwrap_or(10);
 
         let addr = format!("{}:{}", server, port);
-        
+
         let stream = tokio::time::timeout(
             std::time::Duration::from_secs(timeout),
             TcpStream::connect(&addr),
@@ -52,7 +52,7 @@ impl AsnDiscovery {
         // Read response
         let mut response = String::new();
         let mut line = String::new();
-        
+
         while reader.read_line(&mut line).await? > 0 {
             response.push_str(&line);
             line.clear();
@@ -71,7 +71,7 @@ impl AsnDiscovery {
         let response = self.query_whois(&query, &server).await?;
 
         let mut result = HashMap::new();
-        
+
         // Parse Team Cymru response format
         // Format: AS | IP | BGP Prefix | CC | Registry | Allocated | AS Name
         for line in response.lines() {
@@ -121,7 +121,7 @@ impl AsnDiscovery {
         let response = self.query_whois(&query, &server).await?;
 
         let mut result = HashMap::new();
-        
+
         // Parse response
         for line in response.lines() {
             let line = line.trim();
@@ -163,7 +163,7 @@ impl AsnDiscovery {
         let response = self.query_whois(&query, &server).await?;
 
         let mut prefixes = Vec::new();
-        
+
         for line in response.lines() {
             let line = line.trim();
             if line.is_empty() || line.starts_with("Bulk") || line.starts_with("Prefix") {
@@ -181,10 +181,10 @@ impl AsnDiscovery {
 
     async fn resolve_domain_to_ip(&self, domain: &str) -> Result<String> {
         use trust_dns_resolver::TokioAsyncResolver;
-        
+
         let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
         let lookup = resolver.lookup_ip(domain).await?;
-        
+
         lookup
             .iter()
             .next()
@@ -210,7 +210,8 @@ impl Module for AsnDiscovery {
         vec![
             ModuleOption {
                 name: "TARGET".to_string(),
-                description: "Target IP, domain, or ASN (e.g., 8.8.8.8, google.com, AS15169)".to_string(),
+                description: "Target IP, domain, or ASN (e.g., 8.8.8.8, google.com, AS15169)"
+                    .to_string(),
                 required: true,
                 default_value: None,
                 current_value: self.get_option("TARGET"),
@@ -286,10 +287,10 @@ impl Module for AsnDiscovery {
         } else if target.to_uppercase().starts_with("AS") {
             // It's an ASN
             match self.lookup_asn_details(&target).await {
-                Ok(details) => {
+                Ok(_details) => {
                     let elapsed_ms = start.elapsed().as_millis() as u64;
                     fp.insert("response_time_ms".to_string(), elapsed_ms.to_string());
-                    
+
                     return Ok(CheckResult {
                         vulnerable: false,
                         confidence: 1.0,
@@ -326,8 +327,11 @@ impl Module for AsnDiscovery {
             Ok(asn_data) => {
                 let elapsed_ms = start.elapsed().as_millis() as u64;
                 fp.insert("response_time_ms".to_string(), elapsed_ms.to_string());
-                
-                let asn = asn_data.get("asn").cloned().unwrap_or_else(|| "Unknown".to_string());
+
+                let asn = asn_data
+                    .get("asn")
+                    .cloned()
+                    .unwrap_or_else(|| "Unknown".to_string());
                 Ok(CheckResult {
                     vulnerable: false,
                     confidence: 1.0,
@@ -363,10 +367,16 @@ impl Module for AsnDiscovery {
                 match self.lookup_prefixes(&target).await {
                     Ok(prefixes) => {
                         result_data.insert("bgp_prefixes".to_string(), serde_json::json!(prefixes));
-                        result_data.insert("prefix_count".to_string(), serde_json::json!(prefixes.len()));
+                        result_data.insert(
+                            "prefix_count".to_string(),
+                            serde_json::json!(prefixes.len()),
+                        );
                     }
                     Err(_) => {
-                        result_data.insert("bgp_prefixes".to_string(), serde_json::json!(Vec::<String>::new()));
+                        result_data.insert(
+                            "bgp_prefixes".to_string(),
+                            serde_json::json!(Vec::<String>::new()),
+                        );
                     }
                 }
             }
@@ -393,11 +403,18 @@ impl Module for AsnDiscovery {
                 if self.get_option("LOOKUP_PREFIXES").unwrap_or_default() == "true" {
                     match self.lookup_prefixes(asn).await {
                         Ok(prefixes) => {
-                            result_data.insert("bgp_prefixes".to_string(), serde_json::json!(prefixes));
-                            result_data.insert("prefix_count".to_string(), serde_json::json!(prefixes.len()));
+                            result_data
+                                .insert("bgp_prefixes".to_string(), serde_json::json!(prefixes));
+                            result_data.insert(
+                                "prefix_count".to_string(),
+                                serde_json::json!(prefixes.len()),
+                            );
                         }
                         Err(_) => {
-                            result_data.insert("bgp_prefixes".to_string(), serde_json::json!(Vec::<String>::new()));
+                            result_data.insert(
+                                "bgp_prefixes".to_string(),
+                                serde_json::json!(Vec::<String>::new()),
+                            );
                         }
                     }
                 }
@@ -405,7 +422,10 @@ impl Module for AsnDiscovery {
         }
 
         let elapsed = start.elapsed();
-        result_data.insert("scan_time_ms".to_string(), serde_json::json!(elapsed.as_millis()));
+        result_data.insert(
+            "scan_time_ms".to_string(),
+            serde_json::json!(elapsed.as_millis()),
+        );
 
         let mut result = ModuleResult::success(format!(
             "🌐 ASN discovery completed for {} in {:.2}s",

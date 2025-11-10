@@ -1,6 +1,6 @@
 use crate::core::module::Session;
 use crate::core::session_db::{CommandHistory, SessionDB};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -58,10 +58,10 @@ impl SessionManager {
         let id = session.id;
 
         // Save to database if available
-        if let Some(db) = &self.db {
-            if let Err(e) = db.save_session(&session) {
-                eprintln!("Warning: Failed to save session to database: {}", e);
-            }
+        if let Some(db) = &self.db
+            && let Err(e) = db.save_session(&session)
+        {
+            eprintln!("Warning: Failed to save session to database: {}", e);
         }
 
         // Add to in-memory map
