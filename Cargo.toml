@@ -9,6 +9,14 @@ repository = "https://github.com/abdulwahed-sweden/ferox"
 keywords = ["security", "penetration-testing", "cybersecurity", "framework", "ferox"]
 categories = ["command-line-utilities", "development-tools"]
 
+[features]
+default = []
+pdf-export = ["printpdf"]
+
+[lib]
+name = "ferox"
+path = "src/lib.rs"
+
 [[bin]]
 name = "ferox"
 path = "src/main.rs"
@@ -27,7 +35,6 @@ indicatif = "0.18.2"
 console = "0.16.1"
 atty = "0.2.14"
 owo-colors = "4.2.3"
-windows = { version = "0.62.2", features = ["Win32_System_Console"] }
 
 # Networking
 reqwest = { version = "0.12.24", features = ["json", "rustls-tls"] }
@@ -38,7 +45,6 @@ tokio-native-tls = "0.3.1"
 x509-parser = "0.18.0"
 
 # Database
-sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "sqlite"] }
 rusqlite = { version = "0.37.0", features = ["bundled"] }
 
 # Serialization
@@ -63,7 +69,7 @@ base64 = "0.22.1"
 
 # Report Generation
 tera = "1.20.1"
-printpdf = "0.8.2"
+printpdf = { version = "0.8", optional = true }
 
 [dev-dependencies]
 tokio-test = "0.4.4"
