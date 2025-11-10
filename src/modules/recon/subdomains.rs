@@ -9,7 +9,7 @@ use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::{Mutex, Semaphore};
 use tokio::time::{Duration, timeout};
-use trust_dns_resolver::TokioAsyncResolver;
+use hickory_resolver::TokioResolver;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SubdomainRecord {
@@ -71,7 +71,7 @@ impl SubdomainEnum {
     }
 
     async fn resolve_subdomain(
-        resolver: Arc<TokioAsyncResolver>,
+        resolver: Arc<TokioResolver>,
         subdomain: String,
         timeout_ms: u64,
     ) -> Result<SubdomainRecord> {
@@ -228,7 +228,7 @@ impl Module for SubdomainEnum {
         let domain = self.get_option("RHOSTS").unwrap();
 
         // Create resolver
-        let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
+        let resolver = TokioResolver::builder_tokio()?.build();
 
         // Try to resolve base domain
         match timeout(Duration::from_secs(5), resolver.lookup_ip(domain.as_str())).await {
@@ -279,7 +279,7 @@ impl Module for SubdomainEnum {
         let words = Self::read_wordlist(&wordlist_path)?;
 
         // Create resolver and HTTP client
-        let resolver = Arc::new(TokioAsyncResolver::tokio_from_system_conf()?);
+        let resolver = Arc::new(TokioResolver::builder_tokio()?.build());
         let client = reqwest::Client::builder()
             .timeout(Duration::from_millis(timeout_ms))
             .danger_accept_invalid_certs(true)

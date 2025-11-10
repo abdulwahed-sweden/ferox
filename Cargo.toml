@@ -33,13 +33,13 @@ rustyline = "17.0.2"
 colored = "3.0.0"
 indicatif = "0.18.2"
 console = "0.16.1"
-atty = "0.2.14"
+is-terminal = "0.4.17"
 owo-colors = "4.2.3"
 
 # Networking
 reqwest = { version = "0.12.24", features = ["json", "rustls-tls"] }
 tokio-stream = "0.1.17"
-trust-dns-resolver = "0.23.2"
+hickory-resolver = "0.25.2"
 native-tls = "0.2.14"
 tokio-native-tls = "0.3.1"
 x509-parser = "0.18.0"
@@ -70,14 +70,14 @@ base64 = "0.22.1"
 
 # Report Generation
 tera = "1.20.1"
-printpdf = { version = "0.8", optional = true }
+printpdf = { version = "0.8.2", optional = true }
 
 # Phase 3 lightweight crypto deps (RustCrypto) - small and widely used
 aes-gcm = "0.10.3"
 hmac = "0.12.1"
-sha2 = "0.10.8"
+sha2 = "0.10.9"
 hkdf = "0.12.4"
-data-encoding = "2.6.0" # base32 helpers for dns_c2
+data-encoding = "2.9.0" # base32 helpers for dns_c2
 
 [dev-dependencies]
 tokio-test = "0.4.4"

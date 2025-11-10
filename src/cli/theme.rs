@@ -3,7 +3,7 @@
 //! and plain fallbacks. Maintains backward compatibility with previous Theme API.
 
 use anyhow::Result;
-use atty::Stream as AttyStream;
+use is_terminal::IsTerminal;
 use indicatif::ProgressStyle;
 use owo_colors::{AnsiColors, OwoColorize};
 use std::env;
@@ -90,7 +90,7 @@ impl Theme {
         let no_color = env::var_os("NO_COLOR").is_some();
         let no_emoji = env::var_os("NO_EMOJI").is_some();
         let is_ci = env::var_os("CI").is_some();
-        let is_tty = atty::is(AttyStream::Stdout);
+        let is_tty = std::io::stdout().is_terminal();
         let utf8 = env::var("LANG")
             .unwrap_or_default()
             .to_ascii_lowercase()

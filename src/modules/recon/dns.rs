@@ -4,9 +4,10 @@ use async_trait::async_trait;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Instant;
-use trust_dns_resolver::TokioAsyncResolver;
-use trust_dns_resolver::config::*;
-use trust_dns_resolver::proto::rr::RecordType;
+use hickory_resolver::config::*;
+use hickory_resolver::name_server::TokioConnectionProvider;
+use hickory_resolver::proto::rr::RecordType;
+use hickory_resolver::TokioResolver;
 
 pub struct DnsEnumerator {
     options: HashMap<String, String>,
@@ -32,13 +33,12 @@ impl DnsEnumerator {
         Self { options }
     }
 
-    async fn get_resolver(&self) -> Result<TokioAsyncResolver> {
+    async fn get_resolver(&self) -> Result<TokioResolver> {
         let timeout = self
             .get_option("TIMEOUT")
             .and_then(|v| v.parse::<u64>().ok())
             .unwrap_or(5);
 
-        let mut config = ResolverConfig::default();
         let mut opts = ResolverOpts::default();
         opts.timeout = std::time::Duration::from_secs(timeout);
 
@@ -47,14 +47,19 @@ impl DnsEnumerator {
             && !ns.is_empty()
             && let Ok(ip) = ns.parse::<IpAddr>()
         {
-            config = ResolverConfig::from_parts(
+            let config = ResolverConfig::from_parts(
                 None,
                 vec![],
-                trust_dns_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
+                hickory_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
             );
+            let builder =
+                TokioResolver::builder_with_config(config, TokioConnectionProvider::default());
+            return Ok(builder.with_options(opts).build());
         }
 
-        Ok(TokioAsyncResolver::tokio(config, opts))
+        let mut builder = TokioResolver::builder_tokio()?;
+        builder.options_mut().timeout = opts.timeout;
+        Ok(builder.build())
     }
 
     fn parse_record_types(&self) -> Vec<RecordType> {
@@ -82,7 +87,7 @@ impl DnsEnumerator {
     async fn enumerate_records(
         &self,
         domain: &str,
-        resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     ) -> HashMap<String, Vec<String>> {
         let mut results = HashMap::new();
         let record_types = self.parse_record_types();
@@ -119,7 +124,7 @@ impl DnsEnumerator {
     async fn enumerate_subdomains(
         &self,
         domain: &str,
-        resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     ) -> Vec<String> {
         let wordlist_str = self
             .get_option("WORDLIST")
@@ -149,7 +154,7 @@ impl DnsEnumerator {
     async fn reverse_dns_lookup(
         &self,
         ip: IpAddr,
-        resolver: &TokioAsyncResolver,
+    resolver: &TokioResolver,
     ) -> Option<String> {
         if let Ok(lookup) = resolver.reverse_lookup(ip).await {
             lookup.iter().next().map(|name| name.to_string())

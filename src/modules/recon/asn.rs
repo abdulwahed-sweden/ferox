@@ -180,9 +180,9 @@ impl AsnDiscovery {
     }
 
     async fn resolve_domain_to_ip(&self, domain: &str) -> Result<String> {
-        use trust_dns_resolver::TokioAsyncResolver;
+        use hickory_resolver::TokioResolver;
 
-        let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
+        let resolver = TokioResolver::builder_tokio()?.build();
         let lookup = resolver.lookup_ip(domain).await?;
 
         lookup
