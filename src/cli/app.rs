@@ -4,6 +4,8 @@ use crate::core::payload::PayloadGenerator;
 use crate::core::session::SessionManager;
 use crate::core::result_store::ResultStore;
 use crate::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+use crate::handlers::{HandlerRegistry, LocalShellHandler, RemoteShellHandler,
+                      FileOperationsHandler, ShellType, HandlerType};
 use anyhow::Result;
 use colored::Colorize;
 use rustyline::{Editor, Config, CompletionType};
@@ -46,7 +48,10 @@ impl FeroxHelper {
             "help", "?", "modules", "list", "ls", "use", "back", "show",
             "set", "s", "options", "o", "check", "c", "run", "execute", "exploit",
             "x", "e", "info", "i", "sessions", "payloads", "export", "clear", "cls",
-            "banner", "version", "exit", "quit", "q"
+            "banner", "version", "exit", "quit", "q",
+            // Handler commands
+            "handlers", "shell", "exec", "upload", "download", "listen", "connect",
+            "sysinfo", "ps", "kill", "pwd", "cd", "cat", "rm", "mkdir"
         ]
         .into_iter()
         .map(|s| s.to_string())
@@ -152,7 +157,9 @@ pub struct FeroxCli {
     registry: Arc<Mutex<ModuleRegistry>>,
     sessions: SessionManager,
     result_store: Arc<Mutex<ResultStore>>,
+    handlers: Arc<Mutex<HandlerRegistry>>,
     current_module: Option<String>,
+    current_handler: Option<Uuid>,
     editor: Editor<FeroxHelper, rustyline::history::DefaultHistory>,
     aliases: HashMap<&'static str, &'static str>,
 }
@@ -179,7 +186,9 @@ impl FeroxCli {
             registry: Arc::new(Mutex::new(registry)),
             sessions: SessionManager::new(),
             result_store: Arc::new(Mutex::new(ResultStore::default())),
+            handlers: Arc::new(Mutex::new(HandlerRegistry::new())),
             current_module: None,
+            current_handler: None,
             editor,
             aliases: get_aliases(),
         })
@@ -252,6 +261,23 @@ impl FeroxCli {
             "sessions" => self.cmd_sessions(args).await,
             "payloads" => self.cmd_payloads().await,
             "export" => self.cmd_export(args).await,
+            // Handler commands
+            "handlers" => self.cmd_handlers(args).await,
+            "shell" => self.cmd_shell(args).await,
+            "exec" => self.cmd_exec(args).await,
+            "upload" => self.cmd_upload(args).await,
+            "download" => self.cmd_download(args).await,
+            "listen" => self.cmd_listen(args).await,
+            "connect" => self.cmd_connect(args).await,
+            "sysinfo" => self.cmd_sysinfo().await,
+            "ps" => self.cmd_ps().await,
+            "kill" => self.cmd_kill(args).await,
+            "pwd" => self.cmd_pwd().await,
+            "cd" => self.cmd_cd(args).await,
+            "cat" => self.cmd_cat(args).await,
+            "rm" => self.cmd_rm(args).await,
+            "mkdir" => self.cmd_mkdir(args).await,
+            // Utility commands
             "clear" | "cls" => self.cmd_clear(),
             "banner" => {
                 Theme::banner();
@@ -304,6 +330,37 @@ impl FeroxCli {
         Theme::command_help("sessions -k <id>", "Mark session inactive");
         Theme::command_help("sessions -r <id>", "Remove session");
         Theme::command_help("sessions -c <hours>", "Cleanup stale sessions");
+        println!();
+
+        println!("  {}", "Handler Commands:".bright_yellow().bold());
+        Theme::command_help("handlers", "List all registered handlers");
+        Theme::command_help("handlers -s", "Show handler statistics");
+        Theme::command_help("handlers -k <id>", "Remove handler by ID");
+        Theme::command_help("handlers -t <type>", "List handlers by type");
+        println!();
+
+        println!("  {}", "Shell & Execution:".bright_yellow().bold());
+        Theme::command_help("shell", "Create new local shell handler");
+        Theme::command_help("shell -i <id>", "Select existing shell handler");
+        Theme::command_help("exec <command>", "Execute command in current shell");
+        Theme::command_help("sysinfo", "Display system information");
+        Theme::command_help("ps", "List running processes");
+        Theme::command_help("kill <pid>", "Terminate process by PID");
+        println!();
+
+        println!("  {}", "File Operations:".bright_yellow().bold());
+        Theme::command_help("upload <src> <dst>", "Upload file to target");
+        Theme::command_help("download <src> <dst>", "Download file from target");
+        Theme::command_help("pwd", "Print current working directory");
+        Theme::command_help("cd <path>", "Change working directory");
+        Theme::command_help("cat <file>", "Display file contents");
+        Theme::command_help("rm <file>", "Delete file");
+        Theme::command_help("mkdir <dir>", "Create directory");
+        println!();
+
+        println!("  {}", "Remote Shell:".bright_yellow().bold());
+        Theme::command_help("listen <port>", "Start reverse shell listener");
+        Theme::command_help("connect <host> <port>", "Create bind shell connection");
         println!();
 
         println!("  {}", "Report & Export Commands:".bright_yellow().bold());
@@ -1062,6 +1119,443 @@ impl FeroxCli {
         Theme::info("💡 Use 'export <format> <file>' to export these results");
         println!();
 
+        Ok(())
+    }
+
+    // ========== HANDLER COMMANDS ==========
+
+    async fn cmd_handlers(&mut self, args: &[&str]) -> Result<()> {
+        let handlers = self.handlers.lock().await;
+
+        match args {
+            [] => {
+                let stats = handlers.get_stats().await;
+                Theme::section("REGISTERED HANDLERS");
+                println!();
+                Theme::info(&format!("Total handlers: {}", stats.total));
+                println!("  Local shells: {}", stats.local_shells);
+                println!("  Remote shells: {}", stats.remote_shells);
+                println!("  File operations: {}", stats.file_operations);
+                println!();
+
+                let local_ids = handlers.list_handlers(HandlerType::LocalShell).await;
+                if !local_ids.is_empty() {
+                    println!("  {}", "Local Shell Handlers:".bright_yellow());
+                    for id in local_ids {
+                        println!("    {}", id.to_string().bright_cyan());
+                    }
+                }
+
+                let remote_ids = handlers.list_handlers(HandlerType::RemoteShell).await;
+                if !remote_ids.is_empty() {
+                    println!("  {}", "Remote Shell Handlers:".bright_yellow());
+                    for id in remote_ids {
+                        println!("    {}", id.to_string().bright_cyan());
+                    }
+                }
+
+                let file_ids = handlers.list_handlers(HandlerType::FileOperations).await;
+                if !file_ids.is_empty() {
+                    println!("  {}", "File Operations Handlers:".bright_yellow());
+                    for id in file_ids {
+                        println!("    {}", id.to_string().bright_cyan());
+                    }
+                }
+                println!();
+            }
+            ["-s"] => {
+                let stats = handlers.get_stats().await;
+                Theme::section("HANDLER STATISTICS");
+                println!();
+                println!("  Total handlers: {}", stats.total);
+                println!("  Local shells: {}", stats.local_shells);
+                println!("  Remote shells: {}", stats.remote_shells);
+                println!("  File operations: {}", stats.file_operations);
+                println!();
+            }
+            ["-k", id_str] => {
+                if let Ok(id) = Uuid::parse_str(id_str) {
+                    for handler_type in &[HandlerType::LocalShell, HandlerType::RemoteShell, HandlerType::FileOperations] {
+                        if handlers.remove_handler(id, *handler_type).await {
+                            Theme::success(&format!("Handler {} removed", id));
+                            if self.current_handler == Some(id) {
+                                drop(handlers);
+                                return self.cmd_back().await;
+                            }
+                            return Ok(());
+                        }
+                    }
+                    Theme::error(&format!("Handler {} not found", id));
+                } else {
+                    Theme::error("Invalid UUID format");
+                }
+            }
+            ["-t", handler_type] => {
+                let htype = match *handler_type {
+                    "local" => HandlerType::LocalShell,
+                    "remote" => HandlerType::RemoteShell,
+                    "file" => HandlerType::FileOperations,
+                    _ => {
+                        Theme::error("Invalid handler type. Use: local, remote, file");
+                        return Ok(());
+                    }
+                };
+
+                let ids = handlers.list_handlers(htype).await;
+                Theme::section(&format!("{:?} HANDLERS", htype));
+                println!();
+                if ids.is_empty() {
+                    Theme::warning("No handlers of this type");
+                } else {
+                    for id in ids {
+                        println!("  {}", id.to_string().bright_cyan());
+                    }
+                }
+                println!();
+            }
+            _ => {
+                Theme::error("Usage: handlers [-s|-k <id>|-t <type>]");
+            }
+        }
+        Ok(())
+    }
+
+    async fn cmd_shell(&mut self, args: &[&str]) -> Result<()> {
+        match args {
+            [] => {
+                let handler = LocalShellHandler::new();
+                let handlers = self.handlers.lock().await;
+                let id = handlers.register_local_shell(handler).await;
+                drop(handlers);
+
+                self.current_handler = Some(id);
+                Theme::success(&format!("Local shell handler created: {}", id));
+                Theme::info("Use 'exec <command>' to execute commands");
+                Theme::info("Use 'back' to deselect handler");
+            }
+            ["-i", id_str] => {
+                if let Ok(id) = Uuid::parse_str(id_str) {
+                    let handlers = self.handlers.lock().await;
+
+                    if handlers.has_handler(id, HandlerType::LocalShell).await ||
+                       handlers.has_handler(id, HandlerType::RemoteShell).await {
+                        drop(handlers);
+                        self.current_handler = Some(id);
+                        Theme::success(&format!("Handler {} selected", id));
+                    } else {
+                        Theme::error(&format!("Handler {} not found", id));
+                    }
+                } else {
+                    Theme::error("Invalid UUID format");
+                }
+            }
+            _ => {
+                Theme::error("Usage: shell [-i <handler_id>]");
+            }
+        }
+        Ok(())
+    }
+
+    async fn cmd_exec(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: exec <command>");
+            return Ok(());
+        }
+
+        let handler_id = match self.current_handler {
+            Some(id) => id,
+            None => {
+                Theme::error("No handler selected. Use 'shell' to create one");
+                return Ok(());
+            }
+        };
+
+        let command = args.join(" ");
+        let handlers = self.handlers.lock().await;
+
+        if let Some(result) = handlers.execute_local_command(handler_id, &command).await {
+            match result {
+                Ok(output) => {
+                    if !output.stdout.is_empty() {
+                        print!("{}", output.stdout);
+                    }
+                    if !output.stderr.is_empty() {
+                        Theme::error(&output.stderr);
+                    }
+                    if !output.success {
+                        Theme::warning(&format!("Command exited with code: {}", output.exit_code));
+                    }
+                }
+                Err(e) => {
+                    Theme::error(&format!("Execution failed: {}", e));
+                }
+            }
+        } else {
+            Theme::error("Handler not found or not a local shell");
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_sysinfo(&self) -> Result<()> {
+        let mut handler = LocalShellHandler::new();
+        let info = handler.get_system_info();
+
+        Theme::section("SYSTEM INFORMATION");
+        println!();
+        println!("  Hostname: {}", info.hostname.bright_cyan());
+        println!("  OS: {} {}", info.os_name, info.os_version);
+        println!("  Kernel: {}", info.kernel_version);
+        println!("  CPUs: {}", info.cpu_count);
+        println!("  Memory: {} MB / {} MB used",
+                 info.used_memory / 1024 / 1024,
+                 info.total_memory / 1024 / 1024);
+        println!("  Swap: {} MB", info.total_swap / 1024 / 1024);
+        println!();
+
+        Ok(())
+    }
+
+    async fn cmd_ps(&self) -> Result<()> {
+        let mut handler = LocalShellHandler::new();
+        let processes = handler.list_processes();
+
+        Theme::section("RUNNING PROCESSES");
+        println!();
+        println!("  {:<8} {:<30} {:<10} {:<10}",
+                 "PID".bright_yellow(),
+                 "NAME".bright_yellow(),
+                 "CPU%".bright_yellow(),
+                 "MEMORY".bright_yellow());
+        println!("  {}", "-".repeat(70));
+
+        let mut sorted = processes;
+        sorted.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
+
+        for (i, proc) in sorted.iter().take(20).enumerate() {
+            let mem_mb = proc.memory / 1024 / 1024;
+            println!("  {:<8} {:<30} {:<10.2} {:<10} MB",
+                     proc.pid,
+                     &proc.name[..proc.name.len().min(30)],
+                     proc.cpu_usage,
+                     mem_mb);
+
+            if i >= 19 {
+                println!("\n  ... showing top 20 processes");
+                break;
+            }
+        }
+        println!();
+
+        Ok(())
+    }
+
+    async fn cmd_kill(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: kill <pid>");
+            return Ok(());
+        }
+
+        if let Ok(pid) = args[0].parse::<i32>() {
+            let handler = LocalShellHandler::new();
+            match handler.kill_process(pid) {
+                Ok(_) => Theme::success(&format!("Process {} killed", pid)),
+                Err(e) => Theme::error(&format!("Failed to kill process: {}", e)),
+            }
+        } else {
+            Theme::error("Invalid PID");
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_listen(&mut self, args: &[&str]) -> Result<()> {
+        let (host, port) = match args {
+            [port_str] => ("0.0.0.0".to_string(), port_str.parse::<u16>()?),
+            [host, port_str] => (host.to_string(), port_str.parse::<u16>()?),
+            _ => {
+                Theme::error("Usage: listen [host] <port>");
+                return Ok(());
+            }
+        };
+
+        Theme::info(&format!("Starting reverse shell listener on {}:{}", host, port));
+
+        let handler = RemoteShellHandler::new(ShellType::Reverse, host.clone(), port);
+
+        match handler.start().await {
+            Ok(_) => {
+                let handlers = self.handlers.lock().await;
+                let id = handlers.register_remote_shell(handler).await;
+                drop(handlers);
+
+                self.current_handler = Some(id);
+                Theme::success(&format!("Connection received! Handler ID: {}", id));
+                Theme::info("Use 'exec <command>' to interact with shell");
+            }
+            Err(e) => {
+                Theme::error(&format!("Failed to start listener: {}", e));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_connect(&mut self, args: &[&str]) -> Result<()> {
+        if args.len() != 2 {
+            Theme::error("Usage: connect <host> <port>");
+            return Ok(());
+        }
+
+        let host = args[0].to_string();
+        let port = args[1].parse::<u16>()?;
+
+        Theme::info(&format!("Connecting to bind shell at {}:{}", host, port));
+
+        let handler = RemoteShellHandler::new(ShellType::Bind, host, port);
+
+        match handler.start().await {
+            Ok(_) => {
+                let handlers = self.handlers.lock().await;
+                let id = handlers.register_remote_shell(handler).await;
+                drop(handlers);
+
+                self.current_handler = Some(id);
+                Theme::success(&format!("Connected! Handler ID: {}", id));
+                Theme::info("Use 'exec <command>' to interact with shell");
+            }
+            Err(e) => {
+                Theme::error(&format!("Connection failed: {}", e));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_upload(&self, args: &[&str]) -> Result<()> {
+        if args.len() != 2 {
+            Theme::error("Usage: upload <local_path> <remote_path>");
+            return Ok(());
+        }
+
+        let handler = FileOperationsHandler::new();
+        let local_path = args[0];
+        let remote_path = args[1];
+
+        Theme::info(&format!("Uploading {} -> {}", local_path, remote_path));
+
+        let spinner = indicatif::ProgressBar::new_spinner();
+        spinner.set_style(Theme::spinner_style());
+        spinner.set_message("Uploading...");
+        spinner.enable_steady_tick(std::time::Duration::from_millis(120));
+
+        match handler.upload(local_path, remote_path).await {
+            Ok(result) => {
+                spinner.finish_and_clear();
+                Theme::success(&format!("Uploaded {} bytes", result.bytes_transferred));
+            }
+            Err(e) => {
+                spinner.finish_and_clear();
+                Theme::error(&format!("Upload failed: {}", e));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_download(&self, args: &[&str]) -> Result<()> {
+        if args.len() != 2 {
+            Theme::error("Usage: download <remote_path> <local_path>");
+            return Ok(());
+        }
+
+        let handler = FileOperationsHandler::new();
+        let remote_path = args[0];
+        let local_path = args[1];
+
+        Theme::info(&format!("Downloading {} -> {}", remote_path, local_path));
+
+        let spinner = indicatif::ProgressBar::new_spinner();
+        spinner.set_style(Theme::spinner_style());
+        spinner.set_message("Downloading...");
+        spinner.enable_steady_tick(std::time::Duration::from_millis(120));
+
+        match handler.download(remote_path, local_path).await {
+            Ok(result) => {
+                spinner.finish_and_clear();
+                Theme::success(&format!("Downloaded {} bytes", result.bytes_transferred));
+            }
+            Err(e) => {
+                spinner.finish_and_clear();
+                Theme::error(&format!("Download failed: {}", e));
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn cmd_pwd(&self) -> Result<()> {
+        let handler = LocalShellHandler::new();
+        match handler.get_cwd() {
+            Ok(cwd) => println!("{}", cwd),
+            Err(e) => Theme::error(&format!("Failed to get working directory: {}", e)),
+        }
+        Ok(())
+    }
+
+    async fn cmd_cd(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: cd <path>");
+            return Ok(());
+        }
+
+        let handler = LocalShellHandler::new();
+        match handler.change_directory(args[0]) {
+            Ok(_) => Theme::success(&format!("Changed directory to {}", args[0])),
+            Err(e) => Theme::error(&format!("Failed to change directory: {}", e)),
+        }
+        Ok(())
+    }
+
+    async fn cmd_cat(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: cat <file>");
+            return Ok(());
+        }
+
+        let handler = FileOperationsHandler::new();
+        match handler.read_file_string(args[0]).await {
+            Ok(contents) => print!("{}", contents),
+            Err(e) => Theme::error(&format!("Failed to read file: {}", e)),
+        }
+        Ok(())
+    }
+
+    async fn cmd_rm(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: rm <file>");
+            return Ok(());
+        }
+
+        let handler = FileOperationsHandler::new();
+        match handler.delete_file(args[0]).await {
+            Ok(_) => Theme::success(&format!("Deleted {}", args[0])),
+            Err(e) => Theme::error(&format!("Failed to delete file: {}", e)),
+        }
+        Ok(())
+    }
+
+    async fn cmd_mkdir(&self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::error("Usage: mkdir <directory>");
+            return Ok(());
+        }
+
+        let handler = FileOperationsHandler::new();
+        match handler.create_directory(args[0]).await {
+            Ok(_) => Theme::success(&format!("Created directory {}", args[0])),
+            Err(e) => Theme::error(&format!("Failed to create directory: {}", e)),
+        }
         Ok(())
     }
 }
