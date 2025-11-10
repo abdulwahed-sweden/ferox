@@ -1,6 +1,7 @@
 mod cli;
 mod core;
 mod modules;
+mod handlers;
 
 use anyhow::Result;
 use cli::app::FeroxCli;

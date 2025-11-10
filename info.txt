@@ -1,163 +1,50 @@
+You are an advanced Rust security framework engineer and AI project auditor.
 
-> Next Steps - Let's Make It Even Better!
-Since it's working perfectly, here are practical improvements I suggest:
-🔥 Priority 1: Add More Modules (Most Valuable)
+Task:
+Analyze the uploaded project archive "ferox_project.zip" — this is the source code for Ferox v2.0,
+a Rust-based offensive security framework inspired by Metasploit but built for speed, safety, and async design.
 
-HTTP Scanner - Web fingerprinting
-DNS Enumeration - Advanced DNS recon
-SSL/TLS Analyzer - Certificate checking
-Directory Bruteforce - Web directory discovery
+Steps:
 
-🎨 Priority 2: UX Improvements
+1. **Extract and scan project structure**:
+   - Map all source folders and files.
+   - Identify implemented modules under `src/modules/`, `src/core/`, `src/handlers/`, and `src/cli/`.
+   - Recognize modules such as `scanner/port_scanner.rs`, `recon/subdomain_enum.rs`, `exploit/example.rs`, `handlers/shell_local.rs`, `handlers/file_ops.rs`, etc.
 
-Tab Completion - Auto-complete commands
-Command History - Save/load previous commands
-Session Persistence - Save sessions to disk
-Colorful Help - Better help formatting
+2. **Compare against the official Ferox v2.0 architecture plan**:
+   - Core systems: `core/module.rs`, `core/session.rs`, `core/payload.rs`
+   - CLI: REPL, Command Parser, Theme
+   - Modules:
+     - scanner/
+     - exploit/
+     - post/
+     - evasion/
+     - c2/cloud/
+     - report/
+   - Handlers:
+     - shell_local
+     - shell_remote
+     - file_ops
 
-📊 Priority 3: Features
+3. **Generate a structured report**:
+   - ✅ Existing modules (fully implemented)
+   - 🚧 Incomplete or partial modules
+   - ❌ Missing modules (not yet built)
+   - Include estimated development effort for each missing module in hours (1–10 hours scale).
 
-Report Generator - JSON/HTML/PDF exports
-Database Integration - Store scan results
-API Server - REST API for automation
-Batch Mode - Run multiple scans from file
+4. **Then plan the next development phase automatically:**
+   - Phase 2: Interactive Shell + File Ops (verify presence & completeness)
+   - Phase 3: C2 Cloud Tunnel, EDR Visibility Test, Browser Session Inspector
+   - Phase 4: Web Dashboard, REST API, Plugin System
+   - Suggest exact filenames, directories, and required dependencies (Cargo.toml).
 
+5. **Output format:**
+   - Markdown sectioned report:
+     - `## Detected Modules`
+     - `## Missing Modules`
+     - `## Recommended Development Plan`
+     - `## Suggested Dependencies`
+     - `## Next Phase Commit Instructions`
 
-💡 My Recommendation: Add HTTP Scanner
-This would be the most useful next module because:
-
-✅ Complements subdomain enum perfectly
-✅ Useful for every pentest
-✅ Safe and non-destructive
-✅ Easy to implement
-
-HTTP Scanner Features:
-- HTTP/HTTPS detection
-- Server fingerprinting
-- Technology detection (WordPress, Joomla, etc.)
-- Header analysis
-- Status code checking
-- Response time measurement
-- Redirect following
-- SSL/TLS info
-
-🚀 Want Me To Build It Now?
-I can create a professional HTTP Scanner module with:
-rust✓ Async HTTP requests
-✓ Technology fingerprinting
-✓ Header analysis
-✓ SSL certificate info
-✓ WAF detection
-✓ CMS detection
-✓ Rate limiting
-✓ JSON output
-Example Usage:
-bashferox> use scanner/http_scanner
-ferox(scanner/http_scanner)> set RHOSTS https://example.com
-ferox(scanner/http_scanner)> set THREADS 10
-ferox(scanner/http_scanner)> check
-ferox(scanner/http_scanner)> run
-
-Results:
-  Server: nginx/1.18.0
-  Technologies: WordPress 6.4, PHP 8.1
-  SSL: Valid (expires in 90 days)
-  Status: 200 OK
-  Response Time: 234ms
-
-🎨 Or: Improve the CLI Experience
-Add these CLI enhancements:
-
-Tab Completion:
-
-rustferox> use sca[TAB]
-ferox> use scanner/port_scanner
-
-Better Help with Categories:
-
-bashferox> help scanners
-ferox> help exploits
-ferox> help sessions
-
-Command Aliases:
-
-bashferox> ls = modules
-ferox> x = exploit
-ferox> s = set
-```
-
-4. **Colored Output for Results:**
-```
-✓ Open ports highlighted in green
-⚠ Warnings in yellow
-✗ Errors in red
-
-📋 Or: Add Practical Features
-
-Output to File:
-
-bashferox> set OUTPUT_FILE results.json
-ferox> run
-# Results saved to results.json
-
-Scan Multiple Targets:
-
-bashferox> set RHOSTS file:targets.txt
-# Read targets from file
-
-Resume Scans:
-
-bashferox> sessions -l
-ferox> sessions -r <session_id>
-# Resume interrupted scan
-
-Workspace Management:
-
-bashferox> workspace create mytest
-ferox> workspace use mytest
-# All results saved to this workspace
-```
-
----
-
-## 🤔 **What Do You Want?**
-
-Tell me your preference:
-
-**A) Build HTTP Scanner Module** 🌐
-   - Most practical addition
-   - Complements existing modules
-   - ~400 lines of code
-
-**B) Improve CLI Experience** 🎨
-   - Tab completion
-   - Better help
-   - Command aliases
-   - ~200 lines of code
-
-**C) Add Report Generator** 📊
-   - JSON export
-   - HTML reports
-   - PDF generation
-   - ~300 lines of code
-
-**D) Add More Recon Modules** 🔍
-   - DNS enumeration
-   - WHOIS lookup
-   - ASN discovery
-   - ~500 lines of code
-
-**E) Something Else?** 💡
-   - Tell me what you need!
-
----
-
-## 🏆 **Current Status:**
-```
-Ferox Framework v2.0
-====================
-Status: ✅ WORKING PERFECTLY
-Modules: 3 (Scanner + Recon + Exploit)
-Lines of Code: 1,917
-Build: Release ready
-Quality: Production grade
+Be concise but detailed enough for a senior Rust engineer to act on your plan.
+Focus on realistic, modular, and secure development consistent with async Rust best practices.
