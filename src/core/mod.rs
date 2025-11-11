@@ -1,4 +1,6 @@
+pub mod audit;
 pub mod module;
+pub mod module_options;
 pub mod payload;
 pub mod reporter;
 pub mod result_store;

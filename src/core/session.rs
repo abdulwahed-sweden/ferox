@@ -27,31 +27,23 @@ impl SessionManager {
         let db = SessionDB::new(db_path.into())
             .with_context(|| "Failed to initialize session database")?;
 
-        let mut manager = Self {
+        Ok(Self {
             sessions: Arc::new(Mutex::new(HashMap::new())),
             db: Some(Arc::new(db)),
-        };
-
-        // Load existing sessions from database
-        manager.load_from_db_sync()?;
-
-        Ok(manager)
+        })
     }
 
-    /// Load sessions from database (synchronous version for initialization)
-    fn load_from_db_sync(&mut self) -> Result<()> {
+    /// Load sessions from database (async version)
+    pub async fn load_from_db(&self) -> Result<()> {
         if let Some(db) = &self.db {
             let loaded_sessions = db
                 .load_all_sessions()
                 .with_context(|| "Failed to load sessions from database")?;
 
-            // Use try_lock to avoid blocking inside an async runtime context (tests may call with_db inside #[tokio::test])
-            if let Ok(mut sessions) = self.sessions.try_lock() {
-                for session in loaded_sessions {
-                    sessions.insert(session.id, session);
-                }
-            } else {
-                // TODO: verify behavior: fallback skipped due to lock contention in runtime
+            // Properly await the mutex lock - no silent failures
+            let mut sessions = self.sessions.lock().await;
+            for session in loaded_sessions {
+                sessions.insert(session.id, session);
             }
         }
         Ok(())
@@ -299,6 +291,7 @@ mod tests {
     #[tokio::test]
     async fn test_session_manager_with_db() {
         let manager = SessionManager::with_db(":memory:").unwrap();
+        manager.load_from_db().await.unwrap();
 
         let session = Session::new(
             "test/module".to_string(),
@@ -344,6 +337,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_command() {
         let manager = SessionManager::with_db(":memory:").unwrap();
+        manager.load_from_db().await.unwrap();
 
         let session = Session::new(
             "test/module".to_string(),
@@ -360,5 +354,44 @@ mod tests {
         let history = manager.get_history(id).await.unwrap();
         assert_eq!(history.len(), 1);
         assert_eq!(history[0].command, "whoami");
+    }
+
+    #[tokio::test]
+    async fn test_concurrent_heartbeats() {
+        // This test verifies that concurrent heartbeat operations
+        // don't cause silent failures (regression test for try_lock issue)
+        let manager = Arc::new(SessionManager::new());
+
+        let session = Session::new(
+            "test/module".to_string(),
+            "127.0.0.1".to_string(),
+            Platform::Linux,
+        );
+        let id = session.id;
+
+        manager.add(session).await;
+
+        // Spawn multiple concurrent heartbeat operations
+        let mut handles = vec![];
+        for _ in 0..10 {
+            let manager_clone = Arc::clone(&manager);
+            let handle = tokio::spawn(async move {
+                for _ in 0..5 {
+                    manager_clone.heartbeat(id).await.unwrap();
+                    tokio::time::sleep(tokio::time::Duration::from_millis(1)).await;
+                }
+            });
+            handles.push(handle);
+        }
+
+        // Wait for all heartbeats to complete
+        for handle in handles {
+            handle.await.unwrap();
+        }
+
+        // Verify session still exists and is active
+        let retrieved = manager.get(id).await;
+        assert!(retrieved.is_some());
+        assert!(retrieved.unwrap().active);
     }
 }

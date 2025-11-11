@@ -1,4 +1,5 @@
 use crate::core::module::*;
+use crate::core::module_options::{OptionManager, OptionParser, StandardOptions};
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
@@ -7,27 +8,22 @@ use tokio::net::TcpStream;
 use tokio::time::timeout;
 
 pub struct PortScanner {
-    options: HashMap<String, String>,
+    standard_opts: StandardOptions,
+    ports: String,
 }
 
 impl PortScanner {
     pub fn new() -> Self {
-        let mut options = HashMap::new();
-        options.insert("RHOSTS".to_string(), String::new());
-        options.insert("PORTS".to_string(), "1-1000".to_string());
-        options.insert("TIMEOUT".to_string(), "1000".to_string());
-        options.insert("THREADS".to_string(), "100".to_string());
-
-        Self { options }
+        Self {
+            standard_opts: StandardOptions::default(),
+            ports: "1-1000".to_string(),
+        }
     }
 
     fn parse_ports(&self) -> Result<Vec<u16>> {
-        let ports_str = self
-            .get_option("PORTS")
-            .unwrap_or_else(|| "1-1000".to_string());
         let mut ports = Vec::new();
 
-        for part in ports_str.split(',') {
+        for part in self.ports.split(',') {
             let part = part.trim();
             if part.contains('-') {
                 let range: Vec<&str> = part.split('-').collect();
@@ -45,17 +41,80 @@ impl PortScanner {
     }
 
     async fn scan_port(&self, host: &str, port: u16) -> Option<u16> {
-        let timeout_ms = self
-            .get_option("TIMEOUT")
-            .and_then(|t| t.parse::<u64>().ok())
-            .unwrap_or(1000);
-
         let addr = format!("{}:{}", host, port);
 
-        match timeout(Duration::from_millis(timeout_ms), TcpStream::connect(&addr)).await {
+        match timeout(
+            Duration::from_millis(self.standard_opts.timeout_ms),
+            TcpStream::connect(&addr),
+        )
+        .await
+        {
             Ok(Ok(_)) => Some(port),
             _ => None,
         }
+    }
+}
+
+impl OptionManager for PortScanner {
+    fn validate(&self) -> Result<()> {
+        self.standard_opts.validate_required(true)?;
+        self.parse_ports()?; // Validate port format
+        Ok(())
+    }
+
+    fn set(&mut self, key: &str, value: &str) -> Result<()> {
+        match key {
+            "RHOSTS" => {
+                self.standard_opts.rhosts = Some(value.to_string());
+                Ok(())
+            }
+            "RHOST" => {
+                self.standard_opts.rhost = Some(value.to_string());
+                Ok(())
+            }
+            "PORTS" => {
+                self.ports = value.to_string();
+                Ok(())
+            }
+            "TIMEOUT" => {
+                self.standard_opts.timeout_ms = OptionParser::parse_timeout(value)?;
+                Ok(())
+            }
+            "THREADS" => {
+                self.standard_opts.threads = OptionParser::parse_threads(value)?;
+                Ok(())
+            }
+            _ => Err(anyhow!("Unknown option: {}", key)),
+        }
+    }
+
+    fn get(&self, key: &str) -> Option<String> {
+        match key {
+            "RHOSTS" => self.standard_opts.rhosts.clone(),
+            "RHOST" => self.standard_opts.rhost.clone(),
+            "PORTS" => Some(self.ports.clone()),
+            "TIMEOUT" => Some(self.standard_opts.timeout_ms.to_string()),
+            "THREADS" => Some(self.standard_opts.threads.to_string()),
+            _ => None,
+        }
+    }
+
+    fn list(&self) -> HashMap<String, String> {
+        let mut map = HashMap::new();
+        map.insert(
+            "RHOSTS".to_string(),
+            self.standard_opts.rhosts.clone().unwrap_or_default(),
+        );
+        map.insert("PORTS".to_string(), self.ports.clone());
+        map.insert(
+            "TIMEOUT".to_string(),
+            self.standard_opts.timeout_ms.to_string(),
+        );
+        map.insert(
+            "THREADS".to_string(),
+            self.standard_opts.threads.to_string(),
+        );
+        map
     }
 }
 
@@ -80,61 +139,53 @@ impl Module for PortScanner {
                 description: "Target host or IP address".to_string(),
                 required: true,
                 default_value: None,
-                current_value: self.get_option("RHOSTS"),
+                current_value: self.get("RHOSTS"),
             },
             ModuleOption {
                 name: "PORTS".to_string(),
                 description: "Ports to scan (e.g., 80,443 or 1-1000)".to_string(),
                 required: false,
                 default_value: Some("1-1000".to_string()),
-                current_value: self.get_option("PORTS"),
+                current_value: self.get("PORTS"),
             },
             ModuleOption {
                 name: "TIMEOUT".to_string(),
                 description: "Connection timeout in milliseconds".to_string(),
                 required: false,
-                default_value: Some("1000".to_string()),
-                current_value: self.get_option("TIMEOUT"),
+                default_value: Some("5000".to_string()),
+                current_value: self.get("TIMEOUT"),
             },
             ModuleOption {
                 name: "THREADS".to_string(),
                 description: "Number of concurrent connections".to_string(),
                 required: false,
-                default_value: Some("100".to_string()),
-                current_value: self.get_option("THREADS"),
+                default_value: Some("10".to_string()),
+                current_value: self.get("THREADS"),
             },
         ]
     }
 
     fn set_option(&mut self, name: &str, value: &str) -> Result<()> {
-        if self.options.contains_key(name) {
-            self.options.insert(name.to_string(), value.to_string());
-            Ok(())
-        } else {
-            Err(anyhow!("Unknown option: {}", name))
-        }
+        self.set(name, value)
     }
 
     fn get_option(&self, name: &str) -> Option<String> {
-        self.options.get(name).cloned()
+        self.get(name)
     }
 
     fn validate(&self) -> Result<()> {
-        if self.get_option("RHOSTS").unwrap_or_default().is_empty() {
-            return Err(anyhow!("RHOSTS is required"));
-        }
-        Ok(())
+        OptionManager::validate(self)
     }
 
     async fn run(&mut self) -> Result<ModuleResult> {
-        self.validate()?;
+        Module::validate(self)?;
 
-        let host = self.get_option("RHOSTS").unwrap();
+        let host = self
+            .standard_opts
+            .get_target()
+            .ok_or_else(|| anyhow!("No target host specified"))?;
         let ports = self.parse_ports()?;
-        let max_concurrent = self
-            .get_option("THREADS")
-            .and_then(|t| t.parse::<usize>().ok())
-            .unwrap_or(100);
+        let max_concurrent = self.standard_opts.threads;
 
         let mut open_ports = Vec::new();
         let total = ports.len();

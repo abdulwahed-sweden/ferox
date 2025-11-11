@@ -1,4 +1,5 @@
 use crate::cli::theme::Theme;
+use crate::core::audit;
 use crate::core::module::{ModuleRegistry, ModuleResult, ModuleType};
 use crate::core::payload::PayloadGenerator;
 #[cfg(feature = "pdf-export")]
@@ -20,6 +21,7 @@ use rustyline::hint::Hinter;
 use rustyline::validate::Validator;
 use rustyline::{CompletionType, Config, Editor};
 use std::collections::HashMap;
+use std::io::{self, Write};
 use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -839,6 +841,51 @@ impl FeroxCli {
                 Theme::error(&format!("Validation failed: {}", e));
                 Theme::info("Use 'options' to check required parameters");
                 return Ok(());
+            }
+
+            // CRITICAL: Enforce confirmation for dangerous modules
+            if module.requires_confirmation() {
+                let info = module.info();
+                println!();
+                Theme::warning("⚠️  This module performs potentially destructive operations!");
+                Theme::info(&format!("Module: {}", info.name));
+                Theme::info(&format!("Category: {}", info.category));
+                Theme::info(&format!("Description: {}", info.description));
+                println!();
+                Theme::warning("⚠️  AUTHORIZED USE ONLY - Explicit permission required");
+                Theme::warning("⚠️  Use only in authorized testing environments");
+                println!();
+
+                print!("Continue? [y/N]: ");
+                io::stdout().flush()?;
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input)?;
+
+                let confirmed = input.trim().eq_ignore_ascii_case("y");
+
+                // Log to audit file (append-only)
+                let user = std::env::var("USER")
+                    .or_else(|_| std::env::var("USERNAME"))
+                    .unwrap_or_else(|_| "unknown".to_string());
+
+                if let Err(e) = audit::append_confirmation(
+                    &info.name,
+                    &info.category,
+                    &user,
+                    confirmed,
+                ) {
+                    Theme::warning(&format!("Failed to write audit log: {}", e));
+                }
+
+                if !confirmed {
+                    Theme::warning("Module execution cancelled by user");
+                    println!();
+                    return Ok(());
+                }
+
+                Theme::success("Confirmation received - proceeding with execution");
+                println!();
             }
 
             Theme::section("EXECUTING MODULE");
