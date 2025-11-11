@@ -1,5 +1,6 @@
 pub mod audit;
 pub mod config;
+pub mod exploit_framework;
 pub mod module;
 pub mod module_metadata;
 pub mod module_options;
