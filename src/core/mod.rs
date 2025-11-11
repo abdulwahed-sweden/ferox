@@ -1,5 +1,7 @@
 pub mod audit;
+pub mod config;
 pub mod module;
+pub mod module_metadata;
 pub mod module_options;
 pub mod payload;
 pub mod reporter;
