@@ -9,6 +9,7 @@ pub mod cli;
 pub mod core;
 pub mod handlers;
 pub mod modules;
+pub mod tools;
 // Phase 3 infrastructure modules
 pub mod infra; // new lightweight infrastructure namespace (crypto, etc.)
 

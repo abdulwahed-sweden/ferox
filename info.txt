@@ -1,220 +1,521 @@
-Commands Executed - Phase 3 Implementation Complete
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🛠️ Ferox Maintenance & Diagnostic System
 
-✅ PHASE 3: NEXT-GEN C2 & POST-EXPLOITATION MODULES
-Implementation Date: 2025-11-10
-Status: COMPLETE - Production Ready (Mock Mode)
+## 📋 Table of Contents
+1. [Architecture Overview](#-architecture-overview)
+2. [Maintenance CLI](#-maintenance-cli)
+3. [Smart Build System](#-smart-build-system)
+4. [Module Manifest](#-module-manifest)
+5. [Cargo Subcommands](#-cargo-subcommands)
+6. [Diagnostic Tools](#-diagnostic-tools)
+7. [Testing Framework](#-testing-framework)
+8. [Documentation](#-documentation)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 🏗️ Architecture Overview
 
-📦 IMPLEMENTED MODULES (4 Total)
+### Integrated Maintenance Utility
+```rust
+// src/tools/maintenance/mod.rs
+pub struct MaintenanceEngine {
+    module_registry: ModuleRegistry,
+    diagnostic_runner: DiagnosticRunner,
+    fix_applier: FixApplier,
+}
 
-1. c2/teams_tunnel (596 lines)
-   • Microsoft Teams-based C2 channel
-   • AES-256-GCM + HMAC-SHA256 encryption
-   • Graph API integration for covert C&C
-   • Phantom meeting creation with encrypted commands
-   • Tests: 3/3 passing ✓
+impl MaintenanceEngine {
+    pub fn new() -> Self {
+        Self {
+            module_registry: ModuleRegistry::load_manifest(),
+            diagnostic_runner: DiagnosticRunner::new(),
+            fix_applier: FixApplier::new(),
+        }
+    }
+    
+    pub fn run_health_check(&self) -> HealthReport {
+        // Comprehensive system diagnostics
+    }
+}
+```
 
-2. post/browser/deep_session_hijack (518 lines)
-   • Chrome/Edge/Firefox cookie extraction
-   • In-memory SQLite database parsing
-   • Targets: *.microsoft.com, *.google.com, *.okta.com
-   • JSON/CSV output formats
-   • Tests: 5/5 passing ✓
+## ⚙️ Maintenance CLI
 
-3. auxiliary/cloud/onedrive_sync_exfil (529 lines)
-   • OneDrive-based data exfiltration
-   • Uses victim's OAuth token from memory
-   • Mimics legitimate sync traffic
-   • Uploads to Backups/ folder for cover
-   • Tests: 4/4 passing ✓
+### Integrated Command Structure
+```rust
+// src/cli/maintenance.rs
+#[derive(clap::Subcommand)]
+pub enum MaintenanceCommands {
+    /// Run comprehensive system health check
+    Check {
+        /// Check module visibility
+        #[arg(short, long)]
+        modules: bool,
+        
+        /// Check build configuration
+        #[arg(short, long)]
+        build: bool,
+        
+        /// Check file structure
+        #[arg(short, long)]
+        structure: bool,
+    },
+    
+    /// Fix detected issues automatically
+    Fix {
+        /// Fix module registration
+        #[arg(short, long)]
+        modules: bool,
+        
+        /// Fix build configuration
+        #[arg(short, long)]
+        config: bool,
+    },
+    
+    /// Generate detailed system report
+    Diagnose {
+        /// Output format
+        #[arg(short, long, default_value = "text")]
+        format: OutputFormat,
+    },
+}
+```
 
-4. evasion/edr/silent_shadow (488 lines)
-   • Detects 5 major EDR products
-   • CrowdStrike, SentinelOne, Defender, Carbon Black, Cylance
-   • Hook detection in NTDLL functions
-   • Direct syscall & unhooking simulation (mock mode)
-   • Tests: 5/5 passing ✓
+### Usage Examples
+```bash
+# Integrated maintenance commands
+ferox --maint check --modules --build
+ferox --maint fix --modules
+ferox --maint diagnose --format json
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Quick health check
+ferox doctor
+```
 
-🧪 TEST & BUILD RESULTS
+## 🔧 Smart Build System
 
-Total Tests:        56 tests passing ✓
-  Phase 3:          17 tests passing ✓
-  Existing:         39 tests passing ✓
+### Intelligent Build Script
+```rust
+// build.rs
+use std::{collections::HashMap, env, fs, path::Path};
 
-Code Quality:
-  Clippy:           0 warnings (with -D warnings) ✓
-  Build:            Release successful ✓
-  Coverage:         100% test success rate ✓
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed=Cargo.toml");
+    
+    let manifest = ModuleManifest::load()?;
+    let mut report = BuildReport::new();
+    
+    // Validate module structure
+    for (category, modules) in &manifest.categories {
+        for module in modules {
+            let path = format!("src/{}/{}.rs", category, module);
+            if Path::new(&path).exists() {
+                report.add_success(category, module);
+                println!("cargo:warning=✅ {}::{} registered", category, module);
+            } else {
+                report.add_missing(category, module);
+                println!("cargo:warning=❌ {}::{} - FILE MISSING", category, module);
+            }
+        }
+    }
+    
+    // Generate module registry
+    if let Err(e) = generate_module_registry(&manifest) {
+        eprintln!("cargo:warning=Failed to generate module registry: {}", e);
+    }
+    
+    Ok(())
+}
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Build Output Enhancement
+```toml
+# Cargo.toml enhancements
+[package]
+build = "build.rs"
 
-🏗️ TECHNICAL IMPLEMENTATION
+[build-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
-Infrastructure:
-  • Added crypto module (src/infra/crypto.rs)
-    - AES-256-GCM authenticated encryption
-    - HMAC-SHA256 message authentication
-    - HKDF-SHA256 key derivation
+[dependencies]
+colored = "2.0"
+owo-colors = "3.0"
+```
 
-  • New module namespaces:
-    - src/modules/c2/ (Teams Tunnel)
-    - src/modules/post/browser/ (Session Hijack)
-    - src/modules/auxiliary/cloud/ (OneDrive Exfil)
-    - src/modules/evasion/edr/ (EDR Evasion)
+## 📦 Module Manifest System
 
-Dependencies Added:
-  • aes-gcm = "0.10.3"
-  • hmac = "0.12.1"
-  • sha2 = "0.10.9"
-  • hkdf = "0.12.4"
-  • data-encoding = "2.6.0"
-  • dirs = "6.0.0"
+### Structured Manifest Format
+```json
+// src/modules/manifest.json
+{
+  "version": "2.0.0",
+  "last_updated": "2025-11-12",
+  "categories": {
+    "memory_forensics": {
+      "description": "Advanced memory analysis capabilities",
+      "modules": [
+        "dump_parser",
+        "process_analyzer", 
+        "malware_detector",
+        "network_analyzer",
+        "registry_analyzer",
+        "credential_extractor",
+        "mitre_mapper",
+        "volatility_bridge"
+      ]
+    },
+    "reconnaissance": {
+      "description": "Information gathering and enumeration",
+      "modules": [
+        "asn",
+        "dns",
+        "subdomains",
+        "whois"
+      ]
+    }
+  }
+}
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Automatic Registry Generator
+```rust
+// src/tools/registry_generator.rs
+pub struct RegistryGenerator {
+    manifest: ModuleManifest,
+}
 
-📚 DOCUMENTATION
+impl RegistryGenerator {
+    pub fn generate_rust_code(&self) -> String {
+        let mut code = String::from("// Auto-generated module registry\n\n");
+        
+        for (category, data) in &self.manifest.categories {
+            code.push_str(&format!("pub mod {} {{\n", category));
+            
+            for module in &data.modules {
+                code.push_str(&format!("    pub mod {};\n", module));
+            }
+            
+            code.push_str("}\n\n");
+        }
+        
+        code
+    }
+    
+    pub fn write_registry_file(&self) -> Result<(), std::io::Error> {
+        let code = self.generate_rust_code();
+        std::fs::write("src/modules/auto_generated.rs", code)
+    }
+}
+```
 
-Created:
-  • PHASE3_IMPLEMENTATION.md (300+ lines)
-    - Complete technical documentation
-    - Module specifications
-    - Architecture details
-    - Security features
-    - Comparison with industry tools
+## 🛠️ Cargo Subcommands
 
-  • examples/phase3_examples.md (400+ lines)
-    - CLI usage examples
-    - Complete workflows
-    - Command reference
-    - Troubleshooting guide
+### Custom Cargo Commands
+```rust
+// src/bin/cargo-ferox/main.rs
+use clap::{Parser, Subcommand};
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#[derive(Parser)]
+#[command(name = "cargo")]
+#[command(bin_name = "cargo")]
+enum CargoCli {
+    Ferox(FeroxArgs),
+}
 
-🔒 SECURITY & SAFETY
+#[derive(Parser)]
+#[command(name = "ferox")]
+#[command(about = "Ferox framework maintenance tools")]
+struct FeroxArgs {
+    #[command(subcommand)]
+    command: FeroxCommands,
+}
 
-✓ Mock mode enabled by default on ALL modules
-✓ No real operations without explicit opt-in
-✓ Confirmation required for destructive operations
-✓ Clear "AUTHORIZED USE ONLY" warnings
-✓ In-memory operations (no forensic artifacts)
-✓ Production evasion disabled for safety
+#[derive(Subcommand)]
+enum FeroxCommands {
+    /// Diagnose framework health
+    Diagnose {
+        /// Check level
+        #[arg(short, long, default_value = "full")]
+        level: CheckLevel,
+    },
+    /// Fix common issues
+    Fix {
+        /// Issue type to fix
+        #[arg(short, long)]
+        issue: IssueType,
+    },
+    /// Check module visibility
+    CheckModules,
+}
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Subcommand Implementation
+```toml
+# Additional Cargo.toml configuration
+[[bin]]
+name = "cargo-ferox"
+path = "src/bin/cargo-ferox/main.rs"
 
-🚀 MODULE USAGE EXAMPLES
+[[bin]]
+name = "ferox-doctor"
+path = "src/bin/ferox-doctor/main.rs"
+```
 
-Teams C2:
-  ferox> use c2/teams_tunnel
-  ferox> set access_token <token>
-  ferox> set encryption_key MyPassword
-  ferox> set mock_mode true
-  ferox> run
+## 🩺 Diagnostic Tools
 
-Browser Session Hijack:
-  ferox> use post/browser/deep_session_hijack
-  ferox> set browser chrome
-  ferox> set target_domains *.microsoft.com
-  ferox> set mock_mode true
-  ferox> run
+### Ferox Doctor Implementation
+```rust
+// src/bin/ferox-doctor/main.rs
+use ferox_tools::maintenance::{Doctor, HealthReport};
+use owo_colors::OwoColorize;
 
-OneDrive Exfil:
-  ferox> use auxiliary/cloud/onedrive_sync_exfil
-  ferox> set oauth_token <token>
-  ferox> set source_file /tmp/data.zip
-  ferox> set mock_mode true
-  ferox> run
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("{}", "🩺 Ferox Doctor".bold().blue());
+    println!("{}", "──────────────────────────────".dimmed());
+    
+    let doctor = Doctor::new();
+    let report = doctor.run_comprehensive_check()?;
+    
+    report.print_colored();
+    
+    if report.is_healthy() {
+        println!("{}", "✅ Everything healthy!".green().bold());
+    } else {
+        println!("{}", "❌ Issues detected. Run 'ferox --maint fix'".red().bold());
+        std::process::exit(1);
+    }
+    
+    Ok(())
+}
+```
 
-EDR Detection:
-  ferox> use evasion/edr/silent_shadow
-  ferox> set technique detection_only
-  ferox> run
+### Colorized Output System
+```rust
+// src/tools/output.rs
+use owo_colors::OwoColorize;
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pub struct ColorizedOutput;
 
-📊 COMPARISON WITH INDUSTRY TOOLS
+impl ColorizedOutput {
+    pub fn success(message: &str) {
+        println!("{} {}", "✅".green(), message);
+    }
+    
+    pub fn warning(message: &str) {
+        println!("{} {}", "⚠️".yellow(), message);
+    }
+    
+    pub fn error(message: &str) {
+        println!("{} {}", "❌".red(), message);
+    }
+    
+    pub fn info(message: &str) {
+        println!("{} {}", "ℹ️".blue(), message);
+    }
+    
+    pub fn section_header(title: &str) {
+        println!("\n{}", title.bold().cyan());
+        println!("{}", "─".repeat(title.len()).dimmed());
+    }
+}
+```
 
-Feature                    Ferox Phase 3    Cobalt Strike    Sliver    Metasploit
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Memory-safe (Rust)              ✅               ❌             ✅          ❌
-Cloud-native C2 (Teams)         ✅               ⚠️             ✅          ❌
-Mock mode safety                ✅               ❌             ❌          ⚠️
-Browser session hijack          ✅               ⚠️             ❌          ⚠️
-OneDrive exfiltration          ✅               ❌             ❌          ❌
-EDR detection                   ✅               ✅             ✅          ⚠️
+## 🧪 Testing Framework
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Automated Module Tests
+```rust
+// tests/module_visibility.rs
+use std::path::Path;
 
-✨ KEY INNOVATIONS
+#[test]
+fn test_memory_forensics_modules_exist() {
+    let expected_modules = [
+        "dump_parser",
+        "process_analyzer", 
+        "malware_detector",
+        "network_analyzer",
+        "registry_analyzer",
+        "credential_extractor",
+        "mitre_mapper",
+        "volatility_bridge"
+    ];
+    
+    for module in expected_modules {
+        let path = format!("src/memory_forensics/{}.rs", module);
+        assert!(
+            Path::new(&path).exists(),
+            "Missing memory forensics module: {}",
+            module
+        );
+    }
+}
 
-1. First Rust-based framework with native Teams C2 integration
-2. Memory-safe offensive security with zero unsafe code
-3. Mock-first design for safe development and testing
-4. Cloud-native architecture (SaaS tunneling, OAuth token reuse)
-5. Modern 2025 threat landscape focus (EDR, cloud, browser sessions)
+#[test]
+fn test_module_registration() {
+    // Test that all modules are properly registered
+    let manifest = ferox_tools::manifest::load_manifest().unwrap();
+    
+    for (category, data) in manifest.categories {
+        for module in data.modules {
+            // Test Rust module declaration exists
+            let mod_path = format!("src/{}/mod.rs", category);
+            let mod_content = std::fs::read_to_string(mod_path).unwrap();
+            
+            assert!(
+                mod_content.contains(&format!("pub mod {};", module)),
+                "Module {} not registered in {}/mod.rs",
+                module,
+                category
+            );
+        }
+    }
+}
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Integration Test Suite
+```rust
+// tests/integration/maintenance.rs
+#[cfg(test)]
+mod integration_tests {
+    use ferox_tools::maintenance::MaintenanceEngine;
+    
+    #[test]
+    fn test_health_check_integration() {
+        let engine = MaintenanceEngine::new();
+        let report = engine.run_health_check();
+        
+        assert!(report.build_health, "Build health check failed");
+        assert!(report.module_health, "Module health check failed");
+        assert!(report.structure_health, "Structure health check failed");
+    }
+    
+    #[test]
+    fn test_auto_fix_integration() {
+        let engine = MaintenanceEngine::new();
+        let fixes = engine.run_auto_fix();
+        
+        assert!(fixes.applied > 0, "No fixes were applied");
+        assert!(!fixes.has_errors, "Fix application had errors");
+    }
+}
+```
 
-📈 METRICS
+## 📚 Documentation
 
-Lines of Code:         ~2,500+ production code
-Test Coverage:         56 tests (100% passing)
-Modules:               4 complete offensive security modules
-Documentation:         1,100+ lines
-Time to Implement:     Single session
-Code Quality:          Clippy clean, release build successful
+### Maintenance Guide
+```markdown
+# 🛠️ Ferox Maintenance Guide
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## Overview
+The Ferox maintenance system provides automated tools for framework health monitoring, issue detection, and automatic repairs.
 
-🎯 DELIVERABLES COMPLETED
+## Quick Start
 
-✅ Teams Tunnel C2 with Graph API integration
-✅ Deep Session Hijack for browser cookie extraction
-✅ OneDrive Sync Exfil for cloud exfiltration
-✅ Silent Shadow EDR detection & evasion
-✅ Crypto infrastructure (AES-GCM, HMAC, HKDF)
-✅ Full test coverage (56 tests, 100% passing)
-✅ Clippy clean (0 warnings)
-✅ Release build successful
-✅ Module registration in main.rs
-✅ Mock mode for all modules
-✅ Comprehensive documentation (1,100+ lines)
+### Basic Health Check
+```bash
+ferox doctor
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Comprehensive Maintenance
+```bash
+ferox --maint check --modules --build --structure
+ferox --maint fix --modules --config
+```
 
-⚠️  IMPORTANT LEGAL NOTICE
+### Cargo Integration
+```bash
+cargo ferox diagnose
+cargo ferox check-modules
+```
 
-All Phase 3 modules require EXPLICIT WRITTEN AUTHORIZATION before real use:
-  • Penetration testing engagements
-  • Red team exercises with client approval
-  • Security research in controlled environments
-  • CTF competitions
+## Architecture
 
-Unauthorized use is ILLEGAL and UNETHICAL.
+### Module Manifest System
+- **Location**: `src/modules/manifest.json`
+- **Purpose**: Centralized module configuration
+- **Auto-generation**: Registry files generated during build
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Diagnostic Engine
+- **Health Checks**: Module visibility, build config, file structure
+- **Auto-fix**: Common issues resolution
+- **Reporting**: Colorized output with detailed findings
 
-🎓 CONCLUSION
+## Advanced Usage
 
-"The best payload is the one that never looks like a payload."
+### Custom Health Checks
+Add custom checks to `src/tools/custom_checks.rs`:
 
-Ferox Phase 3 is COMPLETE. The framework now includes production-ready,
-memory-safe C2 and post-exploitation modules that blend into legitimate
-enterprise traffic. All modules are safe by default (mock mode) and ready
-for authorized security testing.
+```rust
+pub fn custom_module_check() -> HealthCheckResult {
+    // Implementation
+}
+```
 
-Ferox is now a legitimate competitor to commercial offensive security
-frameworks, with the advantages of:
-  • Memory safety (Rust)
-  • Async-first architecture (Tokio)
-  • Cloud-native design (SaaS tunneling)
-  • Modern tradecraft (2025 threat landscape)
-  • Safe development (mock mode by default)
+### Build Integration
+The system integrates with Cargo build process:
+- Automatic module validation during `cargo build`
+- Registry generation
+- Health reporting
+```
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 🚀 Implementation Roadmap
 
-STATUS: ✅ PRODUCTION READY (MOCK MODE)
-        ⚠️  AUTHORIZATION REQUIRED FOR REAL OPERATIONS
+### Phase 1: Core Infrastructure (Week 1)
+1. **Module manifest system**
+2. **Basic maintenance CLI**
+3. **Build script integration**
+
+### Phase 2: Diagnostic Tools (Week 2)
+1. **Ferox Doctor implementation**
+2. **Colorized output system**
+3. **Health reporting**
+
+### Phase 3: Advanced Features (Week 3)
+1. **Cargo subcommands**
+2. **Auto-fix capabilities**
+3. **Testing framework**
+
+### Phase 4: Polish & Documentation (Week 4)
+1. **Comprehensive documentation**
+2. **Performance optimization**
+3. **User experience refinement**
+
+## 💡 Usage Examples
+
+### Daily Development Workflow
+```bash
+# Start with health check
+ferox doctor
+
+# If issues found, fix them
+ferox --maint fix --modules
+
+# Verify fixes
+ferox --maint check --modules
+
+# Build with validation
+cargo build --features memory-forensics
+```
+
+### CI/CD Integration
+```yaml
+# GitHub Actions example
+- name: Ferox Health Check
+  run: |
+    cargo ferox diagnose --level full
+    if [ $? -ne 0 ]; then
+      cargo ferox fix --all
+    fi
+```
+
+### Pre-commit Hook
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+cargo ferox check-modules
+if [ $? -ne 0 ]; then
+    echo "Module issues detected. Run 'cargo ferox fix'"
+    exit 1
+fi
+```
+
+This comprehensive maintenance system transforms Ferox from a collection of scripts into a professionally managed framework with built-in health monitoring, automated issue resolution, and enterprise-grade maintenance capabilities.
