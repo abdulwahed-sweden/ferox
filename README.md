@@ -1,136 +1,411 @@
-# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless# 🦊 Ferox - Fast, Fierce, Fearless Security Framework
+# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless
 
+[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
 
+> Ferox is a Rust-native offensive security framework for authorized operators who demand uncompromising speed, safety, and observability.
 
-[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
-
-[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
-
-[![License](https://img.shields.io/badge/license-MIT-blue)]()[![License](https://img.shields.io/badge/license-MIT-blue)]()
-
-[![Status](https://img.shields.io/badge/status-production%20ready-success)]()[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
-
-
-
-> Ferox is a Rust-native offensive security framework built for authorized operators who demand uncompromising speed, safety, and observability.> A modern offensive security framework built in Rust - designed for authorized penetration testing, CTF competitions, and security research.
-
-
-
-- ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers.## ⚡ Why Ferox?
-
+- ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers.
 - 🛡️ **Guardrails:** Authorization gating, immutable audit trails, safe-mode confirmations, and policy enforcement.
+- 🧠 **Intelligence:** Integrated memory forensics, MITRE ATT&CK mapping, and evidence persistence.
 
-- 🧠 **Intelligence:** Integrated memory forensics, MITRE ATT&CK mapping, and evidence persistence.- **50-100x Faster** - Startup in 0.11s vs Metasploit's 5-10s
+📚 **Quick navigation:** [Overview](docs/overview.md) · [Modules](docs/modules.md) · [Usage Guide](docs/usage-guide.md) · [Developer Guide](docs/developer-guide.md) · [Testing & CI](docs/testing-and-ci.md) · [Memory Forensics](docs/memory-forensics.md) · [Changelog](docs/changelog.md)
 
-- **Memory Safe** - Built with Rust's safety guarantees
-
-📚 **Quick navigation:** [Overview](docs/overview.md) · [Modules](docs/modules.md) · [Usage Guide](docs/usage-guide.md) · [Developer Guide](docs/developer-guide.md) · [Testing & CI](docs/testing-and-ci.md) · [Memory Forensics](docs/memory-forensics.md) · [Changelog](docs/changelog.md)- **Authorization-First** - Built-in security controls
-
-- **Enterprise-Grade** - Professional infrastructure
-
-## 🔑 Core Capabilities- **Type-Safe** - Catch errors at compile time
-
-- **Modern Async** - High-performance I/O with Tokio
+## 🔑 Core Capabilities
 
 | Pillar | Highlights |
-
-| --- | --- |## 🎯 Features
-
+| --- | --- |
 | Command & Control | HTTP beacon, DNS tunnel, Teams tunnel, relay manager, cloud pivots |
-
-| Reconnaissance | ASN discovery, DNS/subdomain enumeration, WHOIS intelligence |### Security & Compliance
-
-| Scanning | High-speed TCP/HTTP scanners with asynchronous execution |- ✅ **Authorization System** - Time-bound, target-scoped permissions
-
-| Evasion & Post | Silent Shadow EDR bypass, deep session hijacking, credential workflows |- ✅ **Audit Logging** - Tamper-proof security trail
-
-| Memory Forensics | Dump parsing, process tree scoring, malware heuristics, MITRE correlation |- ✅ **Safe Mode** - Confirmation prompts for dangerous operations
-
-| Governance | Time-boxed authorization, safe mode, tamper-proof audit logging |- ✅ **Security Policies** - Module whitelisting/blacklisting
-
-- ✅ **Session Management** - SQLite persistence with concurrent safety
+| Reconnaissance | ASN discovery, DNS/subdomain enumeration, WHOIS intelligence |
+| Scanning | High-speed TCP/HTTP scanners with asynchronous execution |
+| Evasion & Post | Silent Shadow EDR bypass, deep session hijacking, credential workflows |
+| Memory Forensics | Dump parsing, process tree scoring, malware heuristics, MITRE correlation |
+| Governance | Time-boxed authorization, safe mode, tamper-proof audit logging |
 
 ## 🚀 Getting Started
 
-### Infrastructure
-
-```bash- ✅ **Module Metadata** - Versioning, dependencies, platform support
-
-# Clone and enter the repo- ✅ **Dependency Resolution** - Topological sort, circular detection
-
-git clone https://github.com/abdulwahed-sweden/ferox- ✅ **Configuration Management** - TOML-based, hierarchical
-
-cd ferox- ✅ **Advanced Options** - Type-safe, validated options
-
-
-
-# Build with memory forensics enabled### Framework Capabilities
-
-cargo build --release --features memory-forensics- ✅ **Exploit Framework** - Target analysis, payload selection
-
-- ✅ **12 Security Modules** - Scanner, recon, exploit, C2, post-exploitation
-
-# Initialize workspace (optional)- ✅ **Memory Forensics** - Integrated Windows dump analysis (NEW!)
-
-mkdir -p ~/.ferox && cp ferox_security.toml ~/.ferox/config.toml- ✅ **Session Tracking** - Persistent sessions with command history
-
-```- ✅ **Report Generation** - JSON, HTML, PDF export
-
-
-
-### Run the CLI## 🚀 Quick Start
-
 ```bash
-
-./target/release/ferox --help### Prerequisites
-
-./target/release/ferox memory --help```bash
-
-```# Rust 1.70 or higher
-
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-### Mock / Safe Testing Mode```
-
-Run dangerous modules with full auditing but without touching live infrastructure.
-
-```bash### Installation
-
-SAFE_MODE=1 ./target/release/ferox --mock run c2/teams_tunnel```bash
-
-```git clone https://github.com/abdulwahed-sweden/ferox
-
+# Clone and enter the repo
+git clone https://github.com/abdulwahed-sweden/ferox
 cd ferox
 
-Audit entries for mock executions appear under `~/.ferox/logs/audit.log` and are tagged accordingly.cargo build --release
+# Build with memory forensics enabled
+cargo build --release --features memory-forensics
 
+# Initialize workspace (optional)
+mkdir -p ~/.ferox && cp ferox_security.toml ~/.ferox/config.toml
 ```
+
+### Run the CLI
+```bash
+./target/release/ferox --help
+./target/release/ferox memory --help
+```
+
+### Mock / Safe Testing Mode
+Run dangerous modules with full auditing but without touching live infrastructure.
+```bash
+SAFE_MODE=1 ./target/release/ferox --mock run c2/teams_tunnel
+```
+
+Audit entries for mock executions appear under `~/.ferox/logs/audit.log` and are tagged accordingly.
 
 ## 🖥️ CLI Snapshots
 
-### Verify Installation
-
-```text```bash
-
-ferox> help./verify_phase1.sh
-
-ferox> use scanner/port```
-
+```text
+ferox> help
+ferox> use scanner/port
 ferox (scanner/port)> set RHOSTS 10.0.5.0/24
-
-ferox (scanner/port)> set PORTS 1-1000### Run Ferox
-
-ferox (scanner/port)> run --json > reports/port-scan.json```bash
-
-```./target/release/ferox
-
+ferox (scanner/port)> set PORTS 1-1000
+ferox (scanner/port)> run --json > reports/port-scan.json
 ```
 
 ```bash
+# Memory forensics workflow
+ferox memory analyze dumps/workstation.dmp --database analysis.db --output reports/workstation.json
+ferox memory malfind dumps/workstation.dmp --min-score 0.6 --mitre --format table
+ferox memory mitre dumps/workstation.dmp --database analysis.db --format markdown
+```
+
+## 🗃️ Build & Test Matrix
+
+```bash
+# Standard build
+cargo build
+
+# Full feature build
+cargo build --all-features
+
+# Test suites
+cargo test --lib
+cargo test --features memory-forensics --tests
+cargo test --test integration_tests
+```
+
+Add `SAFE_MODE=1` for smoke validation in CI environments.
+
+## 🧭 Documentation Highlights
+
+- [docs/overview.md](docs/overview.md) — architecture, mission, security posture.
+- [docs/modules.md](docs/modules.md) — categorized module catalog.
+- [docs/usage-guide.md](docs/usage-guide.md) — CLI walkthroughs and automation tips.
+- [docs/developer-guide.md](docs/developer-guide.md) — coding standards and contribution workflow.
+- [docs/testing-and-ci.md](docs/testing-and-ci.md) — verification pipeline and quality gates.
+- [docs/memory-forensics.md](docs/memory-forensics.md) — in-depth analysis workflow.
+- [docs/changelog.md](docs/changelog.md) — release evolution from v1.x to v2.0.0.
+
+## 🛣️ Roadmap
+
+| Status | Initiative |
+| --- | --- |
+| ✅ | v2.0.0 memory forensics launch |
+| 🔄 | Plugin marketplace with signed module distribution |
+| 🔄 | Extended payload library and automation templates |
+| 🔄 | Web operator console with real-time telemetry |
+| 🗓️ | Hardware-backed credential vault integration |
+
+Have ideas? See the [Developer Guide](docs/developer-guide.md) and open a discussion.
+
+## 🤝 Contributing
+
+We welcome issues, proposals, and pull requests that respect the project's safety-first ethos.
+
+1. Fork and branch (`git checkout -b feat/<short-description>`).
+2. Follow the test matrix, including `cargo test --features memory-forensics --tests`.
+3. Document new modules and update metadata.
+4. Reference authorization and audit implications in your PR description.
+
+Please ensure all work complies with applicable laws and engagement contracts.
+
+## 📜 License & Compliance
+
+Ferox is released under the [MIT License](LICENSE). Usage is restricted to authorized security testing, defensive research, and educational scenarios. Unauthorized or malicious use is strictly prohibited.
+
+## 📬 Support & Contact
+
+- Maintainer: Abdulwahed Mansour — `abdulwahed.mansour@gmail.com`
+- Security inquiries: `security@ferox.local`
+- GitHub: [@abdulwahed-sweden](https://github.com/abdulwahed-sweden)
+
+---
+
+_Version 2.0.0 · Updated 2025-11-12 · Ferox — Fast. Fierce. Fearless._ 🦊# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless
+# 🦊 Ferox - Fast, Fierce, Fearless Security Framework
+
+## 🔑 Core Capabilities
+## 🔑 Core Capabilities
+| Pillar | Highlights |
+| --- | --- |
+| ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers. |
+# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless# 🦊 Ferox - Fast, Fierce, Fearless Security Framework
+
+
+
+[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
+
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
+
+[![License](https://img.shields.io/badge/license-MIT-blue)]()[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
+
+[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
+
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
+
+> Ferox is a Rust-native offensive security framework for authorized operators who demand uncompromising speed, safety, and observability.
+
+[![License](https://img.shields.io/badge/license-MIT-blue)]()[![License](https://img.shields.io/badge/license-MIT-blue)]()
+
+- ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers.
+
+- 🛡️ **Guardrails:** Authorization gating, immutable audit trails, safe-mode confirmations, and policy enforcement.[![Status](https://img.shields.io/badge/status-production%20ready-success)]()[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
+
+- 🧠 **Intelligence:** Integrated memory forensics, MITRE ATT&CK mapping, and evidence persistence.
+
+
+
+📚 **Quick navigation:** [Overview](docs/overview.md) · [Modules](docs/modules.md) · [Usage Guide](docs/usage-guide.md) · [Developer Guide](docs/developer-guide.md) · [Testing & CI](docs/testing-and-ci.md) · [Memory Forensics](docs/memory-forensics.md) · [Changelog](docs/changelog.md)
+
+> Ferox is a Rust-native offensive security framework built for authorized operators who demand uncompromising speed, safety, and observability.> A modern offensive security framework built in Rust - designed for authorized penetration testing, CTF competitions, and security research.
+
+## 🔑 Core Capabilities
+
+
+
+| Pillar | Highlights |
+
+| --- | --- |- ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers.## ⚡ Why Ferox?
+
+| Command & Control | HTTP beacon, DNS tunnel, Teams tunnel, relay manager, cloud pivots |
+
+| Reconnaissance | ASN discovery, DNS/subdomain enumeration, WHOIS intelligence |- 🛡️ **Guardrails:** Authorization gating, immutable audit trails, safe-mode confirmations, and policy enforcement.
+
+| Scanning | High-speed TCP/HTTP scanners with asynchronous execution |
+
+| Evasion & Post | Silent Shadow EDR bypass, deep session hijacking, credential workflows |- 🧠 **Intelligence:** Integrated memory forensics, MITRE ATT&CK mapping, and evidence persistence.- **50-100x Faster** - Startup in 0.11s vs Metasploit's 5-10s
+
+| Memory Forensics | Dump parsing, process tree scoring, malware heuristics, MITRE correlation |
+
+| Governance | Time-boxed authorization, safe mode, tamper-proof audit logging |- **Memory Safe** - Built with Rust's safety guarantees
+
+
+
+## 🚀 Getting Started📚 **Quick navigation:** [Overview](docs/overview.md) · [Modules](docs/modules.md) · [Usage Guide](docs/usage-guide.md) · [Developer Guide](docs/developer-guide.md) · [Testing & CI](docs/testing-and-ci.md) · [Memory Forensics](docs/memory-forensics.md) · [Changelog](docs/changelog.md)- **Authorization-First** - Built-in security controls
+
+
+
+```bash- **Enterprise-Grade** - Professional infrastructure
+
+# Clone and enter the repo
+
+git clone https://github.com/abdulwahed-sweden/ferox## 🔑 Core Capabilities- **Type-Safe** - Catch errors at compile time
+
+cd ferox
+
+- **Modern Async** - High-performance I/O with Tokio
+
+# Build with memory forensics enabled
+
+cargo build --release --features memory-forensics| Pillar | Highlights |
+
+
+
+# Initialize workspace (optional)| --- | --- |## 🎯 Features
+
+mkdir -p ~/.ferox && cp ferox_security.toml ~/.ferox/config.toml
+
+```| Command & Control | HTTP beacon, DNS tunnel, Teams tunnel, relay manager, cloud pivots |
+
+
+
+### Run the CLI| Reconnaissance | ASN discovery, DNS/subdomain enumeration, WHOIS intelligence |### Security & Compliance
+
+```bash
+
+./target/release/ferox --help| Scanning | High-speed TCP/HTTP scanners with asynchronous execution |- ✅ **Authorization System** - Time-bound, target-scoped permissions
+
+./target/release/ferox memory --help
+
+```| Evasion & Post | Silent Shadow EDR bypass, deep session hijacking, credential workflows |- ✅ **Audit Logging** - Tamper-proof security trail
+
+
+
+### Mock / Safe Testing Mode| Memory Forensics | Dump parsing, process tree scoring, malware heuristics, MITRE correlation |- ✅ **Safe Mode** - Confirmation prompts for dangerous operations
+
+Run dangerous modules with full auditing but without touching live infrastructure.
+
+```bash| Governance | Time-boxed authorization, safe mode, tamper-proof audit logging |- ✅ **Security Policies** - Module whitelisting/blacklisting
+
+SAFE_MODE=1 ./target/release/ferox --mock run c2/teams_tunnel
+
+```- ✅ **Session Management** - SQLite persistence with concurrent safety
+
+
+
+Audit entries for mock executions appear under `~/.ferox/logs/audit.log` and are tagged accordingly.## 🚀 Getting Started
+
+
+
+## 🖥️ CLI Snapshots### Infrastructure
+
+
+
+```text```bash- ✅ **Module Metadata** - Versioning, dependencies, platform support
+
+ferox> help
+
+ferox> use scanner/port# Clone and enter the repo- ✅ **Dependency Resolution** - Topological sort, circular detection
+
+ferox (scanner/port)> set RHOSTS 10.0.5.0/24
+
+ferox (scanner/port)> set PORTS 1-1000git clone https://github.com/abdulwahed-sweden/ferox- ✅ **Configuration Management** - TOML-based, hierarchical
+
+ferox (scanner/port)> run --json > reports/port-scan.json
+
+```cd ferox- ✅ **Advanced Options** - Type-safe, validated options
+
+
+
+```bash
+
+# Memory forensics workflow
+
+ferox memory analyze dumps/workstation.dmp --database analysis.db --output reports/workstation.json# Build with memory forensics enabled### Framework Capabilities
+
+ferox memory malfind dumps/workstation.dmp --min-score 0.6 --mitre --format table
+
+ferox memory mitre dumps/workstation.dmp --database analysis.db --format markdowncargo build --release --features memory-forensics- ✅ **Exploit Framework** - Target analysis, payload selection
+
+```
+
+- ✅ **12 Security Modules** - Scanner, recon, exploit, C2, post-exploitation
+
+## 🗃️ Build & Test Matrix
+
+# Initialize workspace (optional)- ✅ **Memory Forensics** - Integrated Windows dump analysis (NEW!)
+
+```bash
+
+# Standard buildmkdir -p ~/.ferox && cp ferox_security.toml ~/.ferox/config.toml- ✅ **Session Tracking** - Persistent sessions with command history
+
+cargo build
+
+```- ✅ **Report Generation** - JSON, HTML, PDF export
+
+# Full feature build
+
+cargo build --all-features
+
+
+
+# Test suites### Run the CLI## 🚀 Quick Start
+
+cargo test --lib
+
+cargo test --features memory-forensics --tests```bash
+
+cargo test --test integration_tests
+
+```./target/release/ferox --help### Prerequisites
+
+
+
+Add `SAFE_MODE=1` for smoke validation in CI environments../target/release/ferox memory --help```bash
+
+
+
+## 🧭 Documentation Highlights```# Rust 1.70 or higher
+
+
+
+- [docs/overview.md](docs/overview.md) — architecture, mission, security posture.curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+- [docs/modules.md](docs/modules.md) — categorized module catalog.
+
+- [docs/usage-guide.md](docs/usage-guide.md) — CLI walkthroughs and automation tips.### Mock / Safe Testing Mode```
+
+- [docs/developer-guide.md](docs/developer-guide.md) — coding standards and contribution workflow.
+
+- [docs/testing-and-ci.md](docs/testing-and-ci.md) — verification pipeline and quality gates.Run dangerous modules with full auditing but without touching live infrastructure.
+
+- [docs/memory-forensics.md](docs/memory-forensics.md) — in-depth analysis workflow.
+
+- [docs/changelog.md](docs/changelog.md) — release evolution from v1.x to v2.0.0.```bash### Installation
+
+
+
+## 🛣️ RoadmapSAFE_MODE=1 ./target/release/ferox --mock run c2/teams_tunnel```bash
+
+
+
+| Status | Initiative |```git clone https://github.com/abdulwahed-sweden/ferox
+
+| --- | --- |
+
+| ✅ | v2.0.0 memory forensics launch |cd ferox
+
+| 🔄 | Plugin marketplace with signed module distribution |
+
+| 🔄 | Extended payload library and automation templates |Audit entries for mock executions appear under `~/.ferox/logs/audit.log` and are tagged accordingly.cargo build --release
+
+| 🔄 | Web operator console with real-time telemetry |
+
+| 🗓️ | Hardware-backed credential vault integration |```
+
+
+
+Have ideas? See the [Developer Guide](docs/developer-guide.md) and open a discussion.## 🖥️ CLI Snapshots
+
+
+
+## 🤝 Contributing### Verify Installation
+
+
+
+We welcome issues, proposals, and pull requests that respect the project's safety-first ethos.```text```bash
+
+
+
+1. Fork and branch (`git checkout -b feat/<short-description>`).ferox> help./verify_phase1.sh
+
+2. Follow the test matrix, including `cargo test --features memory-forensics --tests`.
+
+3. Document new modules and update metadata.ferox> use scanner/port```
+
+4. Reference authorization and audit implications in your PR description.
+
+ferox (scanner/port)> set RHOSTS 10.0.5.0/24
+
+Please ensure all work complies with applicable laws and engagement contracts.
+
+ferox (scanner/port)> set PORTS 1-1000### Run Ferox
+
+## 📜 License & Compliance
+
+ferox (scanner/port)> run --json > reports/port-scan.json```bash
+
+Ferox is released under the [MIT License](LICENSE). Usage is restricted to authorized security testing, defensive research, and educational scenarios. Unauthorized or malicious use is strictly prohibited.
+
+```./target/release/ferox
+
+## 📬 Support & Contact
+
+```
+
+- Maintainer: Abdulwahed Mansour — `abdulwahed.mansour@gmail.com`
+
+- Security inquiries: `security@ferox.local````bash
+
+- GitHub: [@abdulwahed-sweden](https://github.com/abdulwahed-sweden)
 
 # Memory forensics workflow### Memory Forensics CLI
 
+---
+
 ferox memory analyze dumps/workstation.dmp --database analysis.db --output reports/workstation.json```bash
+
+_Version 2.0.0 · Updated 2025-11-12 · Ferox — Fast. Fierce. Fearless._ 🦊
 
 ferox memory malfind dumps/workstation.dmp --min-score 0.6 --mitre --format table# Full analysis with JSON export
 
