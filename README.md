@@ -1,137 +1,271 @@
-# 🦊 Ferox - Fast, Fierce, Fearless Security Framework
+# 🦊 Ferox 2.0.0 — Fast, Fierce, Fearless# 🦊 Ferox - Fast, Fierce, Fearless Security Framework
 
-[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
-[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
 
-> A modern offensive security framework built in Rust - designed for authorized penetration testing, CTF competitions, and security research.
 
-## ⚡ Why Ferox?
+[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)]()
 
-- **50-100x Faster** - Startup in 0.11s vs Metasploit's 5-10s
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)]()
+
+[![License](https://img.shields.io/badge/license-MIT-blue)]()[![License](https://img.shields.io/badge/license-MIT-blue)]()
+
+[![Status](https://img.shields.io/badge/status-production%20ready-success)]()[![Status](https://img.shields.io/badge/status-production%20ready-success)]()
+
+
+
+> Ferox is a Rust-native offensive security framework built for authorized operators who demand uncompromising speed, safety, and observability.> A modern offensive security framework built in Rust - designed for authorized penetration testing, CTF competitions, and security research.
+
+
+
+- ⚡ **Mission:** Deliver a trustworthy alternative to legacy exploitation stacks for red teams, defenders, and researchers.## ⚡ Why Ferox?
+
+- 🛡️ **Guardrails:** Authorization gating, immutable audit trails, safe-mode confirmations, and policy enforcement.
+
+- 🧠 **Intelligence:** Integrated memory forensics, MITRE ATT&CK mapping, and evidence persistence.- **50-100x Faster** - Startup in 0.11s vs Metasploit's 5-10s
+
 - **Memory Safe** - Built with Rust's safety guarantees
-- **Authorization-First** - Built-in security controls
+
+📚 **Quick navigation:** [Overview](docs/overview.md) · [Modules](docs/modules.md) · [Usage Guide](docs/usage-guide.md) · [Developer Guide](docs/developer-guide.md) · [Testing & CI](docs/testing-and-ci.md) · [Memory Forensics](docs/memory-forensics.md) · [Changelog](docs/changelog.md)- **Authorization-First** - Built-in security controls
+
 - **Enterprise-Grade** - Professional infrastructure
-- **Type-Safe** - Catch errors at compile time
+
+## 🔑 Core Capabilities- **Type-Safe** - Catch errors at compile time
+
 - **Modern Async** - High-performance I/O with Tokio
 
-## 🎯 Features
+| Pillar | Highlights |
 
-### Security & Compliance
-- ✅ **Authorization System** - Time-bound, target-scoped permissions
-- ✅ **Audit Logging** - Tamper-proof security trail
-- ✅ **Safe Mode** - Confirmation prompts for dangerous operations
-- ✅ **Security Policies** - Module whitelisting/blacklisting
+| --- | --- |## 🎯 Features
+
+| Command & Control | HTTP beacon, DNS tunnel, Teams tunnel, relay manager, cloud pivots |
+
+| Reconnaissance | ASN discovery, DNS/subdomain enumeration, WHOIS intelligence |### Security & Compliance
+
+| Scanning | High-speed TCP/HTTP scanners with asynchronous execution |- ✅ **Authorization System** - Time-bound, target-scoped permissions
+
+| Evasion & Post | Silent Shadow EDR bypass, deep session hijacking, credential workflows |- ✅ **Audit Logging** - Tamper-proof security trail
+
+| Memory Forensics | Dump parsing, process tree scoring, malware heuristics, MITRE correlation |- ✅ **Safe Mode** - Confirmation prompts for dangerous operations
+
+| Governance | Time-boxed authorization, safe mode, tamper-proof audit logging |- ✅ **Security Policies** - Module whitelisting/blacklisting
+
 - ✅ **Session Management** - SQLite persistence with concurrent safety
 
+## 🚀 Getting Started
+
 ### Infrastructure
-- ✅ **Module Metadata** - Versioning, dependencies, platform support
-- ✅ **Dependency Resolution** - Topological sort, circular detection
-- ✅ **Configuration Management** - TOML-based, hierarchical
-- ✅ **Advanced Options** - Type-safe, validated options
 
-### Framework Capabilities
-- ✅ **Exploit Framework** - Target analysis, payload selection
+```bash- ✅ **Module Metadata** - Versioning, dependencies, platform support
+
+# Clone and enter the repo- ✅ **Dependency Resolution** - Topological sort, circular detection
+
+git clone https://github.com/abdulwahed-sweden/ferox- ✅ **Configuration Management** - TOML-based, hierarchical
+
+cd ferox- ✅ **Advanced Options** - Type-safe, validated options
+
+
+
+# Build with memory forensics enabled### Framework Capabilities
+
+cargo build --release --features memory-forensics- ✅ **Exploit Framework** - Target analysis, payload selection
+
 - ✅ **12 Security Modules** - Scanner, recon, exploit, C2, post-exploitation
-- ✅ **Memory Forensics** - Integrated Windows dump analysis (NEW!)
-- ✅ **Session Tracking** - Persistent sessions with command history
-- ✅ **Report Generation** - JSON, HTML, PDF export
 
-## 🚀 Quick Start
+# Initialize workspace (optional)- ✅ **Memory Forensics** - Integrated Windows dump analysis (NEW!)
 
-### Prerequisites
+mkdir -p ~/.ferox && cp ferox_security.toml ~/.ferox/config.toml- ✅ **Session Tracking** - Persistent sessions with command history
+
+```- ✅ **Report Generation** - JSON, HTML, PDF export
+
+
+
+### Run the CLI## 🚀 Quick Start
+
 ```bash
-# Rust 1.70 or higher
+
+./target/release/ferox --help### Prerequisites
+
+./target/release/ferox memory --help```bash
+
+```# Rust 1.70 or higher
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+### Mock / Safe Testing Mode```
+
+Run dangerous modules with full auditing but without touching live infrastructure.
+
+```bash### Installation
+
+SAFE_MODE=1 ./target/release/ferox --mock run c2/teams_tunnel```bash
+
+```git clone https://github.com/abdulwahed-sweden/ferox
+
+cd ferox
+
+Audit entries for mock executions appear under `~/.ferox/logs/audit.log` and are tagged accordingly.cargo build --release
+
 ```
 
-### Installation
-```bash
-git clone https://github.com/abdulwahed-sweden/ferox
-cd ferox
-cargo build --release
-```
+## 🖥️ CLI Snapshots
 
 ### Verify Installation
-```bash
-./verify_phase1.sh
+
+```text```bash
+
+ferox> help./verify_phase1.sh
+
+ferox> use scanner/port```
+
+ferox (scanner/port)> set RHOSTS 10.0.5.0/24
+
+ferox (scanner/port)> set PORTS 1-1000### Run Ferox
+
+ferox (scanner/port)> run --json > reports/port-scan.json```bash
+
+```./target/release/ferox
+
 ```
 
-### Run Ferox
 ```bash
-./target/release/ferox
-```
 
-### Memory Forensics CLI
-```bash
-# Full analysis with JSON export
-./target/release/ferox memory analyze memory.dmp --output report.json
+# Memory forensics workflow### Memory Forensics CLI
+
+ferox memory analyze dumps/workstation.dmp --database analysis.db --output reports/workstation.json```bash
+
+ferox memory malfind dumps/workstation.dmp --min-score 0.6 --mitre --format table# Full analysis with JSON export
+
+ferox memory mitre dumps/workstation.dmp --database analysis.db --format markdown./target/release/ferox memory analyze memory.dmp --output report.json
+
+```
 
 # Process inventory
-./target/release/ferox memory pslist memory.dmp
+
+## 🗃️ Build & Test Matrix./target/release/ferox memory pslist memory.dmp
+
 ```
 
-## 📖 Usage Examples
+```bash
+
+# Standard build## 📖 Usage Examples
+
+cargo build
 
 ### Basic Port Scanning
-```bash
-ferox> use scanner/port_scanner
+
+# Full feature build```bash
+
+cargo build --all-featuresferox> use scanner/port_scanner
+
 ferox (scanner/port_scanner)> set RHOSTS 192.168.1.0/24
-ferox (scanner/port_scanner)> set PORTS 1-1000
-ferox (scanner/port_scanner)> run
-```
 
-### Authorized Exploit Framework
+# Test suitesferox (scanner/port_scanner)> set PORTS 1-1000
+
+cargo test --libferox (scanner/port_scanner)> run
+
+cargo test --features memory-forensics --tests```
+
+cargo test --test integration_tests
+
+```### Authorized Exploit Framework
+
 ```rust
-use ferox::core::exploit_framework::*;
 
-// Create authorization for penetration testing
+Add `SAFE_MODE=1` for smoke validation in CI environments.use ferox::core::exploit_framework::*;
+
+
+
+## 🧭 Documentation Highlights// Create authorization for penetration testing
+
 let auth = AuthorizationContext::new_pentest(
-    "PENTEST-2025-001".to_string(),
-    vec!["192.168.1.0/24".to_string()],
-);
 
-// Initialize framework (requires valid authorization)
-let mut framework = ExploitFramework::new(auth)?;
+- [docs/overview.md](docs/overview.md) — architecture, mission, security posture.    "PENTEST-2025-001".to_string(),
+
+- [docs/modules.md](docs/modules.md) — categorized module catalog.    vec!["192.168.1.0/24".to_string()],
+
+- [docs/usage-guide.md](docs/usage-guide.md) — CLI walkthroughs and automation tips.);
+
+- [docs/developer-guide.md](docs/developer-guide.md) — coding standards and contribution workflow.
+
+- [docs/testing-and-ci.md](docs/testing-and-ci.md) — verification pipeline and quality gates.// Initialize framework (requires valid authorization)
+
+- [docs/memory-forensics.md](docs/memory-forensics.md) — in-depth analysis workflow.let mut framework = ExploitFramework::new(auth)?;
+
+- [docs/changelog.md](docs/changelog.md) — release evolution from v1.x to v2.0.0.
 
 // Analyze target
-let target = TargetInfo {
+
+## 🛣️ Roadmaplet target = TargetInfo {
+
     hostname: "target.example.com".to_string(),
-    ip_address: Some("192.168.1.100".to_string()),
-    operating_system: Some("Linux".to_string()),
-    services: vec![/* ... */],
-    metadata: HashMap::new(),
-};
 
-let profile = framework.analyze_target(&target)?;
+| Status | Initiative |    ip_address: Some("192.168.1.100".to_string()),
+
+| --- | --- |    operating_system: Some("Linux".to_string()),
+
+| ✅ | v2.0.0 memory forensics launch |    services: vec![/* ... */],
+
+| 🔄 | Plugin marketplace with signed module distribution |    metadata: HashMap::new(),
+
+| 🔄 | Extended payload library and automation templates |};
+
+| 🔄 | Web operator console with real-time telemetry |
+
+| 🗓️ | Hardware-backed credential vault integration |let profile = framework.analyze_target(&target)?;
+
 let payload = framework.select_payload(&profile)?;
-```
 
-### Memory Analysis (CLI)
+Have ideas? See the [Developer Guide](docs/developer-guide.md) and open a discussion.```
+
+
+
+## 🤝 Contributing### Memory Analysis (CLI)
+
 ```bash
-ferox memory analyze memory.dmp --output report.json
+
+We welcome issues, proposals, and pull requests that respect the project's safety-first ethos.ferox memory analyze memory.dmp --output report.json
+
 ferox memory malfind memory.dmp
-ferox memory mitre memory.dmp --output mitre.json
-```
 
-### Configuration
+1. Fork and branch (`git checkout -b feat/<short-description>`).ferox memory mitre memory.dmp --output mitre.json
+
+2. Follow the test matrix, including `cargo test --features memory-forensics --tests`.```
+
+3. Document new modules and update metadata.
+
+4. Reference authorization and audit implications in your PR description.### Configuration
+
 ```toml
-# ~/.ferox/config.toml
 
-[global]
+Please ensure all work complies with applicable laws and engagement contracts.# ~/.ferox/config.toml
+
+
+
+## 📜 License & Compliance[global]
+
 workspace = "/home/user/.ferox"
-max_concurrent_operations = 100
+
+Ferox is released under the [MIT License](LICENSE). Usage is restricted to authorized security testing, defensive research, and educational scenarios. Unauthorized or malicious use is strictly prohibited.max_concurrent_operations = 100
+
 verbose = false
 
-[security]
-require_confirmation = true
-audit_logging = true
-allowed_categories = ["scanner", "recon"]
+## 📬 Support & Contact
 
-[network]
+[security]
+
+- Maintainer: Abdulwahed Mansour — `abdulwahed.mansour@gmail.com`require_confirmation = true
+
+- Security inquiries: `security@ferox.local`audit_logging = true
+
+- GitHub: [@abdulwahed-sweden](https://github.com/abdulwahed-sweden)allowed_categories = ["scanner", "recon"]
+
+
+
+---[network]
+
 user_agent = "Ferox/2.0.0"
-connection_timeout = 10
+
+_Version 2.0.0 · Updated 2025-11-12 · Ferox — Fast. Fierce. Fearless._ 🦊connection_timeout = 10
+
 verify_tls = true
 ```
 
