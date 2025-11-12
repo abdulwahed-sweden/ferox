@@ -5,6 +5,7 @@
 pub mod cloud_tunnel;
 pub mod command_scheduler;
 pub mod dns_c2;
+pub mod github_c2;
 pub mod http_beacon;
 pub mod relay_manager;
 pub mod teams_tunnel;

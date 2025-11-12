@@ -6,6 +6,7 @@ pub mod module;
 pub mod module_metadata;
 pub mod module_options;
 pub mod payload;
+pub mod payload_system;
 pub mod reporter;
 pub mod result_store;
 pub mod session;
