@@ -1,6 +1,7 @@
 use crate::core::module::*;
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
+use hickory_resolver::TokioResolver;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::File;
@@ -9,7 +10,6 @@ use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::{Mutex, Semaphore};
 use tokio::time::{Duration, timeout};
-use hickory_resolver::TokioResolver;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SubdomainRecord {

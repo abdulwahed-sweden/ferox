@@ -1,3 +1,5 @@
+#[cfg(feature = "memory-forensics")]
+use crate::cli::memory::MemoryCli;
 use crate::cli::theme::Theme;
 use crate::core::audit;
 use crate::core::module::{ModuleRegistry, ModuleResult, ModuleType};
@@ -57,6 +59,8 @@ impl FeroxHelper {
             // Handler commands
             "handlers", "shell", "exec", "upload", "download", "listen", "connect", "sysinfo", "ps",
             "kill", "pwd", "cd", "cat", "rm", "mkdir",
+            // Memory forensics (feature gated at runtime)
+            "memory",
         ]
         .into_iter()
         .map(|s| s.to_string())
@@ -277,6 +281,7 @@ impl FeroxCli {
             "cat" => self.cmd_cat(args).await,
             "rm" => self.cmd_rm(args).await,
             "mkdir" => self.cmd_mkdir(args).await,
+            "memory" => self.cmd_memory(args).await,
             // Utility commands
             "clear" | "cls" => self.cmd_clear(),
             "banner" => {
@@ -365,6 +370,20 @@ impl FeroxCli {
         Theme::command_help("listen <port>", "Start reverse shell listener");
         Theme::command_help("connect <host> <port>", "Create bind shell connection");
         println!();
+
+        #[cfg(feature = "memory-forensics")]
+        {
+            println!("  {}", "Memory Forensics:".bright_yellow().bold());
+            Theme::command_help("memory analyze <dump>", "Run full memory analysis pipeline");
+            Theme::command_help("memory pslist <dump>", "List heuristic process inventory");
+            Theme::command_help(
+                "memory malfind <dump>",
+                "Search for injection and malware strings",
+            );
+            Theme::command_help("memory netscan <dump>", "Extract network indicators");
+            Theme::command_help("memory mitre <dump>", "Map findings to MITRE ATT&CK");
+            println!();
+        }
 
         println!("  {}", "Report & Export Commands:".bright_yellow().bold());
         Theme::command_help("export <format> <file>", "Export results (json, html, pdf)");
@@ -869,12 +888,9 @@ impl FeroxCli {
                     .or_else(|_| std::env::var("USERNAME"))
                     .unwrap_or_else(|_| "unknown".to_string());
 
-                if let Err(e) = audit::append_confirmation(
-                    &info.name,
-                    &info.category,
-                    &user,
-                    confirmed,
-                ) {
+                if let Err(e) =
+                    audit::append_confirmation(&info.name, &info.category, &user, confirmed)
+                {
                     Theme::warning(&format!("Failed to write audit log: {}", e));
                 }
 
@@ -1667,6 +1683,24 @@ impl FeroxCli {
             Ok(_) => Theme::success(&format!("Created directory {}", args[0])),
             Err(e) => Theme::error(&format!("Failed to create directory: {}", e)),
         }
+        Ok(())
+    }
+
+    #[cfg(feature = "memory-forensics")]
+    async fn cmd_memory(&mut self, args: &[&str]) -> Result<()> {
+        if args.is_empty() {
+            Theme::info("Usage: memory <subcommand> <dump> [options]");
+            return Ok(());
+        }
+
+        MemoryCli::handle(args)
+    }
+
+    #[cfg(not(feature = "memory-forensics"))]
+    async fn cmd_memory(&mut self, _args: &[&str]) -> Result<()> {
+        Theme::warning(
+            "Ferox built without memory analysis support. Rebuild with `--features memory-forensics`.",
+        );
         Ok(())
     }
 }

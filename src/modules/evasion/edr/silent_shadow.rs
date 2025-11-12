@@ -31,12 +31,14 @@
 //! - May trigger EDR alerts during execution
 //! - Permanently logs "EDR detected" before aborting if unsafe
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::core::module::{CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType};
+use crate::core::module::{
+    CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType,
+};
 
 /// Detected EDR products
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -73,7 +75,11 @@ impl SilentShadow {
 
     /// Detect EDR products on the system
     async fn detect_edr_products(&self) -> Result<Vec<EdRProduct>> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         let mut products = vec![
             EdRProduct {
@@ -144,7 +150,11 @@ impl SilentShadow {
 
     /// Perform direct syscall (mock implementation)
     async fn perform_direct_syscall(&self) -> Result<EvasionResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         if mock_mode {
             return Ok(EvasionResult {
@@ -178,7 +188,11 @@ impl SilentShadow {
 
     /// Unhook NTDLL by restoring clean copy from disk (mock implementation)
     async fn unhook_ntdll(&self) -> Result<EvasionResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         if mock_mode {
             return Ok(EvasionResult {
@@ -213,7 +227,11 @@ impl SilentShadow {
 
     /// Detect hooks in current process
     async fn detect_hooks(&self) -> Result<Vec<String>> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         if mock_mode {
             return Ok(vec![
@@ -253,7 +271,8 @@ impl Module for SilentShadow {
         vec![
             ModuleOption {
                 name: "technique".to_string(),
-                description: "Evasion technique (detection_only, direct_syscall, unhook_ntdll)".to_string(),
+                description: "Evasion technique (detection_only, direct_syscall, unhook_ntdll)"
+                    .to_string(),
                 required: false,
                 default_value: Some("detection_only".to_string()),
                 current_value: self.options.get("technique").cloned(),
@@ -292,11 +311,19 @@ impl Module for SilentShadow {
     }
 
     fn validate(&self) -> Result<()> {
-        let technique = self.options.get("technique").map(|s| s.as_str()).unwrap_or("detection_only");
+        let technique = self
+            .options
+            .get("technique")
+            .map(|s| s.as_str())
+            .unwrap_or("detection_only");
 
         let valid_techniques = ["detection_only", "direct_syscall", "unhook_ntdll"];
         if !valid_techniques.contains(&technique) {
-            bail!("Invalid technique: {}. Supported: {:?}", technique, valid_techniques);
+            bail!(
+                "Invalid technique: {}. Supported: {:?}",
+                technique,
+                valid_techniques
+            );
         }
 
         // Check platform compatibility
@@ -349,8 +376,16 @@ impl Module for SilentShadow {
     }
 
     async fn run(&mut self) -> Result<ModuleResult> {
-        let technique = self.options.get("technique").map(|s| s.as_str()).unwrap_or("detection_only");
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let technique = self
+            .options
+            .get("technique")
+            .map(|s| s.as_str())
+            .unwrap_or("detection_only");
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         // Step 1: Detect EDR products
         let products = self.detect_edr_products().await?;
@@ -369,7 +404,11 @@ impl Module for SilentShadow {
                 vec![EvasionResult {
                     technique: "Detection Only".to_string(),
                     success: true,
-                    details: format!("Detected {} EDR(s) and {} hook(s)", detected_edrs.len(), hooks.len()),
+                    details: format!(
+                        "Detected {} EDR(s) and {} hook(s)",
+                        detected_edrs.len(),
+                        hooks.len()
+                    ),
                 }]
             }
             "direct_syscall" => {
@@ -384,15 +423,9 @@ impl Module for SilentShadow {
         // Build result
         let success = evasion_results.iter().all(|r| r.success);
         let message = if success {
-            format!(
-                "Evasion technique '{}' completed successfully",
-                technique
-            )
+            format!("Evasion technique '{}' completed successfully", technique)
         } else {
-            format!(
-                "Evasion technique '{}' completed with warnings",
-                technique
-            )
+            format!("Evasion technique '{}' completed with warnings", technique)
         };
 
         Ok(ModuleResult::success(message)
@@ -405,7 +438,11 @@ impl Module for SilentShadow {
 
     async fn cleanup(&mut self) -> Result<()> {
         // Restore hooks if requested
-        let restore = self.options.get("restore_after").map(|s| s == "true").unwrap_or(true);
+        let restore = self
+            .options
+            .get("restore_after")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         if restore {
             // In real implementation, would restore original hooks
@@ -416,7 +453,11 @@ impl Module for SilentShadow {
 
     fn requires_confirmation(&self) -> bool {
         // Always require confirmation for evasion techniques
-        let technique = self.options.get("technique").map(|s| s.as_str()).unwrap_or("detection_only");
+        let technique = self
+            .options
+            .get("technique")
+            .map(|s| s.as_str())
+            .unwrap_or("detection_only");
         technique != "detection_only"
     }
 }
@@ -481,7 +522,7 @@ mod tests {
     fn test_module_info() {
         let module = SilentShadow::new();
         let info = module.info();
-    assert_eq!(info.name, "silent_shadow");
+        assert_eq!(info.name, "silent_shadow");
         assert!(info.description.contains("AUTHORIZED"));
     }
 }

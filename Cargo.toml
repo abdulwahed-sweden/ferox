@@ -10,7 +10,28 @@ keywords = ["security", "penetration-testing", "cybersecurity", "framework", "fe
 categories = ["command-line-utilities", "development-tools"]
 
 [features]
-default = []
+default = ["memory-forensics"]
+memory-forensics = [
+	"dep:kdmp-parser",
+	"dep:udmp-parser",
+	"dep:minidump",
+	"dep:pelite",
+	"dep:goblin",
+	"dep:windows",
+	"dep:memmap2",
+	"dep:byteorder",
+	"dep:regex",
+	"dep:rayon",
+	"dep:zeroize",
+]
+yara-support = ["memory-forensics", "yara"]
+volatility-bridge = ["memory-forensics", "pyo3"]
+full = [
+	"memory-forensics",
+	"yara-support",
+	"volatility-bridge",
+	"pdf-export",
+]
 pdf-export = ["printpdf"]
 
 [lib]
@@ -31,7 +52,7 @@ futures = "0.3.31"
 clap = { version = "4.5.51", features = ["derive", "color"] }
 rustyline = "17.0.2"
 colored = "3.0.0"
-indicatif = "0.18.2"
+indicatif = "0.18.3"
 console = "0.16.1"
 is-terminal = "0.4.17"
 owo-colors = "4.2.3"
@@ -43,6 +64,26 @@ hickory-resolver = "0.25.2"
 native-tls = "0.2.14"
 tokio-native-tls = "0.3.1"
 x509-parser = "0.18.0"
+
+# Memory Forensics Stack
+kdmp-parser = { version = "0.2", optional = true }
+udmp-parser = { version = "0.1", optional = true }
+minidump = { version = "0.22", optional = true }
+pelite = { version = "0.10", optional = true }
+goblin = { version = "0.8", optional = true }
+windows = { version = "0.58", optional = true, features = [
+	"Win32_System_Memory",
+	"Win32_System_Diagnostics_Debug",
+	"Win32_System_Threading",
+	"Win32_Security",
+] }
+memmap2 = { version = "0.9", optional = true }
+byteorder = { version = "1.5", optional = true }
+regex = { version = "1.10", optional = true }
+rayon = { version = "1.10", optional = true }
+yara = { version = "0.30.0", optional = true }
+pyo3 = { version = "0.27.1", features = ["auto-initialize"], optional = true }
+zeroize = { version = "1.8", optional = true }
 
 # Database
 rusqlite = { version = "0.37.0", features = ["bundled"] }

@@ -38,8 +38,7 @@ pub fn get_audit_log_path() -> Result<PathBuf> {
     let ferox_dir = home.join(".ferox");
 
     // Ensure directory exists
-    std::fs::create_dir_all(&ferox_dir)
-        .context("Failed to create .ferox directory")?;
+    std::fs::create_dir_all(&ferox_dir).context("Failed to create .ferox directory")?;
 
     Ok(ferox_dir.join("audit.log"))
 }
@@ -75,8 +74,7 @@ fn append_entry(log_path: &Path, entry: &AuditEntry) -> Result<()> {
     file.write_all(entry.to_log_line().as_bytes())
         .context("Failed to write audit log entry")?;
 
-    file.sync_all()
-        .context("Failed to sync audit log")?;
+    file.sync_all().context("Failed to sync audit log")?;
 
     Ok(())
 }

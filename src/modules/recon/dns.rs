@@ -1,13 +1,13 @@
 use crate::core::module::*;
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
-use std::collections::HashMap;
-use std::net::IpAddr;
-use std::time::Instant;
+use hickory_resolver::TokioResolver;
 use hickory_resolver::config::*;
 use hickory_resolver::name_server::TokioConnectionProvider;
 use hickory_resolver::proto::rr::RecordType;
-use hickory_resolver::TokioResolver;
+use std::collections::HashMap;
+use std::net::IpAddr;
+use std::time::Instant;
 
 pub struct DnsEnumerator {
     options: HashMap<String, String>,
@@ -87,7 +87,7 @@ impl DnsEnumerator {
     async fn enumerate_records(
         &self,
         domain: &str,
-    resolver: &TokioResolver,
+        resolver: &TokioResolver,
     ) -> HashMap<String, Vec<String>> {
         let mut results = HashMap::new();
         let record_types = self.parse_record_types();
@@ -121,11 +121,7 @@ impl DnsEnumerator {
         results
     }
 
-    async fn enumerate_subdomains(
-        &self,
-        domain: &str,
-    resolver: &TokioResolver,
-    ) -> Vec<String> {
+    async fn enumerate_subdomains(&self, domain: &str, resolver: &TokioResolver) -> Vec<String> {
         let wordlist_str = self
             .get_option("WORDLIST")
             .unwrap_or_else(|| "www,mail,ftp".to_string());
@@ -151,11 +147,7 @@ impl DnsEnumerator {
         found
     }
 
-    async fn reverse_dns_lookup(
-        &self,
-        ip: IpAddr,
-    resolver: &TokioResolver,
-    ) -> Option<String> {
+    async fn reverse_dns_lookup(&self, ip: IpAddr, resolver: &TokioResolver) -> Option<String> {
         if let Ok(lookup) = resolver.reverse_lookup(ip).await {
             lookup.iter().next().map(|name| name.to_string())
         } else {

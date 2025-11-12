@@ -3,8 +3,8 @@
 //! and plain fallbacks. Maintains backward compatibility with previous Theme API.
 
 use anyhow::Result;
-use is_terminal::IsTerminal;
 use indicatif::ProgressStyle;
+use is_terminal::IsTerminal;
 use owo_colors::{AnsiColors, OwoColorize};
 use std::env;
 use std::sync::{OnceLock, RwLock};

@@ -13,17 +13,20 @@
 //!
 //! TODO: Consider adding XChaCha20-Poly1305 for wider nonce space if needed.
 
-use anyhow::{anyhow, Result};
-use aes_gcm::{aead::{Aead, KeyInit, OsRng}, Aes256Gcm, Nonce};
 use aes_gcm::aead::rand_core::RngCore; // bring trait for OsRng::fill_bytes
+use aes_gcm::{
+    Aes256Gcm, Nonce,
+    aead::{Aead, KeyInit, OsRng},
+};
+use anyhow::{Result, anyhow};
+use hkdf::Hkdf;
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
-use hkdf::Hkdf;
 // no external rand crate needed; we use rand_core re-exported via aes_gcm
 
 /// Length constants
 pub const AES_KEY_LEN: usize = 32; // 256-bit
-pub const NONCE_LEN: usize = 12;   // 96-bit (AES-GCM standard)
+pub const NONCE_LEN: usize = 12; // 96-bit (AES-GCM standard)
 pub const HMAC_KEY_LEN: usize = 32; // Using 256-bit key for HMAC-SHA256
 
 /// Derived key set used for separating concerns (encryption vs integrity)
@@ -37,7 +40,8 @@ pub struct DerivedKeys {
 pub fn derive_keys(seed: &[u8], salt: &[u8]) -> Result<DerivedKeys> {
     let hk = Hkdf::<Sha256>::new(Some(salt), seed);
     let mut okm = [0u8; AES_KEY_LEN + HMAC_KEY_LEN];
-    hk.expand(b"ferox-phase3", &mut okm).map_err(|_| anyhow!("HKDF expand failed"))?;
+    hk.expand(b"ferox-phase3", &mut okm)
+        .map_err(|_| anyhow!("HKDF expand failed"))?;
 
     let mut enc_key = [0u8; AES_KEY_LEN];
     enc_key.copy_from_slice(&okm[0..AES_KEY_LEN]);
@@ -56,36 +60,61 @@ pub fn generate_nonce() -> [u8; NONCE_LEN] {
 
 /// Encrypt plaintext with AES-256-GCM using provided key and random nonce.
 /// Returns (nonce, ciphertext). Caller should transmit both.
-pub fn aes_encrypt(key: &[u8; AES_KEY_LEN], plaintext: &[u8], aad: &[u8]) -> Result<([u8; NONCE_LEN], Vec<u8>)> {
+pub fn aes_encrypt(
+    key: &[u8; AES_KEY_LEN],
+    plaintext: &[u8],
+    aad: &[u8],
+) -> Result<([u8; NONCE_LEN], Vec<u8>)> {
     let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| anyhow!("cipher init: {e}"))?;
     let nonce_bytes = generate_nonce();
     #[allow(deprecated)]
     let nonce = Nonce::from_slice(&nonce_bytes);
-    let ct = cipher.encrypt(nonce, aes_gcm::aead::Payload { msg: plaintext, aad }).map_err(|e| anyhow!("encrypt failed: {e}"))?;
+    let ct = cipher
+        .encrypt(
+            nonce,
+            aes_gcm::aead::Payload {
+                msg: plaintext,
+                aad,
+            },
+        )
+        .map_err(|e| anyhow!("encrypt failed: {e}"))?;
     Ok((nonce_bytes, ct))
 }
 
 /// Decrypt ciphertext with AES-256-GCM.
-pub fn aes_decrypt(key: &[u8; AES_KEY_LEN], nonce: &[u8; NONCE_LEN], ciphertext: &[u8], aad: &[u8]) -> Result<Vec<u8>> {
+pub fn aes_decrypt(
+    key: &[u8; AES_KEY_LEN],
+    nonce: &[u8; NONCE_LEN],
+    ciphertext: &[u8],
+    aad: &[u8],
+) -> Result<Vec<u8>> {
     let cipher = Aes256Gcm::new_from_slice(key).map_err(|e| anyhow!("cipher init: {e}"))?;
     #[allow(deprecated)]
     let nonce = Nonce::from_slice(nonce);
-    let pt = cipher.decrypt(nonce, aes_gcm::aead::Payload { msg: ciphertext, aad }).map_err(|e| anyhow!("decrypt failed: {e}"))?;
+    let pt = cipher
+        .decrypt(
+            nonce,
+            aes_gcm::aead::Payload {
+                msg: ciphertext,
+                aad,
+            },
+        )
+        .map_err(|e| anyhow!("decrypt failed: {e}"))?;
     Ok(pt)
 }
 
 /// Compute HMAC-SHA256.
 pub fn hmac_sign(key: &[u8; HMAC_KEY_LEN], data: &[u8]) -> Vec<u8> {
-    let mut mac = <Hmac<Sha256> as hmac::digest::KeyInit>::new_from_slice(key)
-        .expect("HMAC key size valid");
+    let mut mac =
+        <Hmac<Sha256> as hmac::digest::KeyInit>::new_from_slice(key).expect("HMAC key size valid");
     mac.update(data);
     mac.finalize().into_bytes().to_vec()
 }
 
 /// Verify HMAC-SHA256 in constant time.
 pub fn hmac_verify(key: &[u8; HMAC_KEY_LEN], data: &[u8], expected: &[u8]) -> bool {
-    let mut mac = <Hmac<Sha256> as hmac::digest::KeyInit>::new_from_slice(key)
-        .expect("HMAC key size valid");
+    let mut mac =
+        <Hmac<Sha256> as hmac::digest::KeyInit>::new_from_slice(key).expect("HMAC key size valid");
     mac.update(data);
     mac.verify_slice(expected).is_ok()
 }

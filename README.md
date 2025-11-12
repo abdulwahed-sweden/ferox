@@ -34,6 +34,7 @@
 ### Framework Capabilities
 - ✅ **Exploit Framework** - Target analysis, payload selection
 - ✅ **12 Security Modules** - Scanner, recon, exploit, C2, post-exploitation
+- ✅ **Memory Forensics** - Integrated Windows dump analysis (NEW!)
 - ✅ **Session Tracking** - Persistent sessions with command history
 - ✅ **Report Generation** - JSON, HTML, PDF export
 
@@ -60,6 +61,15 @@ cargo build --release
 ### Run Ferox
 ```bash
 ./target/release/ferox
+```
+
+### Memory Forensics CLI
+```bash
+# Full analysis with JSON export
+./target/release/ferox memory analyze memory.dmp --output report.json
+
+# Process inventory
+./target/release/ferox memory pslist memory.dmp
 ```
 
 ## 📖 Usage Examples
@@ -96,6 +106,13 @@ let target = TargetInfo {
 
 let profile = framework.analyze_target(&target)?;
 let payload = framework.select_payload(&profile)?;
+```
+
+### Memory Analysis (CLI)
+```bash
+ferox memory analyze memory.dmp --output report.json
+ferox memory malfind memory.dmp
+ferox memory mitre memory.dmp --output mitre.json
 ```
 
 ### Configuration
@@ -181,6 +198,9 @@ verify_tls = true
 ```bash
 # Run all tests
 cargo test --lib
+
+# Include memory forensics integration tests
+cargo test --features memory-forensics --tests
 
 # Run specific test suite
 cargo test --lib core::exploit_framework

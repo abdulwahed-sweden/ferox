@@ -52,8 +52,7 @@ impl ModuleDependency {
             }
 
             // Same major version, minor and patch can be equal or greater
-            Ok(version_parts[0] == required_parts[0]
-                && version >= required)
+            Ok(version_parts[0] == required_parts[0] && version >= required)
         } else if self.version_requirement.starts_with("=") {
             let required = self.version_requirement.trim_start_matches("=");
             Ok(version == required)
@@ -318,7 +317,10 @@ impl DependencyResolver {
             }
 
             if temp_mark.contains(module_id) {
-                return Err(anyhow!("Circular dependency detected involving {}", module_id));
+                return Err(anyhow!(
+                    "Circular dependency detected involving {}",
+                    module_id
+                ));
             }
 
             temp_mark.insert(module_id.to_string());

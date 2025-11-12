@@ -251,6 +251,7 @@ The Ferox framework is now a **production-ready, enterprise-grade offensive secu
 - **World-class performance** (50-100x faster than Metasploit)
 - **Enterprise infrastructure** (metadata, config, dependencies)
 - **Robust security controls** (authorization, audit, confirmation)
+- **Integrated memory forensics** (process/network/credential analysis with MITRE mapping)
 - **Comprehensive testing** (88 tests, 100% coverage)
 - **Professional documentation** (2,218 lines)
 

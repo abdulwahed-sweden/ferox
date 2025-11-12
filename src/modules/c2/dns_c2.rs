@@ -6,14 +6,24 @@
 use anyhow::Result;
 use data_encoding::{BASE32, BASE64};
 
-pub fn encode_base32(data: &[u8]) -> String { BASE32.encode(data) }
-pub fn decode_base32(s: &str) -> Result<Vec<u8>> { Ok(BASE32.decode(s.as_bytes())?) }
+pub fn encode_base32(data: &[u8]) -> String {
+    BASE32.encode(data)
+}
+pub fn decode_base32(s: &str) -> Result<Vec<u8>> {
+    Ok(BASE32.decode(s.as_bytes())?)
+}
 
-pub fn encode_base64(data: &[u8]) -> String { BASE64.encode(data) }
-pub fn decode_base64(s: &str) -> Result<Vec<u8>> { Ok(BASE64.decode(s.as_bytes())?) }
+pub fn encode_base64(data: &[u8]) -> String {
+    BASE64.encode(data)
+}
+pub fn decode_base64(s: &str) -> Result<Vec<u8>> {
+    Ok(BASE64.decode(s.as_bytes())?)
+}
 
 /// Stub query function; returns Ok(None) to indicate no transport.
-pub async fn dns_query_stub(_qname: &str) -> Result<Option<Vec<u8>>> { Ok(None) }
+pub async fn dns_query_stub(_qname: &str) -> Result<Option<Vec<u8>>> {
+    Ok(None)
+}
 
 #[cfg(test)]
 mod tests {

@@ -9,7 +9,7 @@
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use std::collections::HashMap;
-use tokio::sync::mpsc::{self, Sender, Receiver};
+use tokio::sync::mpsc::{self, Receiver, Sender};
 use uuid::Uuid;
 
 use crate::core::module::{Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType};
@@ -29,22 +29,43 @@ pub struct SessionChannels {
 }
 
 impl RelayManager {
-    pub fn new(max_sessions: usize) -> Self { Self { sessions: HashMap::new(), max_sessions } }
+    pub fn new(max_sessions: usize) -> Self {
+        Self {
+            sessions: HashMap::new(),
+            max_sessions,
+        }
+    }
 
     pub fn register_session(&mut self) -> Result<Uuid> {
-        if self.sessions.len() >= self.max_sessions { anyhow::bail!("max sessions reached"); }
-    let id = Uuid::new_v4();
+        if self.sessions.len() >= self.max_sessions {
+            anyhow::bail!("max sessions reached");
+        }
+        let id = Uuid::new_v4();
         let (cmd_tx, cmd_rx) = mpsc::channel(16);
         let (res_tx, res_rx) = mpsc::channel(16);
         // In a real impl, res_tx would be exposed externally to push results.
         let _ = res_tx; // placeholder
-        self.sessions.insert(id, SessionChannels { cmd_tx, cmd_rx, res_rx });
+        self.sessions.insert(
+            id,
+            SessionChannels {
+                cmd_tx,
+                cmd_rx,
+                res_rx,
+            },
+        );
         Ok(id)
     }
 
     pub async fn send_command(&self, id: Uuid, cmd: &str) -> Result<()> {
-    let chans = self.sessions.get(&id).ok_or_else(|| anyhow!("session not found"))?;
-    chans.cmd_tx.send(cmd.to_string()).await.map_err(|e| anyhow!(e.to_string()))?;
+        let chans = self
+            .sessions
+            .get(&id)
+            .ok_or_else(|| anyhow!("session not found"))?;
+        chans
+            .cmd_tx
+            .send(cmd.to_string())
+            .await
+            .map_err(|e| anyhow!(e.to_string()))?;
         Ok(())
     }
 
@@ -54,7 +75,9 @@ impl RelayManager {
                 Ok(v) => Ok(Some(v)),
                 Err(_) => Ok(None),
             }
-        } else { Ok(None) }
+        } else {
+            Ok(None)
+        }
     }
 }
 
@@ -62,10 +85,18 @@ pub struct RelayManagerModule {
     inner: RelayManager,
 }
 
-impl RelayManagerModule { pub fn new() -> Self { Self { inner: RelayManager::new(32) } } }
+impl RelayManagerModule {
+    pub fn new() -> Self {
+        Self {
+            inner: RelayManager::new(32),
+        }
+    }
+}
 
 impl Default for RelayManagerModule {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[async_trait]
@@ -80,11 +111,21 @@ impl Module for RelayManagerModule {
             category: "c2".into(),
         }
     }
-    fn options(&self) -> Vec<ModuleOption> { vec![] }
-    fn set_option(&mut self, _name: &str, _value: &str) -> Result<()> { Ok(()) }
-    fn get_option(&self, _name: &str) -> Option<String> { None }
-    fn validate(&self) -> Result<()> { Ok(()) }
-    async fn run(&mut self) -> Result<ModuleResult> { Ok(ModuleResult::success("relay manager active")) }
+    fn options(&self) -> Vec<ModuleOption> {
+        vec![]
+    }
+    fn set_option(&mut self, _name: &str, _value: &str) -> Result<()> {
+        Ok(())
+    }
+    fn get_option(&self, _name: &str) -> Option<String> {
+        None
+    }
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+    async fn run(&mut self) -> Result<ModuleResult> {
+        Ok(ModuleResult::success("relay manager active"))
+    }
 }
 
 #[cfg(test)]

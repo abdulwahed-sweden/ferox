@@ -11,3 +11,6 @@ pub mod handlers;
 pub mod modules;
 // Phase 3 infrastructure modules
 pub mod infra; // new lightweight infrastructure namespace (crypto, etc.)
+
+#[cfg(feature = "memory-forensics")]
+pub mod memory_forensics;

@@ -7,9 +7,13 @@ use ferox::modules::c2::http_beacon::{BeaconClient, BeaconConfig, InMemoryBeacon
 
 #[tokio::test]
 async fn beacon_integration_minimal() {
-    let cfg = BeaconConfig { poll_interval_ms: 50, ..Default::default() };
+    let cfg = BeaconConfig {
+        poll_interval_ms: 50,
+        ..Default::default()
+    };
     let client = BeaconClient::new(cfg.clone(), "int_token").unwrap();
-    let (server, cmd_tx, mut res_rx) = InMemoryBeaconServer::new(BeaconClient::new(cfg, "int_token").unwrap());
+    let (server, cmd_tx, mut res_rx) =
+        InMemoryBeaconServer::new(BeaconClient::new(cfg, "int_token").unwrap());
     cmd_tx.send("date".into()).await.unwrap();
     client.tick(&server).await.unwrap();
     let out = res_rx.try_recv().unwrap();

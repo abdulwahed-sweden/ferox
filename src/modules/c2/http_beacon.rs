@@ -9,13 +9,15 @@
 //! - Add TLS pinning / stronger verification options
 //! - Persist nonces and rotate keys periodically
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::JoinHandle;
 
-use crate::infra::crypto::{self, aes_decrypt, aes_encrypt, derive_keys, hmac_sign, hmac_verify, AES_KEY_LEN, HMAC_KEY_LEN};
+use crate::infra::crypto::{
+    self, AES_KEY_LEN, HMAC_KEY_LEN, aes_decrypt, aes_encrypt, derive_keys, hmac_sign, hmac_verify,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BeaconConfig {
@@ -26,7 +28,11 @@ pub struct BeaconConfig {
 
 impl Default for BeaconConfig {
     fn default() -> Self {
-        Self { poll_interval_ms: 500, auth_token_env: "FEROX_C2_TOKEN".into(), tls_verify: true }
+        Self {
+            poll_interval_ms: 500,
+            auth_token_env: "FEROX_C2_TOKEN".into(),
+            tls_verify: true,
+        }
     }
 }
 
@@ -40,7 +46,11 @@ pub struct BeaconClient {
 impl BeaconClient {
     pub fn new(cfg: BeaconConfig, token: &str) -> Result<Self> {
         let keys = derive_keys(token.as_bytes(), b"ferox-c2-salt")?;
-        Ok(Self { cfg, enc_key: keys.enc_key, mac_key: keys.hmac_key })
+        Ok(Self {
+            cfg,
+            enc_key: keys.enc_key,
+            mac_key: keys.hmac_key,
+        })
     }
 
     /// Perform one beacon tick: fetch command, produce result, send back.
@@ -51,17 +61,23 @@ impl BeaconClient {
         let resp = server.fetch_command(req).await?;
         let cmd_bytes = resp.open(self)?;
         // Simulate execution: echo the command uppercased
-        let result = String::from_utf8(cmd_bytes).unwrap_or_default().to_uppercase();
+        let result = String::from_utf8(cmd_bytes)
+            .unwrap_or_default()
+            .to_uppercase();
         let env = AuthEnvelope::new(self, result.as_bytes())?;
         server.submit_result(env).await?;
         Ok(())
     }
 
     /// Start background beacon loop talking to provided server.
-    pub fn start_background<S: BeaconServer + Send + Sync + 'static>(self, server: S) -> (JoinHandle<()>, oneshot::Sender<()>) {
+    pub fn start_background<S: BeaconServer + Send + Sync + 'static>(
+        self,
+        server: S,
+    ) -> (JoinHandle<()>, oneshot::Sender<()>) {
         let (tx_stop, mut rx_stop) = oneshot::channel();
         let handle = tokio::spawn(async move {
-            let mut interval = tokio::time::interval(Duration::from_millis(self.cfg.poll_interval_ms));
+            let mut interval =
+                tokio::time::interval(Duration::from_millis(self.cfg.poll_interval_ms));
             loop {
                 tokio::select! {
                     _ = &mut rx_stop => { break; }
@@ -93,15 +109,23 @@ impl AuthEnvelope {
         mac_input.extend_from_slice(&aad);
         mac_input.extend_from_slice(&ct);
         let tag = hmac_sign(&client.mac_key, &mac_input);
-        Ok(Self { nonce, ciphertext: ct, aad, tag })
+        Ok(Self {
+            nonce,
+            ciphertext: ct,
+            aad,
+            tag,
+        })
     }
 
     pub fn open(self, client: &BeaconClient) -> Result<Vec<u8>> {
-        let mut mac_input = Vec::with_capacity(self.nonce.len() + self.aad.len() + self.ciphertext.len());
+        let mut mac_input =
+            Vec::with_capacity(self.nonce.len() + self.aad.len() + self.ciphertext.len());
         mac_input.extend_from_slice(&self.nonce);
         mac_input.extend_from_slice(&self.aad);
         mac_input.extend_from_slice(&self.ciphertext);
-        if !hmac_verify(&client.mac_key, &mac_input, &self.tag) { return Err(anyhow!("HMAC verify failed")); }
+        if !hmac_verify(&client.mac_key, &mac_input, &self.tag) {
+            return Err(anyhow!("HMAC verify failed"));
+        }
         let pt = aes_decrypt(&client.enc_key, &self.nonce, &self.ciphertext, &self.aad)?;
         Ok(pt)
     }
@@ -126,7 +150,15 @@ impl InMemoryBeaconServer {
     pub fn new(client: BeaconClient) -> (Self, mpsc::Sender<String>, mpsc::Receiver<String>) {
         let (cmd_tx, cmd_rx) = mpsc::channel(8);
         let (res_tx, res_rx) = mpsc::channel(8);
-        (Self { cmd_rx: tokio::sync::Mutex::new(cmd_rx), res_tx, client }, cmd_tx, res_rx)
+        (
+            Self {
+                cmd_rx: tokio::sync::Mutex::new(cmd_rx),
+                res_tx,
+                client,
+            },
+            cmd_tx,
+            res_rx,
+        )
     }
 }
 
@@ -158,7 +190,9 @@ mod tests {
     async fn beacon_loop_simulation() {
         let cfg = BeaconConfig::default();
         let client = BeaconClient::new(cfg, "test_token").unwrap();
-        let (server, cmd_tx, mut res_rx) = InMemoryBeaconServer::new(BeaconClient::new(BeaconConfig::default(), "test_token").unwrap());
+        let (server, cmd_tx, mut res_rx) = InMemoryBeaconServer::new(
+            BeaconClient::new(BeaconConfig::default(), "test_token").unwrap(),
+        );
 
         // Start a single tick manually (no background loop to keep test deterministic)
         cmd_tx.send("whoami".into()).await.unwrap();

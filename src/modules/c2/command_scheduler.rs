@@ -8,9 +8,9 @@
 //! - Persistent storage of scheduled tasks
 //! - Jitter / backoff handling
 
-use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use anyhow::Result;
+use chrono::{DateTime, Utc};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct ScheduledCommand {
@@ -25,16 +25,28 @@ pub struct CommandScheduler {
 }
 
 impl CommandScheduler {
-    pub fn new() -> Self { Self { tasks: HashMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            tasks: HashMap::new(),
+        }
+    }
 
     pub fn schedule_once(&mut self, id: &str, command: &str, run_at: DateTime<Utc>) -> Result<()> {
-        let sc = ScheduledCommand { id: id.to_string(), command: command.to_string(), next_run: run_at };
+        let sc = ScheduledCommand {
+            id: id.to_string(),
+            command: command.to_string(),
+            next_run: run_at,
+        };
         self.tasks.insert(id.to_string(), sc);
         Ok(())
     }
 
     pub fn due(&self, now: DateTime<Utc>) -> Vec<ScheduledCommand> {
-        self.tasks.values().filter(|t| t.next_run <= now).cloned().collect()
+        self.tasks
+            .values()
+            .filter(|t| t.next_run <= now)
+            .cloned()
+            .collect()
     }
 }
 
