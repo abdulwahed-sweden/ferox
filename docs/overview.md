@@ -1,39 +1,45 @@
----
-title: Ferox Overview
-description: Architecture, mission, and guiding principles of the Ferox 2.0.0 offensive security framework.
----
-
 # Ferox Overview
 
-Ferox 2.0.0 is a Rust-based offensive security operations framework engineered for authorized red teams, incident responders, and research labs that demand speed, safety, and accountability. The platform blends high-performance task orchestration with a hardened security model, making it suitable for enterprise deployments and regulated environments.
+Ferox 2.0.0 is a Rust-native, authorization-first framework for red teams and defenders who need fast reconnaissance, disciplined tradecraft, and incident-response grade memory visibility. Every subsystem is designed to be observable, auditable, and scriptable.
 
-## Mission & Scope
-- Deliver a modern alternative to legacy exploitation frameworks with Rust-level guarantees.
-- Provide analysts with modular C2, reconnaissance, post-exploitation, and memory forensics capabilities.
-- Enforce authorization boundaries, auditability, and safe-mode workflows by default.
+## Mission & Principles
+- **Speed with safeguards:** Async Rust modules, aggressive caching, and safe-mode switches keep operations fast while respecting engagement controls.
+- **Single operator surface:** The Ferox CLI Integration Layer launches doctor, memory, C2, sessions, or the full console from one binary.
+- **Evidence always-on:** Session history, memory reports, and Ferox Doctor integrity scores capture proof without bolting on external tooling.
+- **Mixed Predator Theme:** A unified design language ensures the console, doctor output, and CLI banners remain readable in dark SOCs and air-gapped labs.
 
-## Architecture Summary
-| Layer | Responsibilities | Key Components |
-| --- | --- | --- |
-| Interface | REPL CLI, theming, interactive help, non-interactive commands | `src/cli` |
-| Core Services | Session tracking, configuration, result storage, reporting, audit trail | `src/core` |
-| Execution Engine | Exploit framework, module metadata, option resolution, job scheduler | `src/core/*` |
-| Modules | Scanner, recon, C2, evasion, post-exploitation, memory forensics | `src/modules`, `src/memory_forensics` |
-| Integrations | SQLite persistence, optional Volatility bridge, YARA rule packs | `src/core/memory_analysis.rs`, `plugins/` |
+## Architecture Layers
+```
+Operator
+  │
+  ├─ Ferox CLI Integration Layer (doctor, memory, c2, sessions, console)
+  │
+  ├─ Ferox Console (interactive module runner + Mixed Predator Theme)
+  │
+  ├─ Module System
+  │     ├─ Recon & Scanning
+  │     ├─ Exploit & Post-Exploitation
+  │     ├─ Memory Forensics (Volatility3 + YARA)
+  │     ├─ Command & Control Helpers
+  │     └─ Maintenance & Diagnostics (Ferox Doctor)
+  │
+  └─ Data Services
+        ├─ Session Manager (SQLite)
+        ├─ Result Store / Reporting
+        └─ Integrity Score telemetry
+```
+
+## Key Components
+- **Ferox CLI Integration Layer:** Displays the startup banner, probes dependencies (Python, Volatility3, YARA), and routes subcommands before handing control to the console.
+- **Ferox Console:** Provides module discovery, option management, execution, and handler orchestration with tab completion and guarded destructive actions.
+- **Memory Forensics Pipeline:** Parses raw dumps, extracts artifacts, runs Volatility3-inspired analyses, executes YARA rules, and maps MITRE ATT&CK techniques.
+- **Session Manager:** Tracks live implants or module sessions, stores command history, cleans stale entries, and powers `ferox sessions` automation.
+- **C2 Layer:** Includes Teams tunnel, GitHub Gist C2, relay manager scaffolding, and configuration helpers for new transports.
+- **Maintenance & Diagnostics:** Ferox Doctor validates dependencies, calculates an integrity score, and surfaces remediation guidance for SOC handoff.
 
 ## Security Posture
-- Authorization contexts define engagement scope, targets, and expiry windows.
-- Safe mode prompts protect dangerous actions in production and lab deployments.
-- Immutable audit logging records all privileged operations and command results.
-- Memory forensics modules isolate analysis environments and limit data persistence.
+- **Authorized use only:** Safe-mode, audit logging, and explicit user prompts reduce accidental misuse.
+- **Configurable controls:** `ferox_security.toml` enforces file-system sandboxes, blocked commands, and TLS options.
+- **Deterministic builds:** Rust Edition 2024 + reproducible release profiles produce verifiable binaries.
 
-## Documentation Map
-- [Modules Catalog](modules.md)
-- [Usage Guide](usage-guide.md)
-- [Developer Guide](developer-guide.md)
-- [Testing & CI](testing-and-ci.md)
-- [Memory Forensics Deep Dive](memory-forensics.md)
-- [Changelog](changelog.md)
-
----
-_Version 2.0.0 • Updated 2025-11-12 • Contact: security@ferox.local_
+Use Ferox when you need an auditable alternative to legacy exploit or forensic stacks without sacrificing velocity.

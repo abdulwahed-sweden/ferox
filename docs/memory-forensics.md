@@ -1,61 +1,45 @@
----
-title: Ferox Memory Forensics
-description: End-to-end workflow for memory acquisition analysis in Ferox 2.0.0.
----
-
 # Memory Forensics
 
-Ferox ships with a first-class memory forensics suite purpose-built for Windows crash dumps and raw memory images. Modules follow the same authorization, logging, and safe-mode conventions as the rest of the framework while contributing structured results to the SQLite evidence store.
+Ferox 2.0.0 ships a Volatility3-inspired memory pipeline with optional YARA enrichment. The `ferox memory` subcommands can run from the CLI router, within the console, or via automation scripts.
 
-## Components
-| Component | Responsibility | Source |
-| --- | --- | --- |
-| Dump Parser | Identifies dump type, extracts system metadata, and pre-processes sections. | `src/memory_forensics/dump_parser.rs` |
-| Process Analyzer | Reconstructs process trees, detects hollowing/injections, and annotates anomalies. | `src/memory_forensics/process_analyzer.rs` |
-| Malware Detector | Applies YARA rules and heuristic scoring to suspicious regions. | `src/memory_forensics/malware_detector.rs` |
-| Network Analyzer | Rebuilds socket inventory and beacon timelines. | `src/memory_forensics/network_analyzer.rs` |
-| Registry Analyzer | Surfaces persistence artifacts and credential stores. | `src/memory_forensics/registry_analyzer.rs` |
-| Credential Extractor | Dumps SAM/LSA secrets, DPAPI masters, and cached credentials. | `src/memory_forensics/credential_extractor.rs` |
-| MITRE Mapper | Converts detector findings into ATT&CK techniques for reporting. | `src/memory_forensics/mitre_mapper.rs` |
-| Volatility Bridge (optional) | Invokes custom Python plugins for advanced triage. | `src/memory_forensics/volatility_bridge.rs` |
+## Toolchain Requirements
+- Python 3.10+
+- Volatility3 installed on the PATH (`volatility3` or `vol.py`)
+- `yara` binary for YARA scans
+- Optional: SQLite storage for analysis persistence (`ferox_memory.db`)
 
-## CLI Workflow
+The CLI router probes these binaries at startup and reports readiness.
+
+## Command Overview
+| Command | Purpose |
+| --- | --- |
+| `ferox memory analyze <dump>` | Full pipeline (processes, malware strings, network artifacts, registry evidence). |
+| `ferox memory pslist <dump>` | Fast process inventory. |
+| `ferox memory pstree <dump>` | Hierarchical view with parent-child relationships. |
+| `ferox memory malfind <dump>` | Injection + malware heuristics. |
+| `ferox memory netscan <dump>` | Network sockets, DNS cache, URL extraction. |
+| `ferox memory hashdump <dump>` | Credential artifact extraction. |
+| `ferox memory yarascan <dump> --rules ruleset.yar` | YARA pattern matching over raw pages. |
+| `ferox memory mitre <dump>` | MITRE ATT&CK mapping from collected evidence. |
+
+Each command supports JSON output for downstream automation. `ferox memory analyze` and `ferox memory mitre` also accept `--output <path>` to persist findings.
+
+## Typical Workflow
 ```bash
-# Analyze a dump and store results in SQLite
-ferox memory analyze images/workstation.dmp --database analysis.db --output reports/workstation.json
-
-# Focus on process hollowing
-ferox memory malfind images/workstation.dmp --min-score 0.6 --mitre --format table
-
-# Review ATT&CK coverage
-ferox memory mitre images/workstation.dmp --database analysis.db --format markdown
+ferox memory analyze dumps/workstation.raw --output reports/workstation.json --json
+ferox memory malfind dumps/workstation.raw
+ferox memory yarascan dumps/workstation.raw --rules plugins/yara_rules/windows_malware.yar
+ferox memory mitre dumps/workstation.raw --output reports/mitre.json
 ```
 
-All commands support `--mock` to execute in safe mode without touching live dumps—useful for CI validation of parsing logic.
+## Integration Points
+- **Session Manager:** Findings can be associated with sessions to tie implants back to forensic artifacts.
+- **Maintenance:** Ferox Doctor ensures Volatility3/YARA readiness before memory commands run.
+- **Reporting:** JSON outputs feed into the console result store or external SIEM pipelines.
 
-## Database Schema Overview
-| Table | Purpose |
-| --- | --- |
-| `memory_dumps` | Tracks source files, hashes, acquisition notes, and analyzer versions. |
-| `memory_processes` | Stores process metadata, parentage, integrity levels, and risk scores. |
-| `memory_injections` | Captures suspicious regions, heuristics, and correlated techniques. |
-| `memory_mitre_techniques` | Maintains ATT&CK IDs and references discovered during analysis. |
-| `memory_malware_hits` | Links YARA matches to processes, modules, and confidence scores. |
-| `memory_network_connections` | Records sockets, protocols, timestamps, and anomaly flags. |
+## Performance Tips
+- Keep dumps on fast local storage; avoid network-mounted images.
+- Use `--json` for machine parsing, `--output` for archival, and `--database` (via `MemoryCli`) when persistent comparisons are needed.
+- Run `ferox doctor dependency volatility` if CLI probes fail.
 
-SQLite migrations run automatically; however, export the database before upgrading for long-lived cases.
-
-## Best Practices
-- Acquire dumps with trusted tooling and record chain-of-custody metadata.
-- Keep YARA rules current (`plugins/yara_rules/`) and version control changes.
-- Enable the `volatility-bridge` feature only in controlled environments with Python 3.10+ available.
-- Review audit logs (`~/.ferox/logs/audit.log`) to cross-reference analysis operations.
-- Use `--limit` and filtering flags to maintain human-readable output for reports.
-
-## Further Reading
-- [Usage Guide](usage-guide.md) for CLI examples and scripting tips.
-- [Testing & CI](testing-and-ci.md) for verification strategies.
-- [Changelog](changelog.md) for highlights of the memory suite introduction.
-
----
-_Version 2.0.0 • Updated 2025-11-12 • Contact: security@ferox.local_
+Ferox memory tooling remains non-destructive and suitable for IR labs, hunt teams, and compromise assessments.

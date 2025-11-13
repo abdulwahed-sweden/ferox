@@ -1,60 +1,54 @@
----
-title: Ferox Modules Catalog
-description: Categorized overview of Ferox 2.0.0 modules and their primary capabilities.
----
+# Module Catalog
 
-# Modules Catalog
+Ferox modules are grouped by category inside `src/modules`. Each module implements the `Module` trait, advertises metadata, exposes options, and runs asynchronously through the console or programmatic APIs.
 
-This catalog organizes the Ferox module ecosystem to help operators plan engagements and automate playbooks. All modules inherit shared option handling, authorization checks, and audit logging.
+## Listing Modules
+```bash
+ferox console
+ferox> modules
+ferox> modules | grep c2/
+```
+Or filter directly from the CLI:
+```bash
+ferox -- console <<'EOF'
+modules
+EOF
+```
 
-## Command & Control (C2)
-| Module | Description | Notes |
-| --- | --- | --- |
-| `c2/http_beacon` | Resilient HTTP(S) beacon with jitter and task queueing. | Supports proxy chains and TLS pinning. |
-| `c2/dns_c2` | DNS tunneling channel for low-bandwidth exfiltration. | Encodes tasks via TXT records with rate limiting. |
-| `c2/relay_manager` | Relay control plane for multi-operator workflows. | Handles peer registration and encrypted fan-out. |
-| `c2/teams_tunnel` | Microsoft Teams-based C2 over Graph API. | Requires tenant app registration and scoped auth. |
-| `c2/cloud_tunnel` | Cloud broker route, optimized for covert SaaS pivoting. | Designed for red-teaming cloud-first environments. |
-| `c2/command_scheduler` | Engagement-wide job scheduler for periodic actions. | Coordinates time-based delivery with audit linkage. |
+## Categories
+### Recon & Scanning
+- `scanner/http_scanner` — async HTTP capability scanner.
+- `scanner/port` — TCP reachability with CIDR support.
+- `recon/subdomains`, `recon/dns`, `recon/asn`, `recon/whois`.
 
-## Evasion
-| Module | Description | Notes |
-| --- | --- | --- |
-| `evasion/edr/silent_shadow` | Endpoint detection response evasion primitives. | Ships with process hollowing, DLL stomp, and delay guards. |
+### Exploit & Post-Exploitation
+- `exploit/example` — reference exploit scaffold.
+- `post/browser/deep_session_hijack` — browser session takeover techniques.
+- `evasion/edr/silent_shadow` — research-grade EDR bypass flows.
 
-## Reconnaissance
-| Module | Description | Notes |
-| --- | --- | --- |
-| `recon/asn` | Autonomous system number discovery and attribution. | Maps target IPs to companies and regions. |
-| `recon/dns` | DNS record enumeration with subdomain brute force. | Supports custom resolvers and threading controls. |
-| `recon/subdomains` | Aggregates wordlists, certificates, and APIs for subdomains. | Integrates with `wordlist.txt` and remote feeds. |
-| `recon/whois` | WHOIS lookup and contact detail extraction. | Normalizes registry outputs for reporting. |
+### Auxiliary & Cloud
+- `auxiliary/cloud/onedrive_sync_exfil` — exfiltration via cloud sync abuse.
 
-## Scanning
-| Module | Description | Notes |
-| --- | --- | --- |
-| `scanner/http_scanner` | Enumerates HTTP verbs, headers, and technology hints. | Supports concurrency tuning and reporting integration. |
-| `scanner/port` | High-speed TCP port scanner with banner detection. | Built on async runtime with rate-limit controls. |
+### Command & Control
+- `c2/teams_tunnel` — meeting-based covert channel.
+- `c2/github_c2` — GitHub Gist dead-drop comms.
+- `c2/relay_manager` — session fan-out scaffolding.
 
-## Post-Exploitation
-| Module | Description | Notes |
-| --- | --- | --- |
-| `post/browser/deep_session_hijack` | Harvests browser session state for lateral movement. | Includes mock mode for tabletop exercises. |
+### Memory Forensics
+Accessible via `ferox memory …` or `memory` console command:
+- `memory analyze`, `pslist`, `pstree`, `netscan`, `malfind`, `hashdump`, `yarascan`, `mitre`, and more.
 
-## Auxiliary
-| Module | Description | Notes |
-| --- | --- | --- |
-| `auxiliary/cloud/onedrive_sync_exfil` | OneDrive sync-exfiltration workflow. | Uses safe-mode guardrails to prevent accidental exfil. |
+## Module Lifecycle
+1. `modules` → discover.
+2. `use <category/name>`.
+3. `options` / `show options` → inspect required fields.
+4. `set KEY VALUE`.
+5. `run` or `check`.
+6. Review `sessions`, `result_store`, or exported reports.
 
-## Memory Forensics Suite
-| Component | Description | Notes |
-| --- | --- | --- |
-| `memory analyze` | End-to-end dump analysis with SQLite evidence storage. | Generates consolidated JSON/CSV reports. |
-| `memory pslist` | Process inventory with parent-child reconstruction. | Flags suspicious parentage and integrity gaps. |
-| `memory malfind` | Injection detection with YARA integration. | Outputs code injection summaries and heuristics. |
-| `memory netscan` | Socket timeline and beacon clustering. | Matches MITRE ATT&CK techniques for command staging. |
-| `memory hashdump` | Credential artifact extraction across SAM/LSA secrets. | Auto-scrubs results in safe-mode runs. |
-| `memory mitre` | MITRE ATT&CK technique mapping and scoring. | Adds tags to `memory_analysis` database tables. |
+## Writing Modules
+- Follow Rust Edition 2024 formatting.
+- Put reusable helpers in `src/core` or `src/infra`.
+- Document new modules inside `docs/modules.md` when adding categories.
 
----
-_Version 2.0.0 • Updated 2025-11-12 • Contact: security@ferox.local_
+Ferox discourages destructive defaults—prompt users before impactful actions and ensure safe-mode gating where possible.
