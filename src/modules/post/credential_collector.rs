@@ -90,7 +90,11 @@ impl Credential {
             redacted.password = Some(format!("{}***", &pass[..pass.len().min(2)]));
         }
         if let Some(ref hash) = redacted.hash {
-            redacted.hash = Some(format!("{}...{}", &hash[..8.min(hash.len())], &hash[hash.len().saturating_sub(8)..]));
+            redacted.hash = Some(format!(
+                "{}...{}",
+                &hash[..8.min(hash.len())],
+                &hash[hash.len().saturating_sub(8)..]
+            ));
         }
         redacted
     }
@@ -197,7 +201,11 @@ impl CredentialCollector {
         output.push_str(&format!("Found {} credentials:\n\n", credentials.len()));
 
         for (i, cred) in credentials.iter().enumerate() {
-            let display_cred = if redact { cred.redacted() } else { cred.clone() };
+            let display_cred = if redact {
+                cred.redacted()
+            } else {
+                cred.clone()
+            };
 
             output.push_str(&format!("Credential #{}:\n", i + 1));
             output.push_str(&format!("  Type: {:?}\n", display_cred.cred_type));
@@ -311,7 +319,10 @@ impl Module for CredentialCollector {
             .unwrap_or(true);
 
         let mut fingerprint = HashMap::new();
-        fingerprint.insert("mode".to_string(), if safe_mode { "safe" } else { "production" }.to_string());
+        fingerprint.insert(
+            "mode".to_string(),
+            if safe_mode { "safe" } else { "production" }.to_string(),
+        );
 
         Ok(CheckResult {
             vulnerable: safe_mode, // In safe mode, always "vulnerable" (testable)

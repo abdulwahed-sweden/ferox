@@ -1,20 +1,20 @@
 // src/tools/maintenance/mod.rs
 // Enhanced Ferox maintenance system with self-diagnosis and smart re-testing
 
+pub mod cli_dashboard;
 pub mod enhanced_report;
 pub mod smart_retest;
-pub mod cli_dashboard;
 
-pub use enhanced_report::{
-    MaintenanceReport, Issue, IssueSeverity, FrameworkStatus,
-    HealthScore, IntegrityScore, ReportFormat, ScoreTrend,
-};
-pub use smart_retest::{SmartRetester, RetestConfig, TestResult};
 pub use cli_dashboard::CliDashboard;
+pub use enhanced_report::{
+    FrameworkStatus, HealthScore, IntegrityScore, Issue, IssueSeverity, MaintenanceReport,
+    ReportFormat, ScoreTrend,
+};
+pub use smart_retest::{RetestConfig, SmartRetester, TestResult};
 
+use anyhow::{anyhow, Result};
 use std::path::Path;
 use std::time::Instant;
-use anyhow::Result;
 
 pub struct MaintenanceEngine {
     verbose: bool,
@@ -57,11 +57,7 @@ impl MaintenanceEngine {
     pub fn run_health_check_with_autofix(&self) -> Result<MaintenanceReport> {
         let mut report = self.run_health_check()?;
 
-        let fixable_issues = report
-            .issues
-            .iter()
-            .filter(|i| i.auto_fixable)
-            .count();
+        let fixable_issues = report.issues.iter().filter(|i| i.auto_fixable).count();
 
         if fixable_issues > 0 && self.verbose {
             println!("\n🔧 Attempting to auto-fix {} issue(s)...", fixable_issues);
@@ -76,18 +72,13 @@ impl MaintenanceEngine {
     pub fn run_tests_with_retest(&self, retest_config: RetestConfig) -> Result<TestResult> {
         let retester = SmartRetester::new(retest_config);
 
-        let result = retester.run_with_retries(
-            &retester.config.features,
-            |attempt, max| {
+        let result = retester
+            .run_with_retries(retester.features(), |attempt, max| {
                 if self.verbose {
-                    println!(
-                        "⏳ Retrying tests... attempt {}/{}",
-                        attempt + 1,
-                        max
-                    );
+                    println!("⏳ Retrying tests... attempt {}/{}", attempt + 1, max);
                 }
-            },
-        )?;
+            })
+            .map_err(|e| anyhow!(e))?;
 
         Ok(result)
     }
@@ -149,7 +140,7 @@ impl MaintenanceEngine {
     }
 
     fn check_build(&self, report: &mut MaintenanceReport) -> Result<()> {
-        let mut checks_total = 3;
+        let checks_total = 3;
         let mut checks_passed = 0;
 
         // Check Cargo.toml
@@ -182,7 +173,7 @@ impl MaintenanceEngine {
             "src/modules/auxiliary",
         ];
 
-        let mut checks_total = module_dirs.len();
+        let checks_total = module_dirs.len();
         let mut checks_passed = 0;
 
         for dir in module_dirs {
@@ -206,12 +197,8 @@ impl MaintenanceEngine {
     }
 
     fn check_tests(&self, report: &mut MaintenanceReport) -> Result<()> {
-        let test_dirs = vec![
-            "tests/unit",
-            "tests/integration",
-        ];
-
-        let mut checks_total = 2;
+        let test_dirs = ["tests/unit", "tests/integration"];
+        let total_checks = test_dirs.len();
         let mut checks_passed = 0;
 
         for dir in test_dirs {
@@ -220,17 +207,24 @@ impl MaintenanceEngine {
             }
         }
 
+        report.tests_health.update(checks_passed, total_checks);
+
         // Count test files
         let test_count = std::fs::read_dir("tests")
-            .map(|entries| entries.filter(|e| {
-                e.as_ref()
-                    .map(|f| f.path().extension().map_or(false, |ext| ext == "rs"))
-                    .unwrap_or(false)
-            }).count())
+            .map(|entries| {
+                entries
+                    .filter(|e| {
+                        e.as_ref()
+                            .map(|f| f.path().extension().map_or(false, |ext| ext == "rs"))
+                            .unwrap_or(false)
+                    })
+                    .count()
+            })
             .unwrap_or(0);
 
-        report.tests_health.checks_total = 100;
-        report.tests_health.checks_passed = (test_count).min(100);
+        const SAMPLE_WINDOW: usize = 100;
+        report.tests_health.checks_total = SAMPLE_WINDOW;
+        report.tests_health.checks_passed = test_count.min(SAMPLE_WINDOW);
 
         Ok(())
     }

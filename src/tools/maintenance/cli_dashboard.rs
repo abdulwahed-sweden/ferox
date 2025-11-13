@@ -1,8 +1,10 @@
 // src/tools/maintenance/cli_dashboard.rs
 // Colorized CLI dashboard for maintenance reports
 
+use crate::tools::maintenance::enhanced_report::{
+    FrameworkStatus, IssueSeverity, MaintenanceReport,
+};
 use colored::Colorize;
-use crate::tools::maintenance::enhanced_report::{MaintenanceReport, FrameworkStatus, IssueSeverity};
 
 pub struct CliDashboard;
 
@@ -172,7 +174,12 @@ impl CliDashboard {
             return;
         }
 
-        println!("\n{}", format!("⚠️  ISSUES ({} found)", report.issues.len()).bold().yellow());
+        println!(
+            "\n{}",
+            format!("⚠️  ISSUES ({} found)", report.issues.len())
+                .bold()
+                .yellow()
+        );
         println!("{}", "─".repeat(70).dimmed());
 
         let mut issues_by_severity = vec![
@@ -200,10 +207,7 @@ impl CliDashboard {
                         issue.id.dimmed(),
                         issue.description
                     );
-                    println!(
-                        "      💡 {}",
-                        issue.suggestion.italic().bright_black()
-                    );
+                    println!("      💡 {}", issue.suggestion.italic().bright_black());
                 }
             }
         }
@@ -211,7 +215,12 @@ impl CliDashboard {
 
     fn print_fixes_section(report: &MaintenanceReport) {
         if report.auto_fixes_applied > 0 {
-            println!("\n{}", format!("🔧 AUTO-FIXES APPLIED ({})", report.auto_fixes_applied).bold().green());
+            println!(
+                "\n{}",
+                format!("🔧 AUTO-FIXES APPLIED ({})", report.auto_fixes_applied)
+                    .bold()
+                    .green()
+            );
             println!("{}", "─".repeat(70).dimmed());
             println!(
                 "  {} Automatically resolved {} issue(s)",
@@ -223,7 +232,12 @@ impl CliDashboard {
 
     fn print_recommendations_section(report: &MaintenanceReport) {
         if !report.recommendations.is_empty() {
-            println!("\n{}", format!("💡 RECOMMENDATIONS ({})", report.recommendations.len()).bold().cyan());
+            println!(
+                "\n{}",
+                format!("💡 RECOMMENDATIONS ({})", report.recommendations.len())
+                    .bold()
+                    .cyan()
+            );
             println!("{}", "─".repeat(70).dimmed());
             for (i, rec) in report.recommendations.iter().enumerate() {
                 println!("  {}. {}", (i + 1).to_string().cyan().bold(), rec);
@@ -254,10 +268,7 @@ impl CliDashboard {
                 )
             }
             FrameworkStatus::Initializing => {
-                format!(
-                    "{}  System initializing - Please wait",
-                    "🔄".cyan().bold()
-                )
+                format!("{}  System initializing - Please wait", "🔄".cyan().bold())
             }
         };
 

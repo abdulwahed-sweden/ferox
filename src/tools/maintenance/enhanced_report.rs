@@ -1,8 +1,8 @@
 // src/tools/maintenance/enhanced_report.rs
 // Enhanced maintenance reporting with self-diagnosis and scoring
 
-use std::fmt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Issue {
@@ -162,7 +162,7 @@ impl fmt::Display for ScoreTrend {
 impl MaintenanceReport {
     pub fn new(version: &str) -> Self {
         let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        
+
         Self {
             timestamp: now,
             version: version.to_string(),
@@ -188,20 +188,19 @@ impl MaintenanceReport {
     }
 
     pub fn calculate_overall_status(&mut self) {
-        let avg_health = (
-            self.structure_health.score +
-            self.build_health.score +
-            self.modules_health.score +
-            self.tests_health.score
-        ) / 4.0;
-
-        let critical_count = self.issues.iter()
+        let critical_count = self
+            .issues
+            .iter()
             .filter(|i| i.severity == IssueSeverity::Critical)
             .count();
-        let error_count = self.issues.iter()
+        let error_count = self
+            .issues
+            .iter()
             .filter(|i| i.severity == IssueSeverity::Error)
             .count();
-        let warning_count = self.issues.iter()
+        let warning_count = self
+            .issues
+            .iter()
             .filter(|i| i.severity == IssueSeverity::Warning)
             .count();
 
@@ -212,7 +211,8 @@ impl MaintenanceReport {
         };
 
         // Calculate integrity score
-        let issue_penalty = (critical_count as u32 * 10) + (error_count as u32 * 5) + (warning_count as u32 * 2);
+        let issue_penalty =
+            (critical_count as u32 * 10) + (error_count as u32 * 5) + (warning_count as u32 * 2);
         self.integrity_score.overall = (100u32).saturating_sub(issue_penalty);
         self.integrity_score.module_integrity = self.modules_health.score as u32;
         self.integrity_score.build_integrity = self.build_health.score as u32;
@@ -236,7 +236,9 @@ impl MaintenanceReport {
     ) -> String {
         match (critical, errors, warnings, fixes) {
             (0, 0, 0, 0) => "✅ All systems operational - Framework at peak condition".to_string(),
-            (0, 0, 0, n) if n > 0 => format!("✅ All systems operational - Auto-fixed {} issues", n),
+            (0, 0, 0, n) if n > 0 => {
+                format!("✅ All systems operational - Auto-fixed {} issues", n)
+            }
             (0, 0, w, 0) => format!("⚠️ {} warnings detected - Review recommended", w),
             (0, 0, w, n) => format!("⚠️ {} warnings found, auto-fixed {} issues", w, n),
             (0, e, _, _) => format!("⚠️ {} errors detected - Action required", e),
@@ -261,11 +263,20 @@ impl MaintenanceReport {
         md.push_str("# 🩺 Ferox Maintenance Report\n\n");
         md.push_str(&format!("**Generated:** {}\n", self.timestamp));
         md.push_str(&format!("**Version:** {}\n", self.version));
-        md.push_str(&format!("**Execution Time:** {}ms\n\n", self.execution_time_ms));
+        md.push_str(&format!(
+            "**Execution Time:** {}ms\n\n",
+            self.execution_time_ms
+        ));
 
         md.push_str("## System Status\n\n");
-        md.push_str(&format!("- **Framework Status:** {}\n", self.framework_status));
-        md.push_str(&format!("- **Integrity Score:** {}/100\n", self.integrity_score.overall));
+        md.push_str(&format!(
+            "- **Framework Status:** {}\n",
+            self.framework_status
+        ));
+        md.push_str(&format!(
+            "- **Integrity Score:** {}/100\n",
+            self.integrity_score.overall
+        ));
         md.push_str(&format!("- **Trend:** {}\n\n", self.integrity_score.trend));
 
         md.push_str("## Health Scores\n\n");
@@ -316,7 +327,10 @@ impl MaintenanceReport {
         }
 
         if self.auto_fixes_applied > 0 {
-            md.push_str(&format!("## Auto-fixes Applied\n\n**{} issues automatically fixed**\n\n", self.auto_fixes_applied));
+            md.push_str(&format!(
+                "## Auto-fixes Applied\n\n**{} issues automatically fixed**\n\n",
+                self.auto_fixes_applied
+            ));
         }
 
         if !self.recommendations.is_empty() {

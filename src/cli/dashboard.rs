@@ -2,9 +2,8 @@
 // Interactive CLI control dashboard implementation
 
 use anyhow::Result;
-use colored::*;
-use std::collections::HashMap;
 use chrono::Local;
+use colored::*;
 
 #[derive(Debug, Clone)]
 pub struct DashboardStatus {
@@ -171,74 +170,246 @@ impl Dashboard {
     }
 
     fn print_header(&self) {
-        println!("{}", "════════════════════════════════════════════════════════════════".cyan());
+        println!(
+            "{}",
+            "════════════════════════════════════════════════════════════════".cyan()
+        );
         println!("{}", "🦊 FEROX CONTROL DASHBOARD".bold().cyan());
-        println!("{}", "════════════════════════════════════════════════════════════════".cyan());
+        println!(
+            "{}",
+            "════════════════════════════════════════════════════════════════".cyan()
+        );
         println!();
     }
 
     fn print_project_status(&self, status: &DashboardStatus) {
-        println!("{}", "┌─ PROJECT STATUS ─────────────────────────────────────────────┐".cyan());
-        println!("│ {:<60} │", format!("Version:              {}", status.version));
+        println!(
+            "{}",
+            "┌─ PROJECT STATUS ─────────────────────────────────────────────┐".cyan()
+        );
+        println!(
+            "│ {:<60} │",
+            format!("Version:              {}", status.version)
+        );
         println!("│ {:<60} │", format!("Build Status:         ✅ SUCCESS"));
-        println!("│ {:<60} │", format!("Last Build:           {}", status.build_status.last_build));
-        println!("│ {:<60} │", format!("Binary Size:          {:.1} MB", status.build_status.binary_size_mb));
-        println!("│ {:<60} │", format!("Compilation Time:     {:.1} seconds", status.build_status.compilation_time_s));
-        println!("│ {:<60} │", format!("Startup Time:         {:.2} seconds", status.build_status.startup_time_ms));
-        println!("{}", "└──────────────────────────────────────────────────────────────┘".cyan());
+        println!(
+            "│ {:<60} │",
+            format!("Last Build:           {}", status.build_status.last_build)
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Binary Size:          {:.1} MB",
+                status.build_status.binary_size_mb
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Compilation Time:     {:.1} seconds",
+                status.build_status.compilation_time_s
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Startup Time:         {:.2} seconds",
+                status.build_status.startup_time_ms
+            )
+        );
+        println!(
+            "{}",
+            "└──────────────────────────────────────────────────────────────┘".cyan()
+        );
         println!();
     }
 
     fn print_health_metrics(&self, status: &DashboardStatus) {
         let health = &status.health_metrics;
-        println!("{}", "┌─ HEALTH METRICS ─────────────────────────────────────────────┐".cyan());
-        println!("│ {:<60} │", format!("Overall Health:       {} ({}%)", "✅ HEALTHY".green(), health.overall_health));
-        println!("│ {:<60} │", format!("Module Registry:      ✅ {} modules loaded", health.modules_loaded));
-        println!("│ {:<60} │", format!("Tests Passing:        ✅ {}/{} ({}%)", health.tests_passing, health.tests_total, 
-            (health.tests_passing as f64 / health.tests_total as f64 * 100.0) as u8));
-        println!("│ {:<60} │", format!("Database Health:      ✅ {} databases operational", health.databases_operational));
-        println!("│ {:<60} │", format!("Audit Trail:          ✅ {} entries logged", health.audit_entries));
-        println!("│ {:<60} │", format!("Configuration:        {}", if health.configuration_valid { "✅ Valid".green() } else { "❌ Invalid".red() }));
-        println!("│ {:<60} │", format!("Security Policies:    {}", if health.security_enforced { "✅ Enforced".green() } else { "❌ Not enforced".red() }));
-        println!("│ {:<60} │", format!("Memory Forensics:     ✅ All analyzers ready"));
-        println!("{}", "└──────────────────────────────────────────────────────────────┘".cyan());
+        println!(
+            "{}",
+            "┌─ HEALTH METRICS ─────────────────────────────────────────────┐".cyan()
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Overall Health:       {} ({}%)",
+                "✅ HEALTHY".green(),
+                health.overall_health
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Module Registry:      ✅ {} modules loaded",
+                health.modules_loaded
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Tests Passing:        ✅ {}/{} ({}%)",
+                health.tests_passing,
+                health.tests_total,
+                (health.tests_passing as f64 / health.tests_total as f64 * 100.0) as u8
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Database Health:      ✅ {} databases operational",
+                health.databases_operational
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Audit Trail:          ✅ {} entries logged",
+                health.audit_entries
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Configuration:        {}",
+                if health.configuration_valid {
+                    "✅ Valid".green()
+                } else {
+                    "❌ Invalid".red()
+                }
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Security Policies:    {}",
+                if health.security_enforced {
+                    "✅ Enforced".green()
+                } else {
+                    "❌ Not enforced".red()
+                }
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!("Memory Forensics:     ✅ All analyzers ready")
+        );
+        println!(
+            "{}",
+            "└──────────────────────────────────────────────────────────────┘".cyan()
+        );
         println!();
     }
 
     fn print_module_status(&self, status: &DashboardStatus) {
         let modules = &status.module_status;
-        println!("{}", "┌─ MODULE STATUS ──────────────────────────────────────────────┐".cyan());
-        println!("│ {:<60} │", format!("Scanner:              ✅ {} modules operational", modules.scanner));
-        println!("│ {:<60} │", format!("Reconnaissance:       ✅ {} modules operational", modules.recon));
-        println!("│ {:<60} │", format!("Exploit:              ✅ {} modules operational", modules.exploit));
-        println!("│ {:<60} │", format!("Post-Exploitation:    ✅ {} modules operational", modules.post_exploitation));
-        println!("│ {:<60} │", format!("C2 & Evasion:         ✅ {} modules operational", modules.c2_evasion));
-        println!("│ {:<60} │", format!("Auxiliary:            ✅ {} modules operational", modules.auxiliary));
-        println!("│ {:<60} │", format!("Memory Forensics:     ✅ {} analyzers operational", modules.memory_forensics));
-        println!("{}", "└──────────────────────────────────────────────────────────────┘".cyan());
+        println!(
+            "{}",
+            "┌─ MODULE STATUS ──────────────────────────────────────────────┐".cyan()
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Scanner:              ✅ {} modules operational",
+                modules.scanner
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Reconnaissance:       ✅ {} modules operational",
+                modules.recon
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Exploit:              ✅ {} modules operational",
+                modules.exploit
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Post-Exploitation:    ✅ {} modules operational",
+                modules.post_exploitation
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "C2 & Evasion:         ✅ {} modules operational",
+                modules.c2_evasion
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Auxiliary:            ✅ {} modules operational",
+                modules.auxiliary
+            )
+        );
+        println!(
+            "│ {:<60} │",
+            format!(
+                "Memory Forensics:     ✅ {} analyzers operational",
+                modules.memory_forensics
+            )
+        );
+        println!(
+            "{}",
+            "└──────────────────────────────────────────────────────────────┘".cyan()
+        );
         println!();
     }
 
     fn print_recent_activity(&self, status: &DashboardStatus) {
-        println!("{}", "┌─ RECENT ACTIVITY ────────────────────────────────────────────┐".cyan());
+        println!(
+            "{}",
+            "┌─ RECENT ACTIVITY ────────────────────────────────────────────┐".cyan()
+        );
         for activity in &status.recent_activity {
-            println!("│ {} {} {:<40} │", 
-                activity.timestamp, 
-                activity.status, 
-                activity.message);
+            println!(
+                "│ {} {} {:<40} │",
+                activity.timestamp, activity.status, activity.message
+            );
         }
-        println!("{}", "└──────────────────────────────────────────────────────────────┘".cyan());
+        println!(
+            "{}",
+            "└──────────────────────────────────────────────────────────────┘".cyan()
+        );
         println!();
     }
 
     fn print_quick_actions(&self) {
-        println!("{}", "┌─ QUICK ACTIONS ──────────────────────────────────────────────┐".cyan());
-        println!("│ {:<60} │", "[1] Run Full Test Suite        [2] Execute Build");
-        println!("│ {:<60} │", "[3] Check System Health        [4] View Module Status");
-        println!("│ {:<60} │", "[5] Run Security Audit         [6] Manage Databases");
-        println!("│ {:<60} │", "[7] View Audit Logs            [8] Generate Report");
-        println!("│ {:<60} │", "[9] Run Diagnostics            [0] Exit Dashboard");
-        println!("{}", "└──────────────────────────────────────────────────────────────┘".cyan());
+        println!(
+            "{}",
+            "┌─ QUICK ACTIONS ──────────────────────────────────────────────┐".cyan()
+        );
+        println!(
+            "│ {:<60} │",
+            "[1] Run Full Test Suite        [2] Execute Build"
+        );
+        println!(
+            "│ {:<60} │",
+            "[3] Check System Health        [4] View Module Status"
+        );
+        println!(
+            "│ {:<60} │",
+            "[5] Run Security Audit         [6] Manage Databases"
+        );
+        println!(
+            "│ {:<60} │",
+            "[7] View Audit Logs            [8] Generate Report"
+        );
+        println!(
+            "│ {:<60} │",
+            "[9] Run Diagnostics            [0] Exit Dashboard"
+        );
+        println!(
+            "{}",
+            "└──────────────────────────────────────────────────────────────┘".cyan()
+        );
         println!();
     }
 }
@@ -264,7 +435,7 @@ mod tests {
         let dashboard = Dashboard::new();
         let status = dashboard.gather_status();
         assert!(status.is_ok());
-        
+
         let status = status.unwrap();
         assert_eq!(status.module_status.scanner, 8);
         assert_eq!(status.test_results.total, 113);

@@ -98,7 +98,10 @@ impl PrivilegeEscalation {
     fn generate_escalation_reference(&self, technique: &EscalationTechnique) -> String {
         let mut output = String::new();
         output.push_str(&format!("=== {} ===\n", technique.description()));
-        output.push_str(&format!("MITRE ATT&CK: {}\n\n", technique.mitre_technique()));
+        output.push_str(&format!(
+            "MITRE ATT&CK: {}\n\n",
+            technique.mitre_technique()
+        ));
 
         match technique {
             EscalationTechnique::UacBypassFodhelper => {
@@ -108,7 +111,9 @@ impl PrivilegeEscalation {
                 output.push_str("3. Set DelegateExecute value (empty)\n");
                 output.push_str("4. Execute fodhelper.exe (auto-elevates without UAC)\n");
                 output.push_str("5. Cleanup: Remove registry keys\n\n");
-                output.push_str("[SAFE MODE: Would execute actual registry modifications in production]\n");
+                output.push_str(
+                    "[SAFE MODE: Would execute actual registry modifications in production]\n",
+                );
             }
             EscalationTechnique::UacBypassSdclt => {
                 output.push_str("REFERENCE IMPLEMENTATION:\n");
@@ -116,7 +121,9 @@ impl PrivilegeEscalation {
                 output.push_str("2. Set value to target command\n");
                 output.push_str("3. Execute sdclt.exe /KickOffElev (auto-elevates)\n");
                 output.push_str("4. Cleanup: Remove registry keys\n\n");
-                output.push_str("[SAFE MODE: Would execute actual registry modifications in production]\n");
+                output.push_str(
+                    "[SAFE MODE: Would execute actual registry modifications in production]\n",
+                );
             }
             EscalationTechnique::TokenImpersonation => {
                 output.push_str("REFERENCE IMPLEMENTATION:\n");
@@ -124,7 +131,8 @@ impl PrivilegeEscalation {
                 output.push_str("2. Open process with TOKEN_QUERY | TOKEN_DUPLICATE\n");
                 output.push_str("3. Duplicate token with SecurityImpersonation\n");
                 output.push_str("4. Impersonate token in current thread\n\n");
-                output.push_str("[SAFE MODE: Would perform actual token operations in production]\n");
+                output
+                    .push_str("[SAFE MODE: Would perform actual token operations in production]\n");
             }
             EscalationTechnique::ScheduledTask => {
                 output.push_str("REFERENCE IMPLEMENTATION:\n");
@@ -210,7 +218,9 @@ impl Module for PrivilegeEscalation {
             .unwrap_or(true);
 
         if !safe_mode {
-            bail!("Production mode requires explicit authorization and is not implemented in this reference version");
+            bail!(
+                "Production mode requires explicit authorization and is not implemented in this reference version"
+            );
         }
 
         Ok(())
@@ -221,8 +231,14 @@ impl Module for PrivilegeEscalation {
         let techniques = self.suggest_techniques();
 
         let mut fingerprint = HashMap::new();
-        fingerprint.insert("current_privileges".to_string(), "standard_user".to_string());
-        fingerprint.insert("suggested_techniques".to_string(), format!("{}", techniques.len()));
+        fingerprint.insert(
+            "current_privileges".to_string(),
+            "standard_user".to_string(),
+        );
+        fingerprint.insert(
+            "suggested_techniques".to_string(),
+            format!("{}", techniques.len()),
+        );
 
         Ok(CheckResult {
             vulnerable: true,
@@ -296,7 +312,9 @@ mod tests {
     async fn test_privilege_escalation() {
         let mut module = PrivilegeEscalation::new();
         module.set_option("safe_mode", "true").unwrap();
-        module.set_option("technique", "UacBypassFodhelper").unwrap();
+        module
+            .set_option("technique", "UacBypassFodhelper")
+            .unwrap();
 
         assert!(module.validate().is_ok());
 

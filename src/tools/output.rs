@@ -1,5 +1,4 @@
 /// Colorized output system for diagnostic tools
-use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Color {
@@ -31,49 +30,33 @@ pub struct ColorizedOutput;
 
 impl ColorizedOutput {
     pub fn success(message: &str) {
-        println!(
-            "{} {} {message}",
-            Color::Green.as_ansi_code(),
-            BOLD
-        );
+        println!("{} {} {message}", Color::Green.as_ansi_code(), BOLD);
         print!("{}", RESET);
     }
 
     pub fn warning(message: &str) {
-        println!(
-            "{} {} ⚠️  {message}",
-            Color::Yellow.as_ansi_code(),
-            BOLD
-        );
+        println!("{} {} ⚠️  {message}", Color::Yellow.as_ansi_code(), BOLD);
         print!("{}", RESET);
     }
 
     pub fn error(message: &str) {
-        println!(
-            "{} {} ❌ {message}",
-            Color::Red.as_ansi_code(),
-            BOLD
-        );
+        println!("{} {} ❌ {message}", Color::Red.as_ansi_code(), BOLD);
         print!("{}", RESET);
     }
 
     pub fn info(message: &str) {
-        println!(
-            "{} {} ℹ️  {message}",
-            Color::Blue.as_ansi_code(),
-            BOLD
-        );
+        println!("{} {} ℹ️  {message}", Color::Blue.as_ansi_code(), BOLD);
         print!("{}", RESET);
     }
 
     pub fn section_header(title: &str) {
         println!();
+        println!("{} {} {title}", Color::Cyan.as_ansi_code(), BOLD);
         println!(
-            "{} {} {title}",
-            Color::Cyan.as_ansi_code(),
-            BOLD
+            "{}{}",
+            Color::Dimmed.as_ansi_code(),
+            "─".repeat(title.len())
         );
-        println!("{}{}", Color::Dimmed.as_ansi_code(), "─".repeat(title.len()));
         print!("{}", RESET);
     }
 

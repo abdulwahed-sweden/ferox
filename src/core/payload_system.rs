@@ -179,7 +179,11 @@ impl PayloadGenerator {
     }
 
     /// Generate a smart payload
-    pub fn generate(&self, config: SmartPayloadConfig, target: &TargetInfo) -> Result<SmartPayload> {
+    pub fn generate(
+        &self,
+        config: SmartPayloadConfig,
+        target: &TargetInfo,
+    ) -> Result<SmartPayload> {
         // Authorization check
         if !self.safe_mode {
             // In production, verify authorization here
@@ -210,7 +214,11 @@ impl PayloadGenerator {
     }
 
     /// Generate base payload (architecture-specific)
-    fn generate_base_payload(&self, config: &SmartPayloadConfig, target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_base_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         if self.safe_mode {
             // Safe mode: return reference implementation
             return self.generate_safe_payload(config, target);
@@ -229,7 +237,11 @@ impl PayloadGenerator {
     }
 
     /// Generate safe reference payload (for testing)
-    fn generate_safe_payload(&self, config: &SmartPayloadConfig, target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_safe_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         let script = format!(
             "#!/bin/bash\n\
              # Ferox Safe Mode Payload\n\
@@ -256,7 +268,11 @@ impl PayloadGenerator {
     }
 
     /// Generate x64 shellcode (reference implementation)
-    fn generate_x64_payload(&self, config: &SmartPayloadConfig, _target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_x64_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        _target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         // REFERENCE IMPLEMENTATION ONLY
         // In production, this would generate actual shellcode
         let reference = format!(
@@ -264,54 +280,62 @@ impl PayloadGenerator {
              # Payload: {:?}\n\
              # Connect to: {}:{}\n\
              # EDUCATIONAL/TESTING PURPOSES ONLY\n",
-            config.base_config.payload_type,
-            config.base_config.lhost,
-            config.base_config.lport,
+            config.base_config.payload_type, config.base_config.lhost, config.base_config.lport,
         );
         Ok(reference.into_bytes())
     }
 
     /// Generate x86 shellcode (reference implementation)
-    fn generate_x86_payload(&self, config: &SmartPayloadConfig, _target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_x86_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        _target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         let reference = format!(
             "# x86 shellcode reference\n\
              # Payload: {:?}\n\
              # Connect to: {}:{}\n",
-            config.base_config.payload_type,
-            config.base_config.lhost,
-            config.base_config.lport,
+            config.base_config.payload_type, config.base_config.lhost, config.base_config.lport,
         );
         Ok(reference.into_bytes())
     }
 
     /// Generate ARM64 shellcode (reference implementation)
-    fn generate_arm64_payload(&self, config: &SmartPayloadConfig, _target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_arm64_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        _target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         let reference = format!(
             "# ARM64 shellcode reference\n\
              # Payload: {:?}\n\
              # Connect to: {}:{}\n",
-            config.base_config.payload_type,
-            config.base_config.lhost,
-            config.base_config.lport,
+            config.base_config.payload_type, config.base_config.lhost, config.base_config.lport,
         );
         Ok(reference.into_bytes())
     }
 
     /// Generate ARM shellcode (reference implementation)
-    fn generate_arm_payload(&self, config: &SmartPayloadConfig, _target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_arm_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        _target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         let reference = format!(
             "# ARM shellcode reference\n\
              # Payload: {:?}\n\
              # Connect to: {}:{}\n",
-            config.base_config.payload_type,
-            config.base_config.lhost,
-            config.base_config.lport,
+            config.base_config.payload_type, config.base_config.lhost, config.base_config.lport,
         );
         Ok(reference.into_bytes())
     }
 
     /// Generate script-based payload
-    fn generate_script_payload(&self, config: &SmartPayloadConfig, target: &TargetInfo) -> Result<Vec<u8>> {
+    fn generate_script_payload(
+        &self,
+        config: &SmartPayloadConfig,
+        target: &TargetInfo,
+    ) -> Result<Vec<u8>> {
         let script = if target.os.to_lowercase().contains("windows") {
             self.generate_powershell_payload(config)?
         } else {
@@ -327,9 +351,7 @@ impl PayloadGenerator {
              # SAFE MODE - EDUCATIONAL ONLY\n\
              Write-Host 'Would connect to {}:{}'\n\
              Write-Host 'Payload type: {:?}'\n",
-            config.base_config.lhost,
-            config.base_config.lport,
-            config.base_config.payload_type,
+            config.base_config.lhost, config.base_config.lport, config.base_config.payload_type,
         ))
     }
 
@@ -341,9 +363,7 @@ impl PayloadGenerator {
              # SAFE MODE - EDUCATIONAL ONLY\n\
              echo 'Would connect to {}:{}'\n\
              echo 'Payload type: {:?}'\n",
-            config.base_config.lhost,
-            config.base_config.lport,
-            config.base_config.payload_type,
+            config.base_config.lhost, config.base_config.lport, config.base_config.payload_type,
         ))
     }
 
@@ -364,7 +384,8 @@ impl PayloadGenerator {
             }
             EvasionTechnique::EnvironmentCheck => {
                 // Add environment checks
-                let mut result = b"# Environment check\nif [ -d /proc/vz ]; then exit 0; fi\n".to_vec();
+                let mut result =
+                    b"# Environment check\nif [ -d /proc/vz ]; then exit 0; fi\n".to_vec();
                 result.extend_from_slice(&payload);
                 Ok(result)
             }
@@ -505,11 +526,8 @@ mod tests {
     #[test]
     fn test_safe_payload_generation() {
         let generator = PayloadGenerator::new();
-        let base_config = PayloadConfig::new(
-            PayloadType::ReverseTcp,
-            "192.168.1.10".to_string(),
-            4444,
-        );
+        let base_config =
+            PayloadConfig::new(PayloadType::ReverseTcp, "192.168.1.10".to_string(), 4444);
         let config = SmartPayloadConfig::new(base_config)
             .with_execution_method(ExecutionMethod::MemoryOnly)
             .with_evasion(EvasionTechnique::BehavioralDelay);
@@ -524,13 +542,9 @@ mod tests {
     #[test]
     fn test_encrypted_payload() {
         let generator = PayloadGenerator::new();
-        let base_config = PayloadConfig::new(
-            PayloadType::ReverseTcp,
-            "192.168.1.10".to_string(),
-            4444,
-        );
-        let config = SmartPayloadConfig::new(base_config)
-            .with_encryption("test-key-123");
+        let base_config =
+            PayloadConfig::new(PayloadType::ReverseTcp, "192.168.1.10".to_string(), 4444);
+        let config = SmartPayloadConfig::new(base_config).with_encryption("test-key-123");
 
         let target = TargetInfo::new("linux", Architecture::X64);
         let payload = generator.generate(config, &target).unwrap();
@@ -543,11 +557,8 @@ mod tests {
     fn test_memory_executor() {
         let executor = MemoryExecutor::new();
         let generator = PayloadGenerator::new();
-        let base_config = PayloadConfig::new(
-            PayloadType::ReverseTcp,
-            "192.168.1.10".to_string(),
-            4444,
-        );
+        let base_config =
+            PayloadConfig::new(PayloadType::ReverseTcp, "192.168.1.10".to_string(), 4444);
         let config = SmartPayloadConfig::new(base_config);
         let target = TargetInfo::new("linux", Architecture::X64);
         let payload = generator.generate(config, &target).unwrap();
@@ -577,13 +588,21 @@ mod tests {
 
         // Test behavioral delay
         let result = generator
-            .apply_evasion(base_payload.clone(), &EvasionTechnique::BehavioralDelay, &target)
+            .apply_evasion(
+                base_payload.clone(),
+                &EvasionTechnique::BehavioralDelay,
+                &target,
+            )
             .unwrap();
         assert!(result.len() > base_payload.len());
 
         // Test polymorphic
         let result = generator
-            .apply_evasion(base_payload.clone(), &EvasionTechnique::Polymorphic, &target)
+            .apply_evasion(
+                base_payload.clone(),
+                &EvasionTechnique::Polymorphic,
+                &target,
+            )
             .unwrap();
         assert!(result.len() > base_payload.len());
     }

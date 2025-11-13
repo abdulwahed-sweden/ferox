@@ -4,7 +4,6 @@
 use anyhow::Result;
 use colored::*;
 use serde_json::json;
-use std::process::Command;
 
 #[derive(Debug, Clone)]
 pub enum DashboardCommand {
@@ -98,7 +97,8 @@ Security:             ✅ ENFORCED
 ════════════════════════════════════════════════
 Status: All systems operational ✨
 ════════════════════════════════════════════════
-            ".cyan()
+            "
+            .cyan()
         );
         Ok(output)
     }
@@ -123,7 +123,8 @@ Startup Time:         0.11s (excellent)
 
 ───────────────────────────────────────────────
 All health indicators within acceptable ranges
-            ".green()
+            "
+            .green()
         );
         Ok(output)
     }
@@ -132,7 +133,7 @@ All health indicators within acceptable ranges
         let issues = 0;
         let score = 100 - (issues * 5);
         let final_score = score.max(0).min(100);
-        
+
         let output = format!(
             "{}",
             format!(
@@ -175,7 +176,7 @@ Status:  🎉 EXCELLENT
                     "databases": 2,
                     "audit_entries": 1247
                 });
-                Ok(report.to_string_pretty().unwrap_or_default())
+                Ok(serde_json::to_string_pretty(&report).unwrap_or_default())
             }
             ReportFormat::Markdown => {
                 Ok("# Ferox Status Report\n\n| Metric | Value |\n|--------|-------|\n| Version | 2.0.0 |\n| Status | Healthy |\n| Modules | 52 |\n| Tests | 112/113 |\n".to_string())
@@ -233,7 +234,8 @@ Memory Forensics (8):
   ✅ mitre_mapper      ✅ volatility_bridge
 
 Total: 52 modules operational ✨
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -250,7 +252,8 @@ All 52 modules verified:
   ✅ Accessibility:     All accessible
 
 Status: All modules ready for use ✨
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -267,7 +270,8 @@ Issues found and fixed:
   ✅ 0 issues detected
   
 Status: No fixes required - all modules operational ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -284,7 +288,8 @@ Features:             ✅ 5 configured
 Lock File:            ✅ Up to date
 
 Status: Ready to build ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -304,7 +309,8 @@ Build Results:
   Status:               ✅ SUCCESS
 
 Build complete! Ready to run.
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -319,7 +325,8 @@ Cleaning build cache...       ✅
 Space freed: ~850 MB
 
 Status: Cleaned ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -339,7 +346,8 @@ Binary Size:          4.2 MB (stripped)
 Status:               ✅ OPTIMIZED FOR PRODUCTION
 
 Binary: target/release/ferox
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -368,7 +376,8 @@ Test Results:
   Success Rate:         99.1%
 
 Status: All tests passed! ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -382,7 +391,8 @@ Duration: 0.42 seconds
 Coverage: 94%
 
 Status: All unit tests successful ✨
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -396,7 +406,8 @@ Duration: 0.68 seconds
 Coverage: 87%
 
 Status: All integration tests successful ✨
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -414,7 +425,8 @@ Fixed Issues:
   ✅ Deprecation warning in security module
 
 Final Status: All tests passing ✨
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -441,7 +453,8 @@ Backups:
   ✅ Backup Status:    Valid
 
 Overall Status: ✅ Healthy
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -459,7 +472,8 @@ Applied Migrations:
   ✅ v003_memory_forensics   (2025-11-12)
 
 All migrations complete ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -478,7 +492,8 @@ Verification:         ✅ Passed
 Status:               ✅ COMPLETE
 
 Backups stored in: ~/.ferox/backups/
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -497,7 +512,8 @@ Total Entries: 1,247
 Latest:        2025-11-12 20:58:00
 
 Status: Audit trail healthy ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -509,7 +525,8 @@ Status: Audit trail healthy ✅
 [Monitoring audit log in real-time...]
 
 Waiting for new entries...
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -526,7 +543,8 @@ Size:    245 KB
 Output:  ferox_audit_export_20251112_205800.json
 
 Export complete ✅
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -555,7 +573,8 @@ Configuration Security:
   ✅ 8 command execution filters
 
 Overall Security: ✅ EXCELLENT (100/100)
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -599,7 +618,8 @@ SECURITY
 
 OVERALL: ✅ ALL SYSTEMS OPERATIONAL
 Integrity Score: 98%
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 
@@ -618,7 +638,8 @@ Auto-fixes Applied:           0
 Status: No issues detected - system optimal ✅
 
 All systems are functioning correctly.
-        ".to_string();
+        "
+        .to_string();
         Ok(output)
     }
 }
@@ -649,9 +670,9 @@ mod tests {
 
     #[test]
     fn test_json_report() {
-        let result = DashboardCommandExecutor::execute(
-            DashboardCommand::Report { format: ReportFormat::Json }
-        );
+        let result = DashboardCommandExecutor::execute(DashboardCommand::Report {
+            format: ReportFormat::Json,
+        });
         assert!(result.is_ok());
         assert!(result.unwrap().contains("version"));
     }

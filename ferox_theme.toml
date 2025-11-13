@@ -1,0 +1,26 @@
+[colors]
+primary = { r = 34, g = 34, b = 34 }
+secondary = { r = 76, g = 175, b = 80 }
+accent = { r = 255, g = 87, b = 34 }
+background = { r = 13, g = 17, b = 23 }
+surface = { r = 22, g = 27, b = 34 }
+error = { r = 244, g = 67, b = 54 }
+warning = { r = 255, g = 152, b = 0 }
+success = { r = 76, g = 175, b = 80 }
+info = { r = 33, g = 150, b = 243 }
+
+[typography]
+header_font_size = 18
+body_font_size = 12
+monospace_font = "Fira Code"
+
+[layout]
+border_style = "rounded"
+padding = 1
+margin = 1
+
+[icons]
+success_icon = "✅"
+error_icon = "❌"
+warning_icon = "⚠️"
+info_icon = "ℹ️"

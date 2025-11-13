@@ -1,6 +1,7 @@
 pub mod app;
 pub mod dashboard;
 pub mod dashboard_commands;
+pub mod doctor;
 #[cfg(feature = "memory-forensics")]
 pub mod memory;
 pub mod theme;

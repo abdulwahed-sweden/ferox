@@ -236,7 +236,9 @@ impl Module for Persistence {
         vec![
             ModuleOption {
                 name: "technique".to_string(),
-                description: "Technique: RegistryRun, ScheduledTask, WmiEvent, WindowsService, StartupFolder".to_string(),
+                description:
+                    "Technique: RegistryRun, ScheduledTask, WmiEvent, WindowsService, StartupFolder"
+                        .to_string(),
                 required: false,
                 default_value: Some("RegistryRun".to_string()),
                 current_value: self.options.get("technique").cloned(),
@@ -257,7 +259,8 @@ impl Module for Persistence {
             },
             ModuleOption {
                 name: "persistence_name".to_string(),
-                description: "Name for persistence mechanism (e.g., service name, task name)".to_string(),
+                description: "Name for persistence mechanism (e.g., service name, task name)"
+                    .to_string(),
                 required: false,
                 default_value: Some("WindowsUpdate".to_string()),
                 current_value: self.options.get("persistence_name").cloned(),
@@ -332,14 +335,16 @@ impl Module for Persistence {
         let reference = self.generate_persistence_reference(&technique);
         let all_techniques = self.list_techniques();
 
-        let mut result = ModuleResult::success(
-            "Persistence reference generated (safe mode)".to_string(),
-        );
+        let mut result =
+            ModuleResult::success("Persistence reference generated (safe mode)".to_string());
 
         result = result
             .with_data("technique", serde_json::json!(format!("{:?}", technique)))
             .with_data("mitre_id", serde_json::json!(technique.mitre_technique()))
-            .with_data("stealth_level", serde_json::json!(technique.stealth_level()))
+            .with_data(
+                "stealth_level",
+                serde_json::json!(technique.stealth_level()),
+            )
             .with_data("reference", serde_json::json!(reference))
             .with_data("all_techniques", serde_json::json!(all_techniques))
             .with_data("safe_mode", serde_json::json!(true));

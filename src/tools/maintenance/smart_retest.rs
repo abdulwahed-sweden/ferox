@@ -1,9 +1,9 @@
 // src/tools/maintenance/smart_retest.rs
 // Smart re-testing system with automatic retry after fixes
 
+use crate::tools::maintenance::enhanced_report::{IssueSeverity, MaintenanceReport};
 use std::process::Command;
 use std::time::Instant;
-use crate::tools::maintenance::enhanced_report::{MaintenanceReport, IssueSeverity};
 
 #[derive(Clone, Debug)]
 pub struct RetestConfig {
@@ -52,12 +52,15 @@ impl SmartRetester {
         Self { config }
     }
 
+    pub fn features(&self) -> &[String] {
+        &self.config.features
+    }
+
     pub fn run_tests(&self, features: &[String]) -> Result<TestResult, String> {
         let start = Instant::now();
 
         let mut cmd = Command::new("cargo");
-        cmd.arg("test")
-            .arg("--lib");
+        cmd.arg("test").arg("--lib");
 
         for feature in features {
             cmd.arg("--features");
@@ -101,10 +104,7 @@ impl SmartRetester {
 
         for attempt in 1..=self.config.max_retries {
             if self.config.verbose {
-                println!(
-                    "🧪 Test attempt {}/{}",
-                    attempt, self.config.max_retries
-                );
+                println!("🧪 Test attempt {}/{}", attempt, self.config.max_retries);
             }
 
             match self.run_tests(features) {
@@ -138,12 +138,10 @@ impl SmartRetester {
         }
     }
 
-    pub fn update_report(
-        &self,
-        report: &mut MaintenanceReport,
-        test_result: &TestResult,
-    ) {
-        report.tests_health.update(test_result.passed, test_result.total());
+    pub fn update_report(&self, report: &mut MaintenanceReport, test_result: &TestResult) {
+        report
+            .tests_health
+            .update(test_result.passed, test_result.total());
 
         if !test_result.success() {
             report.add_issue(crate::tools::maintenance::enhanced_report::Issue {

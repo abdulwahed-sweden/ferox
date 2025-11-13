@@ -131,7 +131,10 @@ impl Default for ModuleManifest {
             "post".to_string(),
             ModuleCategory {
                 description: "Post-exploitation capabilities".to_string(),
-                modules: vec!["persistence".to_string(), "credential_collector".to_string()],
+                modules: vec![
+                    "persistence".to_string(),
+                    "credential_collector".to_string(),
+                ],
             },
         );
 
