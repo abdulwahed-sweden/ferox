@@ -12,7 +12,7 @@ pub use enhanced_report::{
 };
 pub use smart_retest::{RetestConfig, SmartRetester, TestResult};
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use std::path::Path;
 use std::time::Instant;
 

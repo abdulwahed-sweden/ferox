@@ -75,6 +75,10 @@ impl MemoryCli {
         Self::default().execute(command)
     }
 
+    pub fn run_command(command: MemoryCommand) -> Result<()> {
+        Self::default().execute(command)
+    }
+
     fn parse_command(args: &[&str]) -> Result<MemoryCommand> {
         if args.is_empty() {
             bail!("usage: memory <subcommand> <dump> [options]");

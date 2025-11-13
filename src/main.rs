@@ -1,10 +1,8 @@
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use ferox::cli::app::FeroxCli;
-use ferox::cli::doctor::{DoctorCommands, handle_doctor_command};
-#[cfg(feature = "memory-forensics")]
-use ferox::cli::memory::MemoryCli;
 use ferox::cli::theme::Theme;
+use ferox::cli::{CommandRouter, RouterCommand, RouterDispatch};
 use ferox::core::module::ModuleRegistry;
 use ferox::core::theme::MixedPredatorTheme;
 use ferox::modules::exploit::example::ExampleExploit;
@@ -31,14 +29,7 @@ use ferox::modules::post::browser::deep_session_hijack::DeepSessionHijack;
 )]
 struct FeroxArgs {
     #[command(subcommand)]
-    command: Option<FeroxCommand>,
-}
-
-#[derive(Subcommand, Debug)]
-enum FeroxCommand {
-    /// Run Ferox Doctor checks without launching the interactive console
-    #[command(subcommand)]
-    Doctor(DoctorCommands),
+    command: Option<RouterCommand>,
 }
 
 #[tokio::main]
@@ -52,6 +43,8 @@ async fn main() -> Result<()> {
     let cli_theme = CliThemeApplier::new(theme.clone());
     cli_theme.apply_colors();
 
+    let router = CommandRouter::initialize(cli_theme).await?;
+
     tracing_subscriber::fmt()
         .with_env_filter("ferox=info")
         .init();
@@ -63,26 +56,9 @@ async fn main() -> Result<()> {
 
     Theme::init();
 
-    if let Some(command) = args.command {
-        match command {
-            FeroxCommand::Doctor(cmd) => {
-                handle_doctor_command(cmd, &cli_theme)?;
-                return Ok(());
-            }
-        }
-    }
-
-    #[cfg(feature = "memory-forensics")]
-    {
-        let mut args = std::env::args().skip(1);
-        if let Some(first) = args.next() {
-            if first.eq_ignore_ascii_case("memory") {
-                let remaining: Vec<String> = args.collect();
-                let ref_args: Vec<&str> = remaining.iter().map(|s| s.as_str()).collect();
-                MemoryCli::handle(&ref_args)?;
-                return Ok(());
-            }
-        }
+    match router.dispatch(args.command).await? {
+        RouterDispatch::Handled => return Ok(()),
+        RouterDispatch::Fallthrough => {}
     }
 
     let mut registry = ModuleRegistry::new();
