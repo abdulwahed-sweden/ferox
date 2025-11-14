@@ -15,9 +15,10 @@
 git clone https://github.com/abdulwahed-sweden/ferox
 cd ferox
 cargo build --release --features memory-forensics
-First Run
-bash
-Copy code
+```
+
+### First Run
+```bash
 # System diagnostics
 ./target/release/ferox doctor check
 
@@ -26,87 +27,80 @@ Copy code
 
 # Memory forensics
 ./target/release/ferox memory analyze dump.raw --output report.json
-🎯 Core Features
-🔍 Memory Forensics
-Volatility3 Integration
+```
 
-YARA Scanning
+## 🎯 Core Features
 
-MITRE ATT&CK Mapping
+### 🔍 Memory Forensics
+- Volatility3 integration
+- YARA scanning
+- MITRE ATT&CK mapping
+- Export formats: JSON, Markdown, tables
 
-Export formats: JSON, Markdown, Tables
+### 🛰️ Command & Control
+- Teams Tunnel C2
+- HTTP beacon
+- DNS C2
+- Relay manager
 
-🛰️ Command & Control
-Teams Tunnel C2
+### 🔧 Security Operations
+- Reconnaissance (ASN, DNS, WHOIS)
+- High-speed scanning
+- Exploitation (authorized)
+- Post-exploitation: credentials, persistence, lateral movement
 
-HTTP Beacon
+### 🗂 System Management
+- SQLite session tracking
+- Tamper-proof audit logs
+- Safe mode for dangerous modules
+- Policy-based authorization
 
-DNS C2
+## 🛠️ Usage Examples
 
-Relay Manager
-
-🔧 Security Operations
-Reconnaissance (ASN, DNS, WHOIS)
-
-High-speed scanning
-
-Exploitation (authorized)
-
-Post-exploitation: credentials, persistence, lateral movement
-
-🗂 System Management
-SQLite session tracking
-
-Tamper-proof audit logs
-
-Safe-mode for dangerous modules
-
-Policy-based authorization
-
-🛠️ Usage Examples
-Interactive Console
-bash
-Copy code
+### Interactive Console
+```bash
 ferox> use scanner/port
 ferox (scanner/port)> set RHOSTS 10.0.0.0/24
 ferox (scanner/port)> set PORTS 1-1000
 ferox (scanner/port)> run --json > scan_results.json
-Memory Analysis
-bash
-Copy code
+```
+
+### Memory Analysis
+```bash
 ferox memory analyze memory.dmp --database analysis.db
 ferox memory malfind memory.dmp --min-score 0.6 --mitre
 ferox memory pslist memory.dmp --format table
-System Diagnostics
-bash
-Copy code
+```
+
+### System Diagnostics
+```bash
 ferox doctor check --critical
 ferox doctor check --format json
 ferox doctor dependency python
 ferox doctor dependency volatility
-C2 Operations
-bash
-Copy code
+```
+
+### C2 Operations
+```bash
 ferox c2 list --status active
 ferox c2 setup teams_tunnel --team-id "security-team"
 ferox c2 test http_beacon --target http://target.com
-🎨 Interface — Mixed Predator Theme
-Dark, high-contrast security palette
+```
 
-Minimal animations (calm UI)
+## 🎨 Interface — Mixed Predator Theme
+- Dark, high-contrast security palette
+- Minimal animations (calm UI)
+- Terminal-optimized typography
+- Clean status symbols (✅ ❌ ⚠️ ℹ️)
 
-Terminal-optimized typography
-
-Clean status symbols (✅ ❌ ⚠️ ℹ️)
-
-Safe Mode Example
-bash
-Copy code
+## 🛡️ Safe Mode Example
+```bash
 SAFE_MODE=1 ferox --mock run c2/teams_tunnel
 SAFE_MODE=1 ferox console
-🔧 Architecture
-scss
-Copy code
+```
+
+## 🔧 Architecture
+```text
 Ferox CLI Integration Layer
        ↓
 [doctor, memory, c2, sessions, console]
@@ -116,19 +110,21 @@ Module Registry & Session Manager
 Security Engine (Async Rust)
        ↓
 [Scanner, Recon, Exploit, Memory, C2, Post, Auxiliary]
-📦 Module Categories
-Category	#	Description
-Scanner	8	Port & service detection
-Recon	6	Information gathering
-Exploit	4	Authorized exploitation
-Memory Forensics	8	Volatility3 workflows
-Post-Exploitation	7	Credentials, persistence
-C2 & Evasion	12	Communication & stealth
-Auxiliary	5	Utility modules
+```
 
-🩺 Ferox Doctor — Diagnostics Engine
-bash
-Copy code
+## 📦 Module Categories
+| Category | # | Description |
+| --- | --- | --- |
+| Scanner | 8 | Port & service detection |
+| Recon | 6 | Information gathering |
+| Exploit | 4 | Authorized exploitation |
+| Memory Forensics | 8 | Volatility3 workflows |
+| Post-Exploitation | 7 | Credentials, persistence |
+| C2 & Evasion | 12 | Communication & stealth |
+| Auxiliary | 5 | Utility modules |
+
+## 🩺 Ferox Doctor — Diagnostics Engine
+```bash
 # Full check
 ferox doctor check
 
@@ -142,88 +138,65 @@ ferox doctor check --fix
 # Formats
 ferox doctor check --format json
 ferox doctor check --format markdown
-🔒 Security & Authorization
-Ferox is designed exclusively for authorized security work.
+```
 
-Permitted
-Authorized penetration testing
+## 🔒 Security & Authorization
 
-Red team assessments
+**Ferox is designed exclusively for authorized security work.**
 
-Security research
+### Permitted
+- Authorized penetration testing
+- Red team assessments
+- Security research
+- CTFs
+- Defensive training
 
-CTFs
+### Prohibited
+- Unauthorized access
+- Criminal activity
+- Malicious operations
+- Violating laws/regulations
 
-Defensive training
+### Built-in Safeguards
+- Authorization context
+- Immutable audit logs
+- Safe mode for high-risk modules
+- Policy-based access control
 
-Prohibited
-Unauthorized access
+## 📚 Documentation
+- docs/overview.md — Architecture & mission
+- docs/console.md — Console usage
+- docs/modules.md — Module catalog
+- docs/memory-forensics.md — Memory workflow
+- docs/c2.md — Command & control layer
+- docs/maintenance.md — Ferox Doctor
 
-Criminal activity
+## 🛣️ Roadmap
+- v2.0.0 – Memory forensics engine
+- Signed plugin marketplace
+- Expanded payload library
+- Web operator dashboard
+- Hardware-backed credential vault
 
-Malicious operations
+## 🤝 Contributing
+1. Fork and branch:
+    ```bash
+    git checkout -b feat/description
+    ```
+2. Run full tests:
+    ```bash
+    cargo test --features memory-forensics --tests
+    ```
+3. Document all new modules.
+4. Include authorization/audit notes in PR.
 
-Violating laws/regulations
+## 📄 License
+Released under the MIT License. Usage limited to ethical and authorized scenarios.
 
-Built-in Safeguards
-Authorization context
-
-Immutable audit logs
-
-Safe mode for high-risk modules
-
-Policy-based access control
-
-📚 Documentation
-docs/overview.md — Architecture & mission
-
-docs/console.md — Console usage
-
-docs/modules.md — Module catalog
-
-docs/memory-forensics.md — Memory workflow
-
-docs/c2.md — Command & control layer
-
-docs/maintenance.md — Ferox Doctor
-
-🛣️ Roadmap
- v2.0.0 – Memory forensics engine
-
- Signed plugin marketplace
-
- Expanded payload library
-
- Web operator dashboard
-
- Hardware-backed credential vault
-
-🤝 Contributing
-Fork and branch:
-
-bash
-Copy code
-git checkout -b feat/description
-Run full tests:
-
-bash
-Copy code
-cargo test --features memory-forensics --tests
-Document all new modules
-
-Include authorization/audit notes in PR
-
-📄 License
-Released under the MIT License.
-Usage limited to ethical and authorized scenarios.
-
-📬 Support
-Maintainer: Abdulwahed Mansour
-
-Email: abdulwahed.mansour@gmail.com
-
-Security Contact: security@ferox.local
-
-GitHub: @abdulwahed-sweden
+## 📬 Support
+- Maintainer: Abdulwahed Mansour
+- Email: abdulwahed.mansour@gmail.com
+- Security Contact: security@ferox.local
+- GitHub: @abdulwahed-sweden
 
 Fast. Fierce. Fearless. Authorized. 🦊
