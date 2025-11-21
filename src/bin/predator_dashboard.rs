@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::io::stdout;
+use std::io::{stdout, IsTerminal};
 use std::time::Duration;
 
 use crossterm::ExecutableCommand;
@@ -13,8 +13,14 @@ use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    enable_raw_mode()?;
     let mut stdout = stdout();
+    // In CI/non-interactive environments, fail fast with a friendly message instead of an EPERM.
+    if !stdout.is_terminal() {
+        println!("Predator dashboard requires an interactive TTY; skipping TUI launch.");
+        return Ok(());
+    }
+
+    enable_raw_mode()?;
     stdout.execute(EnterAlternateScreen)?;
 
     let backend = CrosstermBackend::new(stdout);

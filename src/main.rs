@@ -13,6 +13,7 @@ use ferox::modules::recon::whois::WhoisLookup;
 use ferox::modules::scanner::http_scanner::HttpScanner;
 use ferox::modules::scanner::port::PortScanner;
 use ferox::tools::theme::{CliThemeApplier, ThemeConfig};
+use std::io::{stdin, stdout, IsTerminal};
 
 // Phase 3 modules
 use ferox::modules::auxiliary::cloud::onedrive_sync_exfil::OneDriveSyncExfil;
@@ -59,6 +60,15 @@ async fn main() -> Result<()> {
     match router.dispatch(args.command).await? {
         RouterDispatch::Handled => return Ok(()),
         RouterDispatch::Fallthrough => {}
+    }
+
+    // Gracefully handle non-interactive environments (CI/pipes) without dropping into the console.
+    if !stdin().is_terminal() || !stdout().is_terminal() {
+        println!(
+            "Ferox console requires an interactive TTY. \
+             Use subcommands like `ferox doctor <cmd>` or `ferox memory <cmd>` in non-interactive modes."
+        );
+        return Ok(());
     }
 
     let mut registry = ModuleRegistry::new();
