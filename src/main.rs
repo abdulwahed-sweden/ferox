@@ -21,6 +21,9 @@ use ferox::modules::c2::teams_tunnel::TeamsTunnel;
 use ferox::modules::evasion::edr::silent_shadow::SilentShadow;
 use ferox::modules::post::browser::deep_session_hijack::DeepSessionHijack;
 
+// Phase 4 modules - Smart Payload System
+use ferox::modules::payloads::rev_tcp_fileless::FilelessRevTcp;
+
 #[derive(Parser, Debug)]
 #[command(
     author,
@@ -87,6 +90,9 @@ async fn main() -> Result<()> {
     registry.register(Box::new(DeepSessionHijack::new()));
     registry.register(Box::new(OneDriveSyncExfil::new()));
     registry.register(Box::new(SilentShadow::new()));
+
+    // Phase 4: Smart Payload System modules
+    registry.register(Box::new(FilelessRevTcp::new()));
 
     let mut app = FeroxCli::new(registry)?;
     app.run().await?;

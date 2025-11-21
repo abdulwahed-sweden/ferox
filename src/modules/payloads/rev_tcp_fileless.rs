@@ -26,6 +26,7 @@
 
 use anyhow::{bail, Result};
 use async_trait::async_trait;
+use base64::Engine;
 use std::collections::HashMap;
 
 use crate::core::module::{

@@ -19,13 +19,13 @@
 //! - C2 channel integration (Teams, GitHub, DNS-over-HTTPS)
 //! - Safe mode for testing and validation
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
-use crate::core::payload::{Architecture, PayloadFormat, PayloadType};
+use crate::core::payload::{Architecture, PayloadFormat};
 use crate::infra::crypto::{aes_decrypt, aes_encrypt, derive_keys, AES_KEY_LEN, NONCE_LEN};
 
 /// Result of payload generation
