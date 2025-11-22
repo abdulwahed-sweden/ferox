@@ -8,6 +8,16 @@ import type {
   MitreCoverage,
   NetworkHost,
   NetworkEdge,
+  // Module types
+  PrivEscRequest,
+  PrivEscResult,
+  CredentialHarvestRequest,
+  CredentialHarvestResult,
+  PersistenceRequest,
+  PersistenceResult,
+  LateralMoveRequest,
+  LateralMoveResult,
+  DiscoveryResult,
 } from '../types';
 
 const API_BASE = '/api';
@@ -70,6 +80,42 @@ export function useApi() {
 
     // Health
     healthCheck: () => fetchApi<string>('/health'),
+
+    // ================================================================
+    // Post-Exploitation Modules
+    // ================================================================
+
+    // Privilege Escalation
+    runPrivEsc: (request: PrivEscRequest) =>
+      fetchApi<PrivEscResult>('/modules/privesc', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }),
+
+    // Credential Harvesting
+    harvestCredentials: (request: CredentialHarvestRequest) =>
+      fetchApi<CredentialHarvestResult>('/modules/credentials', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }),
+
+    // Persistence
+    installPersistence: (request: PersistenceRequest) =>
+      fetchApi<PersistenceResult>('/modules/persistence', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }),
+
+    // Lateral Movement
+    lateralMove: (request: LateralMoveRequest) =>
+      fetchApi<LateralMoveResult>('/modules/lateral', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      }),
+
+    // Network Discovery
+    discoverNetwork: (sessionId: string) =>
+      fetchApi<DiscoveryResult>(`/modules/discovery/${sessionId}`),
   };
 }
 

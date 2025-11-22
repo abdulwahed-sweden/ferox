@@ -1,16 +1,22 @@
 //! REST API handlers for the dashboard server
 //!
-//! Provides endpoints for session management, credentials, and statistics.
+//! Provides endpoints for session management, credentials, statistics,
+//! and post-exploitation modules (PrivEsc, Credentials, Persistence, Lateral Movement).
 
+use crate::integration::modules::{
+    CredentialHarvestRequest, CredentialHarvestResult, DiscoveryResult,
+    LateralMoveRequest, LateralMoveResult, ModuleBridge,
+    PersistenceRequest, PersistenceResult, PrivEscRequest, PrivEscResult,
+};
 use crate::state::AppState;
 use crate::types::*;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, Extension},
     http::StatusCode,
     Json,
 };
 use std::sync::Arc;
-use tracing::info;
+use tracing::{info, error};
 use uuid::Uuid;
 
 /// GET /api/sessions - List all sessions
@@ -168,4 +174,110 @@ pub async fn get_network_edges(
 /// Health check endpoint
 pub async fn health_check() -> Json<ApiResponse<&'static str>> {
     Json(ApiResponse::success("Ferox Dashboard Server is running"))
+}
+
+// ============================================================================
+// Post-Exploitation Module Endpoints
+// ============================================================================
+
+/// POST /api/modules/privesc - Run privilege escalation
+pub async fn run_privesc(
+    Extension(module_bridge): Extension<Arc<ModuleBridge>>,
+    Json(request): Json<PrivEscRequest>,
+) -> Result<Json<ApiResponse<PrivEscResult>>, StatusCode> {
+    info!(
+        session_id = %request.session_id,
+        auto_escalate = request.auto_escalate,
+        safe_mode = request.safe_mode,
+        "API: Running privilege escalation"
+    );
+
+    match module_bridge.run_privesc(request).await {
+        Ok(result) => Ok(Json(ApiResponse::success(result))),
+        Err(e) => {
+            error!("PrivEsc failed: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
+/// POST /api/modules/credentials - Harvest credentials
+pub async fn harvest_credentials(
+    Extension(module_bridge): Extension<Arc<ModuleBridge>>,
+    Json(request): Json<CredentialHarvestRequest>,
+) -> Result<Json<ApiResponse<CredentialHarvestResult>>, StatusCode> {
+    info!(
+        session_id = %request.session_id,
+        sources = ?request.sources,
+        safe_mode = request.safe_mode,
+        "API: Harvesting credentials"
+    );
+
+    match module_bridge.harvest_credentials(request).await {
+        Ok(result) => Ok(Json(ApiResponse::success(result))),
+        Err(e) => {
+            error!("Credential harvest failed: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
+/// POST /api/modules/persistence - Install persistence
+pub async fn install_persistence(
+    Extension(module_bridge): Extension<Arc<ModuleBridge>>,
+    Json(request): Json<PersistenceRequest>,
+) -> Result<Json<ApiResponse<PersistenceResult>>, StatusCode> {
+    info!(
+        session_id = %request.session_id,
+        method = %request.method,
+        name = %request.name,
+        safe_mode = request.safe_mode,
+        "API: Installing persistence"
+    );
+
+    match module_bridge.install_persistence(request).await {
+        Ok(result) => Ok(Json(ApiResponse::success(result))),
+        Err(e) => {
+            error!("Persistence installation failed: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
+/// POST /api/modules/lateral - Perform lateral movement
+pub async fn lateral_move(
+    Extension(module_bridge): Extension<Arc<ModuleBridge>>,
+    Json(request): Json<LateralMoveRequest>,
+) -> Result<Json<ApiResponse<LateralMoveResult>>, StatusCode> {
+    info!(
+        session_id = %request.session_id,
+        target_host = %request.target_host,
+        method = %request.method,
+        safe_mode = request.safe_mode,
+        "API: Performing lateral movement"
+    );
+
+    match module_bridge.lateral_move(request).await {
+        Ok(result) => Ok(Json(ApiResponse::success(result))),
+        Err(e) => {
+            error!("Lateral movement failed: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
+/// GET /api/modules/discovery/:session_id - Discover network targets
+pub async fn discover_network(
+    Extension(module_bridge): Extension<Arc<ModuleBridge>>,
+    Path(session_id): Path<Uuid>,
+) -> Result<Json<ApiResponse<DiscoveryResult>>, StatusCode> {
+    info!(session_id = %session_id, "API: Discovering network targets");
+
+    match module_bridge.discover_network(session_id).await {
+        Ok(result) => Ok(Json(ApiResponse::success(result))),
+        Err(e) => {
+            error!("Network discovery failed: {}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }

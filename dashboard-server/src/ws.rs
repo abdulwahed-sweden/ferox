@@ -2,6 +2,7 @@
 //!
 //! Handles WebSocket connections, message routing, and event broadcasting.
 
+use crate::integration::FeroxBridge;
 use crate::state::{AppState, WsClient};
 use crate::types::*;
 use axum::{
@@ -10,6 +11,7 @@ use axum::{
         State, WebSocketUpgrade,
     },
     response::Response,
+    Extension,
 };
 use futures::{SinkExt, StreamExt};
 use std::sync::Arc;
@@ -20,12 +22,13 @@ use uuid::Uuid;
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     State(state): State<Arc<AppState>>,
+    Extension(bridge): Extension<Arc<FeroxBridge>>,
 ) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, state))
+    ws.on_upgrade(move |socket| handle_socket(socket, state, bridge))
 }
 
 /// Handle an individual WebSocket connection
-async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
+async fn handle_socket(socket: WebSocket, state: Arc<AppState>, bridge: Arc<FeroxBridge>) {
     let client = WsClient::new();
     let client_id = client.id;
 
@@ -64,11 +67,12 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
 
     // Handle incoming messages
     let state_clone2 = state.clone();
+    let bridge_clone = bridge.clone();
     let recv_task = tokio::spawn(async move {
         while let Some(result) = receiver.next().await {
             match result {
                 Ok(Message::Text(text)) => {
-                    handle_client_message(&state_clone2, client_id, &text).await;
+                    handle_client_message(&state_clone2, &bridge_clone, client_id, &text).await;
                 }
                 Ok(Message::Ping(_)) => {
                     debug!("Received ping from client {}", client_id);
@@ -104,14 +108,14 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
 }
 
 /// Handle incoming client messages
-async fn handle_client_message(state: &Arc<AppState>, client_id: Uuid, text: &str) {
+async fn handle_client_message(state: &Arc<AppState>, bridge: &Arc<FeroxBridge>, client_id: Uuid, text: &str) {
     match serde_json::from_str::<ClientEvent>(text) {
         Ok(event) => {
             debug!(client_id = %client_id, event = ?event, "Received client event");
 
             match event {
                 ClientEvent::ExecuteCommand { session_id, command } => {
-                    handle_execute_command(state, session_id, command).await;
+                    handle_execute_command(state, bridge, session_id, command).await;
                 }
                 ClientEvent::SubscribeToSession { session_id } => {
                     state.subscribe_to_session(client_id, session_id).await;
@@ -143,10 +147,10 @@ async fn handle_client_message(state: &Arc<AppState>, client_id: Uuid, text: &st
 }
 
 /// Handle command execution request
-async fn handle_execute_command(state: &Arc<AppState>, session_id: Uuid, command_str: String) {
-    info!(session_id = %session_id, command = %command_str, "Executing command");
+async fn handle_execute_command(state: &Arc<AppState>, bridge: &Arc<FeroxBridge>, session_id: Uuid, command_str: String) {
+    info!(session_id = %session_id, command = %command_str, "Executing command via FeroxBridge");
 
-    // Verify session exists
+    // Verify session exists in dashboard state
     let session = state.get_session(session_id).await;
     if session.is_none() {
         let _ = state.event_tx.send(ServerEvent::Error {
@@ -166,73 +170,29 @@ async fn handle_execute_command(state: &Arc<AppState>, session_id: Uuid, command
         session.last_seen = chrono::Utc::now();
     }
 
-    // Simulate command execution (in production, this would connect to actual agent)
-    let output = simulate_command_output(&command_str).await;
+    // Execute command via FeroxBridge (REAL execution)
+    match bridge.execute_command(session_id, command_str.clone()).await {
+        Ok((_bridge_command_id, output)) => {
+            info!(session_id = %session_id, command = %command_str, "Command executed successfully via bridge");
 
-    // Broadcast output
-    state
-        .broadcast_command_output(command_id, session_id, output, true, Some(true))
-        .await;
-}
-
-/// Simulate command output for demo purposes
-async fn simulate_command_output(command: &str) -> String {
-    // Add realistic delay
-    tokio::time::sleep(tokio::time::Duration::from_millis(100 + rand_delay())).await;
-
-    match command.to_lowercase().as_str() {
-        "whoami" => "NT AUTHORITY\\SYSTEM".to_string(),
-        "hostname" => "DC01".to_string(),
-        "ipconfig" | "ifconfig" => {
-            r#"
-Windows IP Configuration
-
-Ethernet adapter Ethernet0:
-   Connection-specific DNS Suffix  . : corp.local
-   IPv4 Address. . . . . . . . . . . : 192.168.1.10
-   Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Default Gateway . . . . . . . . . : 192.168.1.1
-"#
-            .to_string()
+            // Broadcast output to all WebSocket clients
+            state
+                .broadcast_command_output(command_id, session_id, output, true, Some(true))
+                .await;
         }
-        "net user" => {
-            r#"
-User accounts for \\DC01
-
--------------------------------------------------------------------------------
-Administrator            Guest                    krbtgt
-john.doe                 jane.smith               svc_backup
-svc_sql                  DefaultAccount
-The command completed successfully.
-"#
-            .to_string()
+        Err(e) => {
+            // If bridge execution fails, send error to client
+            error!(session_id = %session_id, error = %e, "Failed to execute command via bridge");
+            let _ = state.event_tx.send(ServerEvent::CommandOutput {
+                command_id,
+                session_id,
+                output: format!("Error executing command: {}", e),
+                is_complete: true,
+                success: Some(false),
+            });
         }
-        cmd if cmd.starts_with("dir") || cmd.starts_with("ls") => {
-            r#"
- Volume in drive C is System
- Volume Serial Number is 1234-5678
-
- Directory of C:\Windows\System32
-
-11/22/2024  10:30 AM    <DIR>          .
-11/22/2024  10:30 AM    <DIR>          ..
-11/22/2024  10:30 AM           153,600 cmd.exe
-11/22/2024  10:30 AM           384,512 notepad.exe
-11/22/2024  10:30 AM         1,048,576 powershell.exe
-               3 File(s)      1,586,688 bytes
-"#
-            .to_string()
-        }
-        _ => format!("Executed: {}\n[Command completed successfully]", command),
     }
 }
 
-/// Generate random delay for realistic simulation
-fn rand_delay() -> u64 {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .subsec_nanos();
-    (nanos % 400) as u64
-}
+// Note: Command simulation has been moved to FeroxBridge
+// The WebSocket handler now uses bridge.execute_command() for all command execution

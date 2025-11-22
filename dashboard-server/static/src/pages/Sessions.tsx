@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDashboardStore } from '../store';
+import { useApi } from '../hooks/useApi';
 import {
   Monitor,
   MoreVertical,
@@ -10,6 +11,10 @@ import {
   Trash2,
   Eye,
   Clock,
+  Loader2,
+  X,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { Session } from '../types';
@@ -28,9 +33,11 @@ function formatRelativeTime(dateStr: string): string {
 interface SessionRowProps {
   session: Session;
   onSelect: (session: Session) => void;
+  onAction: (action: string, session: Session) => void;
+  loadingAction: string | null;
 }
 
-function SessionRow({ session, onSelect }: SessionRowProps) {
+function SessionRow({ session, onSelect, onAction, loadingAction }: SessionRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { setActiveTab, selectSession } = useDashboardStore();
 
@@ -39,6 +46,13 @@ function SessionRow({ session, onSelect }: SessionRowProps) {
     setActiveTab('terminal');
     setMenuOpen(false);
   };
+
+  const handleAction = (action: string) => {
+    setMenuOpen(false);
+    onAction(action, session);
+  };
+
+  const isLoading = loadingAction !== null;
 
   return (
     <tr className="table-row">
@@ -114,33 +128,51 @@ function SessionRow({ session, onSelect }: SessionRowProps) {
               <div className="absolute right-0 top-8 z-20 bg-dark-700 border border-dark-500 rounded-lg shadow-lg py-1 min-w-[180px] animate-fade-in">
                 <button
                   onClick={handleTerminal}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary"
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary disabled:opacity-50"
                 >
                   <Terminal size={16} />
                   Execute Command
                 </button>
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary">
-                  <Shield size={16} />
+                <button
+                  onClick={() => handleAction('privesc')}
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary disabled:opacity-50"
+                >
+                  {loadingAction === 'privesc' ? <Loader2 size={16} className="animate-spin" /> : <Shield size={16} />}
                   Escalate Privileges
                 </button>
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary">
-                  <Key size={16} />
+                <button
+                  onClick={() => handleAction('credentials')}
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary disabled:opacity-50"
+                >
+                  {loadingAction === 'credentials' ? <Loader2 size={16} className="animate-spin" /> : <Key size={16} />}
                   Harvest Credentials
                 </button>
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary">
-                  <ArrowRight size={16} />
+                <button
+                  onClick={() => handleAction('lateral')}
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary disabled:opacity-50"
+                >
+                  {loadingAction === 'lateral' ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
                   Lateral Movement
                 </button>
                 <hr className="my-1 border-dark-500" />
                 <button
                   onClick={() => onSelect(session)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary"
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary disabled:opacity-50"
                 >
                   <Eye size={16} />
                   View Details
                 </button>
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-dark-600">
-                  <Trash2 size={16} />
+                <button
+                  onClick={() => handleAction('terminate')}
+                  disabled={isLoading}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-dark-600 disabled:opacity-50"
+                >
+                  {loadingAction === 'terminate' ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                   Terminate Session
                 </button>
               </div>
@@ -278,14 +310,204 @@ function SessionModal({ session, onClose }: SessionModalProps) {
   );
 }
 
+// Result modal for showing action output
+interface ActionResultModalProps {
+  title: string;
+  success: boolean;
+  output: string;
+  onClose: () => void;
+}
+
+function ActionResultModal({ title, success, output, onClose }: ActionResultModalProps) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative bg-dark-700 border border-dark-500 rounded-lg w-full max-w-2xl max-h-[80vh] overflow-auto animate-fade-in">
+        <div className="sticky top-0 bg-dark-700 border-b border-dark-500 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {success ? (
+              <CheckCircle className="text-ferox-green" size={24} />
+            ) : (
+              <AlertCircle className="text-danger" size={24} />
+            )}
+            <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-text-secondary hover:text-text-primary"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className="p-4">
+          <pre className="bg-dark-900 rounded-lg p-4 text-sm text-ferox-green font-mono whitespace-pre-wrap overflow-x-auto">
+            {output}
+          </pre>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Lateral movement input modal
+interface LateralMoveModalProps {
+  session: Session;
+  onClose: () => void;
+  onSubmit: (targetHost: string) => void;
+  isLoading: boolean;
+}
+
+function LateralMoveModal({ session, onClose, onSubmit, isLoading }: LateralMoveModalProps) {
+  const [targetHost, setTargetHost] = useState('');
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative bg-dark-700 border border-dark-500 rounded-lg w-full max-w-md animate-fade-in">
+        <div className="border-b border-dark-500 p-4">
+          <h2 className="text-lg font-semibold text-text-primary">Lateral Movement</h2>
+          <p className="text-sm text-text-secondary mt-1">
+            From: {session.hostname} ({session.ip_address})
+          </p>
+        </div>
+        <div className="p-4 space-y-4">
+          <div>
+            <label className="block text-sm text-text-secondary mb-2">Target Host</label>
+            <input
+              type="text"
+              value={targetHost}
+              onChange={(e) => setTargetHost(e.target.value)}
+              placeholder="192.168.1.50 or WS-DEV01"
+              className="w-full bg-dark-800 border border-dark-500 rounded-lg px-3 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-ferox-green"
+            />
+          </div>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={onClose}
+              disabled={isLoading}
+              className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onSubmit(targetHost)}
+              disabled={!targetHost || isLoading}
+              className="px-4 py-2 text-sm bg-ferox-green text-dark-900 rounded-lg hover:bg-ferox-green/90 disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading && <Loader2 size={16} className="animate-spin" />}
+              Execute
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function SessionsPage() {
-  const { sessions } = useDashboardStore();
+  const { sessions, removeSession } = useDashboardStore();
+  const api = useApi();
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'sleeping' | 'dead'>('all');
+
+  // Action states
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [actionResult, setActionResult] = useState<{ title: string; success: boolean; output: string } | null>(null);
+  const [lateralMoveSession, setLateralMoveSession] = useState<Session | null>(null);
 
   const filteredSessions = sessions.filter(
     (s) => filter === 'all' || s.status === filter
   );
+
+  // Handle quick actions
+  const handleAction = async (action: string, session: Session) => {
+    if (action === 'lateral') {
+      setLateralMoveSession(session);
+      return;
+    }
+
+    setLoadingAction(action);
+
+    try {
+      switch (action) {
+        case 'privesc': {
+          const result = await api.runPrivEsc({
+            session_id: session.id,
+            auto_escalate: true,
+            safe_mode: false,
+          });
+          setActionResult({
+            title: 'Privilege Escalation',
+            success: result.escalation_success,
+            output: result.output,
+          });
+          break;
+        }
+        case 'credentials': {
+          const result = await api.harvestCredentials({
+            session_id: session.id,
+            sources: ['all'],
+            safe_mode: false,
+          });
+          setActionResult({
+            title: 'Credential Harvesting',
+            success: result.total_found > 0,
+            output: result.output,
+          });
+          break;
+        }
+        case 'terminate': {
+          await api.terminateSession(session.id);
+          // Update local state immediately
+          removeSession(session.id);
+          setActionResult({
+            title: 'Session Terminated',
+            success: true,
+            output: `Session ${session.hostname} (${session.id}) has been terminated.`,
+          });
+          break;
+        }
+      }
+    } catch (error) {
+      setActionResult({
+        title: 'Error',
+        success: false,
+        output: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  // Handle lateral movement submission
+  const handleLateralMove = async (targetHost: string) => {
+    if (!lateralMoveSession) return;
+
+    setLoadingAction('lateral');
+
+    try {
+      const result = await api.lateralMove({
+        session_id: lateralMoveSession.id,
+        target_host: targetHost,
+        method: 'auto',
+        safe_mode: false,
+      });
+      setActionResult({
+        title: 'Lateral Movement',
+        success: result.success,
+        output: result.output,
+      });
+    } catch (error) {
+      setActionResult({
+        title: 'Error',
+        success: false,
+        output: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    } finally {
+      setLoadingAction(null);
+      setLateralMoveSession(null);
+    }
+  };
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -329,6 +551,8 @@ export function SessionsPage() {
                 key={session.id}
                 session={session}
                 onSelect={setSelectedSession}
+                onAction={handleAction}
+                loadingAction={loadingAction}
               />
             ))}
           </tbody>
@@ -346,6 +570,26 @@ export function SessionsPage() {
         <SessionModal
           session={selectedSession}
           onClose={() => setSelectedSession(null)}
+        />
+      )}
+
+      {/* Action result modal */}
+      {actionResult && (
+        <ActionResultModal
+          title={actionResult.title}
+          success={actionResult.success}
+          output={actionResult.output}
+          onClose={() => setActionResult(null)}
+        />
+      )}
+
+      {/* Lateral movement input modal */}
+      {lateralMoveSession && (
+        <LateralMoveModal
+          session={lateralMoveSession}
+          onClose={() => setLateralMoveSession(null)}
+          onSubmit={handleLateralMove}
+          isLoading={loadingAction === 'lateral'}
         />
       )}
     </div>

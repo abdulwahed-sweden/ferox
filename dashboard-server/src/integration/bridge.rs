@@ -244,11 +244,12 @@ impl FeroxBridge {
     }
 
     /// Execute a command on a session
+    /// Returns (command_id, output) on success
     pub async fn execute_command(
         &self,
         session_id: Uuid,
         command: String,
-    ) -> Result<Uuid> {
+    ) -> Result<(Uuid, String)> {
         let _session = self
             .session_manager
             .get(session_id)
@@ -261,15 +262,16 @@ impl FeroxBridge {
         // For now, simulate command execution
         let output = self.simulate_command(&command).await;
 
-        // Broadcast output
+        // Broadcast output via bridge events (for internal subscribers)
         let _ = self.event_tx.send(BridgeEvent::CommandOutput {
             session_id,
             command_id,
-            output,
+            output: output.clone(),
             is_complete: true,
         });
 
-        Ok(command_id)
+        // Return output so caller can broadcast to WebSocket clients
+        Ok((command_id, output))
     }
 
     /// Simulate command execution (demo mode)

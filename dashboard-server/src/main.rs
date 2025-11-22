@@ -24,7 +24,7 @@ mod ws;
 
 use axum::{
     routing::{delete, get, post},
-    Router,
+    Extension, Router,
 };
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
@@ -32,7 +32,7 @@ use tower_http::services::ServeDir;
 use tracing::info;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
-use crate::integration::FeroxBridge;
+use crate::integration::{FeroxBridge, ModuleBridge};
 use crate::state::AppState;
 use std::sync::Arc;
 
@@ -55,6 +55,10 @@ async fn main() -> anyhow::Result<()> {
     // Initialize Ferox Core Bridge
     let bridge = Arc::new(FeroxBridge::new());
     info!("Ferox Core Bridge initialized");
+
+    // Initialize Module Bridge (wraps post-exploitation modules)
+    let module_bridge = Arc::new(ModuleBridge::new(bridge.clone()));
+    info!("Module Bridge initialized");
 
     // Start session synchronizer (syncs Ferox sessions to dashboard)
     integration::spawn_session_sync(bridge.clone(), state.clone());
@@ -89,7 +93,13 @@ async fn main() -> anyhow::Result<()> {
         .route("/mitre/coverage", get(api::get_mitre_coverage))
         // Network topology
         .route("/network/hosts", get(api::get_network_hosts))
-        .route("/network/edges", get(api::get_network_edges));
+        .route("/network/edges", get(api::get_network_edges))
+        // Post-exploitation modules
+        .route("/modules/privesc", post(api::run_privesc))
+        .route("/modules/credentials", post(api::harvest_credentials))
+        .route("/modules/persistence", post(api::install_persistence))
+        .route("/modules/lateral", post(api::lateral_move))
+        .route("/modules/discovery/{session_id}", get(api::discover_network));
 
     // Build main router
     let app = Router::new()
@@ -99,6 +109,10 @@ async fn main() -> anyhow::Result<()> {
         .nest("/api", api_routes)
         // Add shared state
         .with_state(state)
+        // Add FeroxBridge as extension for WebSocket handler
+        .layer(Extension(bridge))
+        // Add ModuleBridge as extension for module API endpoints
+        .layer(Extension(module_bridge))
         // Add CORS middleware
         .layer(cors)
         // Serve static files (React dashboard) as fallback

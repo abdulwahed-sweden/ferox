@@ -187,3 +187,119 @@ export interface SubscribeEvent {
     session_id: string;
   };
 }
+
+// ============================================================================
+// Module API Types
+// ============================================================================
+
+// Privilege Escalation
+export interface PrivEscRequest {
+  session_id: string;
+  auto_escalate: boolean;
+  safe_mode: boolean;
+}
+
+export interface PrivEscVector {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  severity: string;
+  confidence: number;
+  mitre_id: string;
+  exploitable: boolean;
+}
+
+export interface PrivEscResult {
+  session_id: string;
+  current_privilege: string;
+  vectors_found: PrivEscVector[];
+  escalation_attempted: boolean;
+  escalation_success: boolean;
+  new_privilege: string | null;
+  output: string;
+}
+
+// Credential Harvesting
+export interface CredentialHarvestRequest {
+  session_id: string;
+  sources: string[];
+  safe_mode: boolean;
+}
+
+export interface HarvestedCred {
+  id: string;
+  cred_type: string;
+  username: string;
+  domain: string | null;
+  secret: string;
+  source: string;
+  sensitivity: string;
+  is_reusable: boolean;
+}
+
+export interface CredentialHarvestResult {
+  session_id: string;
+  credentials: HarvestedCred[];
+  total_found: number;
+  by_type: Record<string, number>;
+  output: string;
+}
+
+// Persistence
+export interface PersistenceRequest {
+  session_id: string;
+  method: string;
+  name: string;
+  safe_mode: boolean;
+}
+
+export interface PersistenceHandle {
+  id: string;
+  method: string;
+  name: string;
+  location: string;
+  status: string;
+  mitre_id: string;
+}
+
+export interface PersistenceResult {
+  session_id: string;
+  success: boolean;
+  handles: PersistenceHandle[];
+  output: string;
+}
+
+// Lateral Movement
+export interface LateralMoveRequest {
+  session_id: string;
+  target_host: string;
+  method: string;
+  credential_id?: string;
+  safe_mode: boolean;
+}
+
+export interface LateralMoveResult {
+  session_id: string;
+  target_host: string;
+  success: boolean;
+  new_session_id: string | null;
+  method_used: string;
+  output: string;
+}
+
+// Network Discovery
+export interface DiscoveredHost {
+  ip: string;
+  hostname: string | null;
+  os: string | null;
+  open_ports: number[];
+  services: string[];
+}
+
+export interface DiscoveryResult {
+  session_id: string;
+  hosts: DiscoveredHost[];
+  subnets_scanned: string[];
+  output: string;
+}
