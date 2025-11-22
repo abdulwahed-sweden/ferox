@@ -1,196 +1,355 @@
-Add OPSEC (Operational Security) Mode
-Context
-Ferox has complete attack chain: payloads, persistence, privesc, credential harvesting, lateral movement. Missing: stealth operations to avoid detection by SOC/SIEM/EDR.
-Task
-Add OPSEC engine that makes all operations stealthy and undetectable.
-Core Components
-1. OPSEC Configuration
-rustpub struct OpsecConfig {
-    pub stealth_level: StealthLevel,     // High, Medium, Low
-    pub sleep: Duration,                  // Base delay between operations
-    pub jitter: f32,                      // Random variance (0.0-1.0)
-    pub max_network_noise: NetworkNoise,  // Limit packet rate
-    pub use_lolbins_only: bool,          // Living-off-the-land binaries
-    pub encrypt_traffic: bool,            // Encrypt all C2 traffic
-    pub simulate_user: bool,              // Mimic human behavior
-    pub edr_aware: bool,                  // Detect & adapt to EDR
-}
 
-pub enum StealthLevel {
-    Ghost,      // Maximum stealth, very slow
-    Silent,     // High stealth, moderate speed
-    Quiet,      // Balanced stealth/speed
-    Normal,     // Standard operations
-}
-2. Traffic Shaping
-rustpub trait TrafficShaper {
-    // Limit network packets
-    async fn throttle(&self, packets: usize) -> usize; // 500 → 3
-    
-    // Random delays
-    async fn sleep_with_jitter(&self);
-    
-    // Blend with legitimate traffic
-    async fn disguise_as_legitimate(&self, data: &[u8]) -> Vec<u8>;
-}
-3. EDR Detection & Adaptation
-rustpub struct EdrDetector {
-    // Detect running EDR
-    async fn detect_edr(&self) -> Option<EdrType>;
-    
-    // Adapt behavior based on EDR
-    async fn adapt_to_edr(&self, edr: EdrType) -> OpsecConfig;
-}
+## Part A: Credential Vault
 
-pub enum EdrType {
-    WindowsDefender,
-    CrowdStrike,
-    SentinelOne,
-    CarbonBlack,
-    // ...
-}
-4. Living-off-the-Land (LOLBins)
-rust// Replace dangerous tools with native binaries
-pub struct LolbinExecutor {
-    // Instead of: psexec.exe
-    // Use: sc.exe, wmic.exe, schtasks.exe
-    
-    async fn execute_native(&self, command: &str) -> Result<Output>;
-}
-5. Log Evasion
-rustpub trait LogEvasion {
-    // Modify existing scheduled tasks instead of creating new
-    async fn hijack_existing_task(&self) -> Result<()>;
-    
-    // Use inline modifications (no file writes)
-    async fn execute_in_memory(&self) -> Result<()>;
-    
-    // Avoid high-monitoring areas
-    fn is_monitored(&self, action: &Action) -> bool;
-}
-6. User Simulation
-rustpub struct UserSimulator {
-    // Random delays between actions
-    async fn random_delay(&self) -> Duration;
-    
-    // Mimic user behavior patterns
-    async fn simulate_typing(&self);
-    async fn simulate_mouse_movement(&self);
-    async fn work_hours_only(&self) -> bool;
-}
-OPSEC Integration
-Apply to all modules:
-rust// Payload deployment
-payload_system.deploy_with_opsec(target, opsec_config).await?;
+### Layout
+Two-column layout:
+- Left: Credential list (scrollable)
+- Right: Selected credential details
 
-// Privilege escalation
-privesc_engine.escalate_stealth(session, opsec_config).await?;
+### Credential List (Left)
+Grouped by type with expandable sections:
+- 🔑 Plain Text Passwords (count)
+- #️⃣ NTLM Hashes (count)
+- 🎫 Kerberos Tickets (count)
+- 🔐 SSH Keys (count)
+- 🌐 Cloud Credentials (count)
+- 🎟️ Tokens & Certificates (count)
 
-// Credential harvesting
-cred_harvester.harvest_silent(session, opsec_config).await?;
+Each credential card shows:
+- Username (bold)
+- Domain (if applicable)
+- Source hostname
+- Collection timestamp
+- Sensitivity badge (Critical/High/Medium/Low)
+- Reusability indicator (can be used for lateral movement)
 
-// Persistence installation
-persist_engine.install_stealth(session, opsec_config).await?;
+### Search & Filters (Top)
+- Search by username, hostname, or domain
+- Filter by type (checkboxes)
+- Filter by sensitivity
+- Filter by source session
+- "Show reusable only" toggle
+- Sort by: newest, oldest, sensitivity
 
-// Lateral movement
-lateral_engine.spread_ghost(session, creds, opsec_config).await?;
-OPSEC Strategies by Stealth Level
-Ghost Mode (Maximum Stealth):
+### Credential Actions
+For each credential:
+- 👁️ Show/Hide secret (redacted by default)
+- 📋 Copy to clipboard
+- 🎯 Test against targets
+- ➡️ Use for lateral movement
+- 🗑️ Delete
+- 📝 Add note
 
-Sleep: 30-60 seconds between operations
-Jitter: 0.5-0.8 randomness
-Network: 1-3 packets only
-LOLBins: Mandatory
-Encryption: Always
-Delays: Random 1-5 minutes
+### Bulk Actions (Top Bar)
+When credentials selected:
+- Test all against discovered targets
+- Export selected (JSON/CSV/Hashcat format)
+- Delete selected
+- Mark as high-priority
 
-Silent Mode (High Stealth):
+### Credential Details Panel (Right)
+When clicking credential, show:
+- Full credential information
+- Redacted secret with "Show" button
+- Source session details
+- When collected
+- Reuse history (which sessions used this)
+- Password strength meter (if applicable)
+- Related credentials (same user, different systems)
+- MITRE technique: T1555, T1552, T1003
 
-Sleep: 10-20 seconds
-Jitter: 0.3-0.5
-Network: <10 packets
-LOLBins: Preferred
-User simulation: Yes
+### Intelligence Panel
+Show analysis:
+- Password reuse detected (X passwords used on Y systems)
+- Domain admin credentials found (highlight in red)
+- Cloud admin access (highlight in orange)
+- Weak passwords detected
+- Recommendations for privilege escalation
 
-Quiet Mode (Balanced):
+---
 
-Sleep: 3-5 seconds
-Jitter: 0.2-0.3
-Network: <50 packets
-LOLBins: When possible
+## Part B: MITRE ATT&CK Dashboard
 
-Normal Mode (Standard):
+### Interactive MITRE Matrix
+Display tactics (columns) and techniques (rows):
 
-Sleep: 0-1 second
-No restrictions
+**Tactics (top row):**
+Initial Access | Execution | Persistence | Privilege Escalation | 
+Defense Evasion | Credential Access | Discovery | 
+Lateral Movement | Collection | Exfiltration | C&C
 
-Specific OPSEC Techniques
-Avoid Detection:
+**Heat Map Colors:**
+- 🟢 Green: Used successfully, low detection
+- 🟡 Yellow: Used, medium detection risk
+- 🟠 Orange: Used, high detection risk
+- ⚪ Gray: Available but not used
+- ⬛ Black: Not available
 
-❌ No PowerShell suspicious commands
-❌ No psexec.exe
-❌ No obvious WMI queries
-❌ No rapid port scanning
-❌ No credential brute force
+**Click on technique:**
+Show modal with:
+- Technique ID and name
+- Full description
+- When used (timestamps)
+- Which sessions used it
+- Success rate
+- Detection rate
+- Related sub-techniques
+- OPSEC considerations
 
-Use Instead:
+### Coverage Statistics (Top)
+Cards showing:
+- Overall coverage: 78% (with progress bar)
+- Techniques used: 24/156
+- Tactics covered: 11/14
+- Detection risk: Medium (average across all)
 
-✅ cmd.exe with native commands
-✅ sc.exe for service control
-✅ schtasks.exe for tasks
-✅ Kerberos instead of NTLM
-✅ Existing tasks/services modification
-✅ Named pipes
-✅ Memory-only execution
+### Tactic Detail Cards (Below Matrix)
+For each tactic, show card:
+- Tactic name and coverage percentage
+- Techniques used from this tactic
+- Mini progress bar
+- Click to filter matrix
 
-Traffic Encryption:
-rust// All C2 traffic through legitimate channels
-- Teams webhooks
-- GitHub Gist API
-- OneDrive API
-- DNS-over-HTTPS
-// Encrypted with AES-256
-// Obfuscated to look like normal traffic
-Environment Analysis:
-rustasync fn analyze_before_action(&self, session: &Session) -> OpsecStrategy {
-    let has_defender = detect_defender(session).await?;
-    let has_crowdstrike = detect_crowdstrike(session).await?;
-    let is_domain_joined = check_domain(session).await?;
-    
-    // Adapt strategy
-    if has_crowdstrike {
-        // Use maximum stealth
-        OpsecStrategy::Ghost
-    } else if has_defender {
-        OpsecStrategy::Silent
-    } else {
-        OpsecStrategy::Quiet
-    }
-}
-CLI Commands
-bashferox config opsec --stealth-level ghost --sleep 30 --jitter 0.7
-ferox lateral spread --opsec
-ferox persist install --stealth
-ferox all --full-attack --opsec-mode ghost
-Requirements
+### Timeline View (Toggle)
+Alternative view showing techniques used over time:
+- Horizontal timeline
+- Each technique as a dot on timeline
+- Color by tactic
+- Size by importance
+- Hover for details
 
-Apply OPSEC to ALL existing modules (payloads, persist, privesc, creds, lateral)
-Sleep + Jitter implementation (like Cobalt Strike)
-EDR detection and adaptation
-LOLBins prioritization
-Traffic encryption and disguise
-User behavior simulation
-Log evasion techniques
-All operations respect OPSEC config
-MITRE coverage: T1562 (Impair Defenses), T1070 (Indicator Removal), T1027 (Obfuscation)
+### OPSEC Overlay
+Toggle to show detection risk:
+- Green overlay: Low risk techniques
+- Red overlay: High risk techniques
+- Recommendations for safer alternatives
 
-Success Criteria
-✅ Operations undetected by Windows Defender
-✅ Low network noise (<10 packets in ghost mode)
-✅ Random delays working (sleep + jitter)
-✅ LOLBins used instead of suspicious tools
-✅ EDR detected and behavior adapted
-✅ All traffic encrypted
-✅ No alerts in SIEM during testing
-Think through: timing attacks, behavior analysis evasion, legitimate traffic mimicry, EDR hooking detection, anomaly detection avoidance.
-Build production-quality stealth. 
+### Export Options
+- Export coverage report (PDF)
+- Export technique list (CSV)
+- Export for compliance documentation
+- Screenshot MITRE matrix
+
+## Success Criteria
+✅ Credentials display clearly by type  
+✅ Search and filters work smoothly  
+✅ Can test credentials against targets  
+✅ MITRE matrix is interactive and informative  
+✅ Heat map accurately reflects usage  
+✅ Detection risk clearly visualized  
+
+**Make credentials easy to find and use. MITRE matrix should be both informative and beautiful.**
+```
+
+---
+
+## **PROMPT 7: Polish, Testing & Production Build**
+
+```markdown
+# Final Polish, Testing & Production Deployment
+
+## Context
+All major features are built. Need final polish, testing, and production configuration.
+
+## Task
+Add finishing touches, optimize performance, and prepare for deployment.
+
+### UI Polish
+
+**Animations & Transitions:**
+- Smooth page transitions (200-300ms)
+- Card hover effects (slight lift + shadow)
+- Loading skeletons for data fetching
+- Success/error toast notifications (top-right corner)
+- Fade-in animations for new sessions
+- Pulse animation for live indicators
+- Smooth scrolling everywhere
+
+**Loading States:**
+- Skeleton loaders for cards while data fetching
+- Spinner for command execution
+- Progress bar for long operations
+- "Loading..." text with animated dots
+
+**Empty States:**
+- No sessions: Show helpful message + "Deploy payload" button
+- No credentials: "No credentials harvested yet"
+- No network data: "Discover network to see map"
+- Professional illustrations or icons
+
+**Error Handling:**
+- Graceful error messages (user-friendly)
+- Retry buttons where applicable
+- Connection lost banner (top of screen)
+- Form validation with helpful messages
+
+**Accessibility:**
+- Keyboard navigation (Tab, Enter, Escape)
+- ARIA labels on interactive elements
+- Focus indicators
+- Screen reader friendly
+
+### Notifications System
+Toast notifications for:
+- ✅ New session established
+- 🔓 Privilege escalation successful
+- 🔐 Credentials harvested
+- 💾 Persistence installed
+- ⚠️ OPSEC warning
+- ❌ Operation failed
+- 🔌 WebSocket disconnected/reconnected
+
+Position: top-right, stack vertically, auto-dismiss after 5s
+
+### Performance Optimization
+
+**React Optimizations:**
+- Memoize expensive components with React.memo
+- Use useMemo for expensive calculations
+- useCallback for event handlers
+- Virtual scrolling for large lists (credential vault, commands)
+- Debounce search inputs
+- Lazy load components with React.lazy
+
+**WebSocket Optimization:**
+- Batch updates (collect events for 100ms before updating UI)
+- Only update visible components
+- Unsubscribe from sessions when not viewing
+
+**Bundle Size:**
+- Code splitting by route
+- Tree shaking unused code
+- Compress images
+- Lazy load cytoscape only on network page
+
+### Testing Checklist
+
+**Frontend:**
+- [ ] All pages render without errors
+- [ ] WebSocket connects successfully
+- [ ] Commands execute and show output
+- [ ] Session list updates in real-time
+- [ ] Network graph displays correctly
+- [ ] Credentials can be searched and filtered
+- [ ] MITRE matrix is interactive
+- [ ] Responsive on different screen sizes
+- [ ] Works in Chrome, Firefox, Safari
+- [ ] No console errors or warnings
+
+**Backend:**
+- [ ] All API endpoints return correct data
+- [ ] WebSocket handles multiple clients
+- [ ] Commands execute on correct sessions
+- [ ] Events broadcast to all connected clients
+- [ ] Proper error handling
+- [ ] No memory leaks
+
+### Production Configuration
+
+**Frontend Build:**
+```bash
+# Optimize for production
+npm run build
+
+# Output to static/ directory
+# Minified and optimized
+```
+
+**Backend:**
+```bash
+# Build release binary
+cargo build --release
+
+# Binary size optimization in Cargo.toml
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+```
+
+**Environment Variables:**
+```
+FEROX_DASHBOARD_PORT=8080
+FEROX_DASHBOARD_HOST=0.0.0.0
+FEROX_LOG_LEVEL=info
+FEROX_CORS_ORIGIN=*
+```
+
+**Docker Support (Optional):**
+```dockerfile
+FROM rust:latest AS builder
+WORKDIR /app
+COPY . .
+RUN cargo build --release --package ferox-dashboard-server
+
+FROM debian:bookworm-slim
+COPY --from=builder /app/target/release/ferox-dashboard-server /usr/local/bin/
+COPY --from=builder /app/dashboard-server/static/dist /static
+EXPOSE 8080
+CMD ["ferox-dashboard-server"]
+```
+
+### Documentation
+
+**README for Dashboard:**
+```markdown
+# Ferox C2 Dashboard
+
+## Quick Start
+1. Start backend: `cargo run --package ferox-dashboard-server`
+2. Open browser: `http://localhost:8080`
+
+## Features
+- Real-time session management
+- Interactive command terminal
+- Network topology visualization
+- Credential vault
+- MITRE ATT&CK coverage
+
+## Development
+- Frontend: React + TypeScript
+- Backend: Rust (Axum + WebSockets)
+```
+
+**User Guide:**
+- How to deploy payload
+- How to execute commands
+- How to use credentials for lateral movement
+- How to read MITRE coverage
+- Keyboard shortcuts
+
+### Final Checklist
+- [ ] All features working end-to-end
+- [ ] No critical bugs
+- [ ] Performance is acceptable
+- [ ] UI is polished and professional
+- [ ] Documentation is complete
+- [ ] Ready for demo
+
+## Success Criteria
+✅ Production build completes successfully  
+✅ Dashboard is fast and responsive  
+✅ All animations are smooth  
+✅ Error handling is robust  
+✅ Ready to show to users  
+
+**Make it production-ready. Focus on stability and user experience.**
+```
+
+---
+
+## 📋 **Summary: 7-Phase Implementation**
+
+```
+Phase 1: Backend WebSocket Server (Week 1)
+Phase 2: React Frontend Foundation (Week 2)
+Phase 3: Dashboard & Session List (Week 3)
+Phase 4: Real-time Command Terminal (Week 4)
+Phase 5: Network Visualization (Week 5)
+Phase 6: Credentials & MITRE (Week 6)
+Phase 7: Polish & Production (Week 7)
+
+Total: 7 weeks to complete professional C2 Dashboard
+```
+
+**Execute phases sequentially. Each phase builds on the previous one.** 🚀 you are free to choose the best 

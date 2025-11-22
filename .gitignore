@@ -37,3 +37,6 @@ Thumbs.db
 
 # Ferox specific
 ferox.toml
+
+# dashboard-server/static/package.json
+dashboard-server/static/node_modules/
