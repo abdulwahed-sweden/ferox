@@ -1,0 +1,196 @@
+Add OPSEC (Operational Security) Mode
+Context
+Ferox has complete attack chain: payloads, persistence, privesc, credential harvesting, lateral movement. Missing: stealth operations to avoid detection by SOC/SIEM/EDR.
+Task
+Add OPSEC engine that makes all operations stealthy and undetectable.
+Core Components
+1. OPSEC Configuration
+rustpub struct OpsecConfig {
+    pub stealth_level: StealthLevel,     // High, Medium, Low
+    pub sleep: Duration,                  // Base delay between operations
+    pub jitter: f32,                      // Random variance (0.0-1.0)
+    pub max_network_noise: NetworkNoise,  // Limit packet rate
+    pub use_lolbins_only: bool,          // Living-off-the-land binaries
+    pub encrypt_traffic: bool,            // Encrypt all C2 traffic
+    pub simulate_user: bool,              // Mimic human behavior
+    pub edr_aware: bool,                  // Detect & adapt to EDR
+}
+
+pub enum StealthLevel {
+    Ghost,      // Maximum stealth, very slow
+    Silent,     // High stealth, moderate speed
+    Quiet,      // Balanced stealth/speed
+    Normal,     // Standard operations
+}
+2. Traffic Shaping
+rustpub trait TrafficShaper {
+    // Limit network packets
+    async fn throttle(&self, packets: usize) -> usize; // 500 → 3
+    
+    // Random delays
+    async fn sleep_with_jitter(&self);
+    
+    // Blend with legitimate traffic
+    async fn disguise_as_legitimate(&self, data: &[u8]) -> Vec<u8>;
+}
+3. EDR Detection & Adaptation
+rustpub struct EdrDetector {
+    // Detect running EDR
+    async fn detect_edr(&self) -> Option<EdrType>;
+    
+    // Adapt behavior based on EDR
+    async fn adapt_to_edr(&self, edr: EdrType) -> OpsecConfig;
+}
+
+pub enum EdrType {
+    WindowsDefender,
+    CrowdStrike,
+    SentinelOne,
+    CarbonBlack,
+    // ...
+}
+4. Living-off-the-Land (LOLBins)
+rust// Replace dangerous tools with native binaries
+pub struct LolbinExecutor {
+    // Instead of: psexec.exe
+    // Use: sc.exe, wmic.exe, schtasks.exe
+    
+    async fn execute_native(&self, command: &str) -> Result<Output>;
+}
+5. Log Evasion
+rustpub trait LogEvasion {
+    // Modify existing scheduled tasks instead of creating new
+    async fn hijack_existing_task(&self) -> Result<()>;
+    
+    // Use inline modifications (no file writes)
+    async fn execute_in_memory(&self) -> Result<()>;
+    
+    // Avoid high-monitoring areas
+    fn is_monitored(&self, action: &Action) -> bool;
+}
+6. User Simulation
+rustpub struct UserSimulator {
+    // Random delays between actions
+    async fn random_delay(&self) -> Duration;
+    
+    // Mimic user behavior patterns
+    async fn simulate_typing(&self);
+    async fn simulate_mouse_movement(&self);
+    async fn work_hours_only(&self) -> bool;
+}
+OPSEC Integration
+Apply to all modules:
+rust// Payload deployment
+payload_system.deploy_with_opsec(target, opsec_config).await?;
+
+// Privilege escalation
+privesc_engine.escalate_stealth(session, opsec_config).await?;
+
+// Credential harvesting
+cred_harvester.harvest_silent(session, opsec_config).await?;
+
+// Persistence installation
+persist_engine.install_stealth(session, opsec_config).await?;
+
+// Lateral movement
+lateral_engine.spread_ghost(session, creds, opsec_config).await?;
+OPSEC Strategies by Stealth Level
+Ghost Mode (Maximum Stealth):
+
+Sleep: 30-60 seconds between operations
+Jitter: 0.5-0.8 randomness
+Network: 1-3 packets only
+LOLBins: Mandatory
+Encryption: Always
+Delays: Random 1-5 minutes
+
+Silent Mode (High Stealth):
+
+Sleep: 10-20 seconds
+Jitter: 0.3-0.5
+Network: <10 packets
+LOLBins: Preferred
+User simulation: Yes
+
+Quiet Mode (Balanced):
+
+Sleep: 3-5 seconds
+Jitter: 0.2-0.3
+Network: <50 packets
+LOLBins: When possible
+
+Normal Mode (Standard):
+
+Sleep: 0-1 second
+No restrictions
+
+Specific OPSEC Techniques
+Avoid Detection:
+
+❌ No PowerShell suspicious commands
+❌ No psexec.exe
+❌ No obvious WMI queries
+❌ No rapid port scanning
+❌ No credential brute force
+
+Use Instead:
+
+✅ cmd.exe with native commands
+✅ sc.exe for service control
+✅ schtasks.exe for tasks
+✅ Kerberos instead of NTLM
+✅ Existing tasks/services modification
+✅ Named pipes
+✅ Memory-only execution
+
+Traffic Encryption:
+rust// All C2 traffic through legitimate channels
+- Teams webhooks
+- GitHub Gist API
+- OneDrive API
+- DNS-over-HTTPS
+// Encrypted with AES-256
+// Obfuscated to look like normal traffic
+Environment Analysis:
+rustasync fn analyze_before_action(&self, session: &Session) -> OpsecStrategy {
+    let has_defender = detect_defender(session).await?;
+    let has_crowdstrike = detect_crowdstrike(session).await?;
+    let is_domain_joined = check_domain(session).await?;
+    
+    // Adapt strategy
+    if has_crowdstrike {
+        // Use maximum stealth
+        OpsecStrategy::Ghost
+    } else if has_defender {
+        OpsecStrategy::Silent
+    } else {
+        OpsecStrategy::Quiet
+    }
+}
+CLI Commands
+bashferox config opsec --stealth-level ghost --sleep 30 --jitter 0.7
+ferox lateral spread --opsec
+ferox persist install --stealth
+ferox all --full-attack --opsec-mode ghost
+Requirements
+
+Apply OPSEC to ALL existing modules (payloads, persist, privesc, creds, lateral)
+Sleep + Jitter implementation (like Cobalt Strike)
+EDR detection and adaptation
+LOLBins prioritization
+Traffic encryption and disguise
+User behavior simulation
+Log evasion techniques
+All operations respect OPSEC config
+MITRE coverage: T1562 (Impair Defenses), T1070 (Indicator Removal), T1027 (Obfuscation)
+
+Success Criteria
+✅ Operations undetected by Windows Defender
+✅ Low network noise (<10 packets in ghost mode)
+✅ Random delays working (sleep + jitter)
+✅ LOLBins used instead of suspicious tools
+✅ EDR detected and behavior adapted
+✅ All traffic encrypted
+✅ No alerts in SIEM during testing
+Think through: timing attacks, behavior analysis evasion, legitimate traffic mimicry, EDR hooking detection, anomaly detection avoidance.
+Build production-quality stealth. 

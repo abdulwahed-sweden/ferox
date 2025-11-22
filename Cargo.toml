@@ -121,6 +121,7 @@ sha2 = "0.10.9"
 hkdf = "0.12.4"
 data-encoding = "2.9.0" # base32 helpers for dns_c2
 hex = "0.4.3" # Phase 4: hex encoding for payload keys
+rand = "0.9.2"
 
 [dev-dependencies]
 tokio-test = "0.4.4"

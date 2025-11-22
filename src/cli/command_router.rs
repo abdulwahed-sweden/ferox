@@ -7,8 +7,8 @@ use clap::Subcommand;
 use crate::cli::commands::{
     C2CommandHandler, C2Commands, CredsCommandHandler, CredsCommands, DoctorCommandHandler,
     LateralCommandHandler, LateralCommands, MemoryCommandHandler, MemoryCommands,
-    PersistCommandHandler, PersistCommands, PrivEscCommandHandler, PrivEscCommands,
-    SessionCommandHandler, SessionsCommands,
+    OpsecCommandHandler, OpsecCommands, PersistCommandHandler, PersistCommands,
+    PrivEscCommandHandler, PrivEscCommands, SessionCommandHandler, SessionsCommands,
 };
 use crate::cli::doctor::DoctorCommands;
 use crate::cli::theme::Theme;
@@ -92,6 +92,10 @@ impl CommandRouter {
                 LateralCommandHandler::new().run(cmd).await?;
                 Ok(RouterDispatch::Handled)
             }
+            Some(RouterCommand::Opsec(cmd)) => {
+                OpsecCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
             Some(RouterCommand::Console) => {
                 self.print_usage();
                 self.ensure_memory_toolchain();
@@ -112,7 +116,7 @@ impl CommandRouter {
     fn print_banner(&self) {
         println!("============================================================================");
         println!("                     Ferox CLI Integration Layer                              ");
-        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral | console");
+        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral | opsec | console");
         println!("============================================================================");
     }
 
@@ -126,6 +130,7 @@ impl CommandRouter {
         Theme::command_help("ferox privesc <cmd>", PrivEscCommandHandler::describe());
         Theme::command_help("ferox creds <cmd>", CredsCommandHandler::describe());
         Theme::command_help("ferox lateral <cmd>", LateralCommandHandler::describe());
+        Theme::command_help("ferox opsec <cmd>", OpsecCommandHandler::describe());
         Theme::command_help("ferox console", "Launch interactive console");
     }
 
@@ -196,6 +201,9 @@ pub enum RouterCommand {
     /// Lateral movement engine commands
     #[command(subcommand)]
     Lateral(LateralCommands),
+    /// OPSEC engine commands
+    #[command(subcommand)]
+    Opsec(OpsecCommands),
     /// Skip router messaging and jump into console
     Console,
 }

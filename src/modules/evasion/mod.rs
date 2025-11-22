@@ -2,3 +2,4 @@
 //! Contains modules for evading endpoint detection and response systems.
 
 pub mod edr;
+pub mod opsec;
