@@ -17,6 +17,7 @@
 //! ```
 
 mod api;
+mod integration;
 mod state;
 mod types;
 mod ws;
@@ -31,7 +32,9 @@ use tower_http::services::ServeDir;
 use tracing::info;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
+use crate::integration::FeroxBridge;
 use crate::state::AppState;
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -49,7 +52,15 @@ async fn main() -> anyhow::Result<()> {
     // Initialize shared state
     let state = AppState::new();
 
-    // Initialize with demo data
+    // Initialize Ferox Core Bridge
+    let bridge = Arc::new(FeroxBridge::new());
+    info!("Ferox Core Bridge initialized");
+
+    // Start session synchronizer (syncs Ferox sessions to dashboard)
+    integration::spawn_session_sync(bridge.clone(), state.clone());
+    info!("Session synchronizer started");
+
+    // Initialize with demo data (for development/testing)
     state.init_demo_data().await;
     info!("Demo data initialized");
 
