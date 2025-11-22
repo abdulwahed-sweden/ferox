@@ -26,10 +26,9 @@ use axum::{
     Router,
 };
 use std::net::SocketAddr;
-use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
-use tracing::{info, Level};
+use tracing::info;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 use crate::state::AppState;
@@ -66,11 +65,11 @@ async fn main() -> anyhow::Result<()> {
         .route("/health", get(api::health_check))
         // Sessions
         .route("/sessions", get(api::list_sessions))
-        .route("/sessions/:id", get(api::get_session))
-        .route("/sessions/:id", delete(api::terminate_session))
-        .route("/sessions/:id/execute", post(api::execute_command))
-        .route("/sessions/:id/commands", get(api::get_session_commands))
-        .route("/sessions/:id/heartbeat", post(api::session_heartbeat))
+        .route("/sessions/{id}", get(api::get_session))
+        .route("/sessions/{id}", delete(api::terminate_session))
+        .route("/sessions/{id}/execute", post(api::execute_command))
+        .route("/sessions/{id}/commands", get(api::get_session_commands))
+        .route("/sessions/{id}/heartbeat", post(api::session_heartbeat))
         // Credentials
         .route("/credentials", get(api::list_credentials))
         // Statistics
@@ -87,12 +86,12 @@ async fn main() -> anyhow::Result<()> {
         .route("/ws", get(ws::ws_handler))
         // API routes under /api prefix
         .nest("/api", api_routes)
-        // Serve static files (React dashboard)
-        .nest_service("/", ServeDir::new("static").append_index_html_on_directories(true))
+        // Add shared state
+        .with_state(state)
         // Add CORS middleware
         .layer(cors)
-        // Add shared state
-        .with_state(state);
+        // Serve static files (React dashboard) as fallback
+        .fallback_service(ServeDir::new("dashboard-server/static/dist").append_index_html_on_directories(true));
 
     // Start server
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));

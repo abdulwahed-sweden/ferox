@@ -65,7 +65,7 @@ pub async fn execute_command(
     state.add_command(command).await;
 
     // Update session
-    if let Some(mut session) = state.sessions.write().await.get_mut(&session_id) {
+    if let Some(session) = state.sessions.write().await.get_mut(&session_id) {
         session.metrics.commands_executed += 1;
         session.last_seen = chrono::Utc::now();
     }

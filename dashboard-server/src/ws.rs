@@ -13,7 +13,6 @@ use axum::{
 };
 use futures::{SinkExt, StreamExt};
 use std::sync::Arc;
-use tokio::sync::broadcast;
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
@@ -48,7 +47,6 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
     }
 
     // Spawn task to forward broadcast events to this client
-    let state_clone = state.clone();
     let send_task = tokio::spawn(async move {
         while let Ok(event) = rx.recv().await {
             match serde_json::to_string(&event) {
@@ -72,7 +70,7 @@ async fn handle_socket(socket: WebSocket, state: Arc<AppState>) {
                 Ok(Message::Text(text)) => {
                     handle_client_message(&state_clone2, client_id, &text).await;
                 }
-                Ok(Message::Ping(data)) => {
+                Ok(Message::Ping(_)) => {
                     debug!("Received ping from client {}", client_id);
                     // Pong is automatically sent by axum
                 }
@@ -163,7 +161,7 @@ async fn handle_execute_command(state: &Arc<AppState>, session_id: Uuid, command
     state.add_command(command).await;
 
     // Update session metrics
-    if let Some(mut session) = state.sessions.write().await.get_mut(&session_id) {
+    if let Some(session) = state.sessions.write().await.get_mut(&session_id) {
         session.metrics.commands_executed += 1;
         session.last_seen = chrono::Utc::now();
     }
