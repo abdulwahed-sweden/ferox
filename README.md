@@ -69,6 +69,12 @@ cargo build --release --features memory-forensics
   - Linux: Sudo abuse, SUID/SGID binaries, Kernel exploits, Capabilities
   - MITRE ATT&CK mapping for all techniques
   - GTFOBins integration references
+- **Credential Harvesting Engine**: Multi-source credential extraction
+  - Windows: LSASS, SAM, Credential Manager, Browser passwords
+  - Linux: /etc/shadow, SSH keys, GNOME Keyring, Browser credentials
+  - macOS: Keychain, Browser passwords
+  - Cross-platform: Cloud credentials (AWS/Azure/GCP), Git tokens
+  - Sensitivity classification and redaction support
 
 ### 🗂 System Management
 - SQLite session tracking
@@ -164,6 +170,24 @@ ferox privesc enumerate --platform linux --category sudo
 ferox privesc describe uac_bypass
 ```
 
+### Credential Harvesting Engine
+```bash
+# List available harvesters
+ferox creds list --platform windows
+
+# Harvest credentials (safe mode)
+ferox creds harvest --platform linux --category all
+
+# Filter by category
+ferox creds harvest --platform windows --category browser
+
+# Show harvester details
+ferox creds describe lsass_memory
+
+# Show harvested credentials
+ferox creds show
+```
+
 ## 🎨 Interface — Mixed Predator Theme
 - Dark, high-contrast security palette
 - Minimal animations (calm UI)
@@ -180,7 +204,7 @@ SAFE_MODE=1 ferox console
 ```text
 Ferox CLI Integration Layer
        ↓
-[doctor, memory, c2, sessions, persist, privesc, console]
+[doctor, memory, c2, sessions, persist, privesc, creds, console]
        ↓
 Module Registry & Session Manager
        ↓
@@ -192,6 +216,7 @@ Security Engine (Async Rust)
 │  Smart Payload Engine (AES-256-GCM, HKDF, Multi-Stage)      │
 │  Persistence Engine (14 methods, 3 platforms)               │
 │  Privilege Escalation Engine (7 enumerators, 2+ exploits)   │
+│  Credential Harvesting Engine (12 harvesters, 3 platforms)  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -203,7 +228,7 @@ Security Engine (Async Rust)
 | Exploit | 4 | Authorized exploitation |
 | **Payloads** | 3 | Smart payload generation with encryption |
 | Memory Forensics | 8 | Volatility3 workflows |
-| **Post-Exploitation** | 14+ | Persistence (14 methods), PrivEsc (7 enumerators) |
+| **Post-Exploitation** | 33+ | Persistence (14), PrivEsc (7), Credentials (12) |
 | C2 & Evasion | 12 | Communication & stealth |
 | Auxiliary | 5 | Utility modules |
 
@@ -258,7 +283,7 @@ ferox doctor check --format markdown
 ## 🛣️ Roadmap
 - [x] v2.0.0 – Memory forensics engine
 - [x] **Phase 4** – Smart Payload System with execution command generators
-- [x] **Phase 5** – Persistence & Privilege Escalation Engines
+- [x] **Phase 5** – Post-Exploitation Engines (Persistence, PrivEsc, Credentials)
 - [ ] Signed plugin marketplace
 - [ ] Web operator dashboard
 - [ ] Hardware-backed credential vault

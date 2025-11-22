@@ -3,5 +3,6 @@
 
 pub mod browser;
 pub mod credential_collector;
+pub mod credential_harvester;
 pub mod persistence;
 pub mod privilege_escalation;
