@@ -1,25 +1,149 @@
-# Rust
+# ==========================================
+# Rust / Cargo
+# ==========================================
 /target/
+**/target/
 **/*.rs.bk
 *.pdb
-Cargo.lock
+*.dSYM/
 
-# IDE
+# Note: Cargo.lock is committed for applications (reproducible builds)
+# Uncomment to ignore: Cargo.lock
+
+# Tauri backend
+src-tauri/target/
+src-tauri/gen/
+src-tauri/tauri-build/
+src-tauri/*.log
+
+# Ferox desktop
+ferox-desktop/src-tauri/target/
+ferox-desktop/src-tauri/gen/
+
+# ==========================================
+# Node / Frontend
+# ==========================================
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+
+# ==========================================
+# Build Artifacts
+# ==========================================
+# Vite / Bundles
+dist/
+**/dist/
+build/
+**/build/
+.output/
+
+# Compressed artifacts
+*.map
+*.gz
+*.br
+*.zip
+*.tgz
+*.xz
+*.tar.gz
+
+# ==========================================
+# IDE / Editors
+# ==========================================
+# VSCode
 .vscode/
+*.code-workspace
+
+# JetBrains (IntelliJ, WebStorm, RustRover)
 .idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
 *.swp
 *.swo
-*~
+.*.sw[a-z]
+
+# Emacs
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Operating System
+# ==========================================
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 
-# Logs
-*.log
-ferox.log
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
 
-# Database
+# Linux
+.directory
+.Trash-*
+
+# Temp files (all platforms)
+*~
+
+# ==========================================
+# Databases
+# ==========================================
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+*.db-journal
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+logs/
+**/logs/
+
+# Specific log files
+ferox.log
+audit.log
+
+# ==========================================
+# Ferox C2 Operational Data
+# ==========================================
+# Session data (sensitive!)
+session_data/
+sessions/
+**/session_data/
+
+# Workspace cache
+workspace_cache/
+.workspace/
+
+# Audit logs (may contain sensitive info)
+audit/
+**/audit/
+
+# Captured credentials (DO NOT COMMIT!)
+credentials/
+creds/
+loot/
+
+# Payloads (generated binaries)
+payloads/
+generated_payloads/
 
 # Results & Reports
 results/
@@ -27,16 +151,117 @@ reports/
 output/
 scans/
 
-# Temporary
+# ==========================================
+# Configuration (Sensitive)
+# ==========================================
+# User-specific Ferox config
+ferox.toml
+config.local.toml
+*.local.toml
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+**/.env
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# ==========================================
+# Temporary Files
+# ==========================================
 tmp/
 temp/
+**/tmp/
+**/temp/
 
-# OS
-Thumbs.db
-.DS_Store
+# Cache directories
+.cache/
+**/cache/
 
-# Ferox specific
-ferox.toml
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.old
 
-# dashboard-server/static/package.json
-dashboard-server/static/node_modules/
+# ==========================================
+# Testing
+# ==========================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ==========================================
+# macOS Security (Tauri specific)
+# ==========================================
+# Keychain items
+*.keychain
+*.keychain-db
+
+# Code signing
+codesign.log
+embedded.provisionprofile
+
+# ==========================================
+# Tauri Bundle Artifacts
+# ==========================================
+# Tauri build outputs
+src-tauri/target/release/bundle/
+ferox-desktop/src-tauri/target/release/bundle/
+
+# Platform-specific builds
+*.app/
+*.dmg
+*.exe
+*.msi
+*.deb
+*.rpm
+*.AppImage
+
+# ==========================================
+# Rust-specific
+# ==========================================
+# Incremental compilation
+**/*.rmeta
+
+# Profiling
+*.profraw
+*.profdata
+
+# ==========================================
+# Documentation Build
+# ==========================================
+/target/doc/
+**/target/doc/
+book/
+mdbook/
+
+# ==========================================
+# Lock Files
+# ==========================================
+# Note: Lock files ARE committed (for reproducible builds)
+# Uncomment to ignore:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ==========================================
+# Custom User Data
+# ==========================================
+# User's personal notes/scripts
+notes/
+scripts/personal/
+TODO.personal.md
+
+# ==========================================
+# Archive (cleanup backups)
+# ==========================================
+archive/

@@ -1,19 +1,0 @@
-Ferox Framework
-
-------------------[ SYSTEM INITIALIZATION ]------------------
-✓ Core engine initialized
-✓ Module registry loaded
-✓ 11 modules available
-ℹ 0 sessions tracked (0 active)
-  +  READY: Ferox is ready to hunt
-
-ℹ 🦊 Type 'help' for available commands
-ℹ 🔥 Type 'modules' to list all modules
-ℹ ⚡ Fast. Fierce. Fearless.
-
-[?2004h[?2026h[Kferox> [7C[?2026l[?2004l
-ℹ Use 'exit' or Ctrl+D to quit
-[?2004h[?2026h[Kferox> [7C[?2026lecho "exit" | timeout 2 ./target/debug/ferox 2>&1 || true[?2004l
-✗ Unknown command: echo
-ℹ Type 'help' for available commands
-[?2004h[?2026h[Kferox> [7C[?2026l

@@ -1,6 +1,6 @@
 # 🦊 Ferox Framework
 
-[![Rust](https://img.shields.io/badge/Rust-1.70%2B-orange)]()
+[![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange)]()
 [![License](https://img.shields.io/badge/License-MIT-blue)]()
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)]()
 
@@ -272,20 +272,40 @@ ferox doctor check --format markdown
 - Safe mode for high-risk modules
 - Policy-based access control
 
+## 🖥️ Ferox Desktop
+
+A professional C2 operations console built with Tauri and React:
+
+```bash
+cd ferox-desktop
+npm install
+cargo tauri dev     # Development
+cargo tauri build   # Production build
+```
+
+**Features:**
+- Real-time session management with live updates
+- Integrated terminal with command history
+- Post-exploitation module dashboard
+- Session tree visualization
+- Dark theme optimized for operations
+
+See [Desktop Documentation](docs/developer/architecture.md) for details.
+
 ## 📚 Documentation
-- docs/overview.md — Architecture & mission
-- docs/console.md — Console usage
-- docs/modules.md — Module catalog
-- docs/memory-forensics.md — Memory workflow
-- docs/c2.md — Command & control layer
-- docs/maintenance.md — Ferox Doctor
+
+- [docs/README.md](docs/README.md) — Documentation index
+- [docs/INSTALLATION.md](docs/INSTALLATION.md) — Installation guide
+- [docs/user-guide/](docs/user-guide/) — End-user documentation
+- [docs/developer/](docs/developer/) — Developer documentation
+- [docs/api/](docs/api/) — API reference
 
 ## 🛣️ Roadmap
 - [x] v2.0.0 – Memory forensics engine
 - [x] **Phase 4** – Smart Payload System with execution command generators
 - [x] **Phase 5** – Post-Exploitation Engines (Persistence, PrivEsc, Credentials)
+- [x] **Phase 6** – Ferox Desktop (Tauri + React operations console)
 - [ ] Signed plugin marketplace
-- [ ] Web operator dashboard
 - [ ] Hardware-backed credential vault
 - [ ] Extended evasion techniques
 

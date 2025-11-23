@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "dashboard-server"]
+members = [".", "ferox-desktop/src-tauri"]
 resolver = "2"
 
 [package]

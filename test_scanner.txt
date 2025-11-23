@@ -1,5 +1,0 @@
-use scanner/http_scanner
-set RHOSTS https://www.google.com
-set PATHS /,/search
-run
-exit
