@@ -1,6 +1,7 @@
 import { useAppStore } from '../store';
 import { Wifi, WifiOff, Monitor, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { ThemeToggle } from './ThemeToggle';
 
 export function StatusBar() {
   const { sessions } = useAppStore();
@@ -18,23 +19,23 @@ export function StatusBar() {
   }, []);
 
   return (
-    <footer className="h-6 bg-dark-800 border-t border-dark-600 flex items-center px-3 text-xs text-text-muted select-none">
+    <footer className="h-6 bg-[var(--bg-secondary)] border-t border-[var(--border-primary)] flex items-center px-3 text-xs text-[var(--text-muted)] select-none">
       {/* Connection status */}
       <div className="flex items-center gap-1.5">
         {connected ? (
           <>
-            <Wifi size={12} className="text-ferox-green" />
+            <Wifi size={12} className="text-[var(--color-ferox-green)]" />
             <span>Connected</span>
           </>
         ) : (
           <>
-            <WifiOff size={12} className="text-danger" />
-            <span className="text-danger">Disconnected</span>
+            <WifiOff size={12} className="text-[var(--color-error)]" />
+            <span className="text-[var(--color-error)]">Disconnected</span>
           </>
         )}
       </div>
 
-      <div className="w-px h-3 bg-dark-600 mx-3" />
+      <div className="w-px h-3 bg-[var(--border-primary)] mx-3" />
 
       {/* Session count */}
       <div className="flex items-center gap-1.5">
@@ -45,6 +46,11 @@ export function StatusBar() {
       </div>
 
       <div className="flex-1" />
+
+      {/* Theme toggle */}
+      <ThemeToggle compact showLabel />
+
+      <div className="w-px h-3 bg-[var(--border-primary)] mx-3" />
 
       {/* Clock */}
       <div className="flex items-center gap-1.5">

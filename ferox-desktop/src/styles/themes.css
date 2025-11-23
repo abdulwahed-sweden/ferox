@@ -1,0 +1,166 @@
+/* ==========================================
+   Ferox Desktop - Theme System
+   ========================================== */
+
+:root {
+  /* Color Tokens - Light Theme (Default) */
+  --theme-mode: 'light';
+
+  /* Backgrounds */
+  --bg-primary: #F5F5F4;      /* Main background - Warm light gray */
+  --bg-secondary: #E7E5E4;    /* Sidebar background */
+  --bg-panel: #FFFFFF;        /* Panel/card background */
+  --bg-hover: #F3F4F6;        /* Hover states */
+  --bg-active: #E5E7EB;       /* Active states */
+  --bg-input: #FFFFFF;        /* Input fields */
+
+  /* Text Colors */
+  --text-primary: #1C1917;    /* Main text - Stone 900 */
+  --text-secondary: #57534E;  /* Secondary text - Stone 600 */
+  --text-tertiary: #78716C;   /* Tertiary text - Stone 500 */
+  --text-muted: #A8A29E;      /* Muted text - Stone 400 */
+  --text-inverted: #FFFFFF;   /* Text on dark backgrounds */
+
+  /* Borders */
+  --border-primary: #D6D3D1;  /* Main borders - Stone 300 */
+  --border-secondary: #E7E5E4; /* Subtle borders - Stone 200 */
+  --border-focus: #6366F1;    /* Focus states */
+
+  /* Brand Colors */
+  --color-primary: #6366F1;   /* Primary brand - Indigo 500 */
+  --color-primary-hover: #4F46E5; /* Primary hover - Indigo 600 */
+  --color-primary-light: #A5B4FC; /* Primary light - Indigo 300 */
+
+  --color-accent: #38BDF8;    /* Accent - Sky 400 */
+  --color-accent-hover: #0EA5E9; /* Accent hover - Sky 500 */
+
+  --color-success: #10B981;   /* Success - Emerald 500 */
+  --color-warning: #F59E0B;   /* Warning - Amber 500 */
+  --color-error: #EF4444;     /* Error - Red 500 */
+  --color-info: #3B82F6;      /* Info - Blue 500 */
+
+  /* Ferox Brand */
+  --color-ferox-green: #00CC6E; /* Slightly dimmed for light mode */
+  --color-ferox-green-hover: #00B862;
+  --color-ferox-green-dim: #00A858;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  /* Status Colors */
+  --status-online: #10B981;
+  --status-offline: #EF4444;
+  --status-idle: #F59E0B;
+  --status-away: #8B5CF6;
+
+  /* Dark theme specific colors (for components) */
+  --dark-900: #F5F5F4;
+  --dark-800: #E7E5E4;
+  --dark-700: #D6D3D1;
+  --dark-600: #A8A29E;
+  --dark-500: #78716C;
+  --dark-400: #57534E;
+  --dark-300: #44403C;
+}
+
+/* ==========================================
+   Dark Theme
+   ========================================== */
+
+[data-theme='dark'] {
+  --theme-mode: 'dark';
+
+  /* Backgrounds - Refined (less harsh) */
+  --bg-primary: #11182C;      /* Main background - Lighter than old #0A0E27 */
+  --bg-secondary: #131C34;    /* Sidebar - Lighter than old #0A0E27 */
+  --bg-panel: #1A2238;        /* Panel/card background */
+  --bg-hover: #212B45;        /* Hover states */
+  --bg-active: #293552;       /* Active states */
+  --bg-input: #1E2740;        /* Input fields */
+
+  /* Text Colors */
+  --text-primary: #E0E6F0;    /* Main text - Brighter */
+  --text-secondary: #A7AEC4;  /* Secondary text */
+  --text-tertiary: #7E88A3;   /* Tertiary text */
+  --text-muted: #5A6482;      /* Muted text */
+  --text-inverted: #11182C;   /* Text on light backgrounds */
+
+  /* Borders - More visible */
+  --border-primary: #2D3750;  /* Main borders - More visible */
+  --border-secondary: #232D44; /* Subtle borders */
+  --border-focus: #6366F1;    /* Focus states */
+
+  /* Brand Colors - Same but adjusted for dark */
+  --color-primary: #818CF8;   /* Indigo 400 - Brighter for dark */
+  --color-primary-hover: #A5B4FC; /* Indigo 300 */
+  --color-primary-light: #6366F1; /* Indigo 500 */
+
+  --color-accent: #38BDF8;    /* Sky 400 */
+  --color-accent-hover: #7DD3FC; /* Sky 300 */
+
+  --color-success: #34D399;   /* Emerald 400 */
+  --color-warning: #FBBF24;   /* Amber 400 */
+  --color-error: #F87171;     /* Red 400 */
+  --color-info: #60A5FA;      /* Blue 400 */
+
+  /* Ferox Brand - Full brightness in dark mode */
+  --color-ferox-green: #00FF88;
+  --color-ferox-green-hover: #33FFA3;
+  --color-ferox-green-dim: #00CC6E;
+
+  /* Shadows - Darker */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+
+  /* Status Colors - Same */
+  --status-online: #10B981;
+  --status-offline: #EF4444;
+  --status-idle: #F59E0B;
+  --status-away: #8B5CF6;
+
+  /* Dark theme specific colors (for components) */
+  --dark-900: #0a0e17;
+  --dark-800: #0f1525;
+  --dark-700: #151d30;
+  --dark-600: #1a253d;
+  --dark-500: #243049;
+  --dark-400: #2e3b56;
+  --dark-300: #3d4d6a;
+}
+
+/* ==========================================
+   Base Application Styles
+   ========================================== */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for theme switching */
+*:not(.no-transition) {
+  transition: background-color 0.2s ease,
+              color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* Disable transitions during theme toggle to prevent flash */
+.theme-transitioning * {
+  transition: none !important;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(0, 255, 136, 0.3);
+}
+
+[data-theme='light'] ::selection {
+  background: rgba(0, 204, 110, 0.3);
+}

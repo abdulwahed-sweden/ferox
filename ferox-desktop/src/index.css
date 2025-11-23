@@ -1,3 +1,5 @@
+@import './styles/themes.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,8 +7,6 @@
 /* Base styles */
 :root {
   font-family: Inter, system-ui, sans-serif;
-  background-color: #0a0e17;
-  color: #ffffff;
 }
 
 * {
@@ -18,6 +18,8 @@
 body {
   min-height: 100vh;
   overflow: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 #root {
@@ -31,37 +33,39 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #151d30;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3d4d6a;
+  background: var(--border-primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4d5d7a;
-}
-
-/* Selection */
-::selection {
-  background: rgba(0, 255, 136, 0.3);
+  background: var(--text-tertiary);
 }
 
 /* Focus styles */
 :focus-visible {
-  outline: 2px solid #00ff88;
+  outline: 2px solid var(--color-ferox-green);
   outline-offset: 2px;
 }
 
 /* Component classes */
 @layer components {
   .card {
-    @apply bg-dark-700 rounded-lg border border-dark-600 p-4;
+    @apply rounded-lg p-4;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-primary);
   }
 
   .card-hover {
-    @apply card transition-all hover:border-dark-400 hover:shadow-lg;
+    @apply card transition-all;
+  }
+
+  .card-hover:hover {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-lg);
   }
 
   .btn {
@@ -69,23 +73,61 @@ body {
   }
 
   .btn-primary {
-    @apply btn bg-ferox-green text-dark-900 hover:bg-ferox-green-dark;
+    @apply btn;
+    background-color: var(--color-ferox-green);
+    color: var(--dark-900);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-ferox-green-hover);
   }
 
   .btn-danger {
-    @apply btn bg-danger text-white hover:bg-red-600;
+    @apply btn text-white;
+    background-color: var(--color-error);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
   }
 
   .btn-ghost {
-    @apply btn bg-transparent text-text-secondary hover:bg-dark-600 hover:text-text-primary;
+    @apply btn;
+    background-color: transparent;
+    color: var(--text-secondary);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
   }
 
   .btn-outline {
-    @apply btn border border-dark-500 text-text-secondary hover:border-ferox-green hover:text-ferox-green;
+    @apply btn;
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-ferox-green);
+    color: var(--color-ferox-green);
   }
 
   .input {
-    @apply bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-text-primary placeholder:text-text-muted focus:border-ferox-green focus:ring-1 focus:ring-ferox-green outline-none transition-colors;
+    @apply rounded-lg px-3 py-2 outline-none transition-colors;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+  }
+
+  .input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input:focus {
+    border-color: var(--color-ferox-green);
+    box-shadow: 0 0 0 1px var(--color-ferox-green);
   }
 
   .badge {
@@ -93,23 +135,28 @@ body {
   }
 
   .badge-success {
-    @apply bg-ferox-green/20 text-ferox-green;
+    background-color: rgba(0, 255, 136, 0.2);
+    color: var(--color-success);
   }
 
   .badge-warning {
-    @apply bg-warning/20 text-warning;
+    background-color: rgba(251, 191, 36, 0.2);
+    color: var(--color-warning);
   }
 
   .badge-danger {
-    @apply bg-danger/20 text-danger;
+    background-color: rgba(248, 113, 113, 0.2);
+    color: var(--color-error);
   }
 
   .badge-info {
-    @apply bg-info/20 text-info;
+    background-color: rgba(96, 165, 250, 0.2);
+    color: var(--color-info);
   }
 
   .badge-gray {
-    @apply bg-dark-500 text-text-secondary;
+    background-color: var(--bg-hover);
+    color: var(--text-secondary);
   }
 
   /* Session status indicators */
@@ -118,32 +165,33 @@ body {
   }
 
   .status-active {
-    @apply bg-ferox-green animate-pulse;
+    @apply animate-pulse;
+    background-color: var(--color-ferox-green);
   }
 
   .status-sleeping {
-    @apply bg-warning;
+    background-color: var(--color-warning);
   }
 
   .status-dead {
-    @apply bg-danger;
+    background-color: var(--color-error);
   }
 
   /* Privilege colors */
   .priv-user {
-    @apply text-text-secondary;
+    color: var(--text-secondary);
   }
 
   .priv-admin {
-    @apply text-warning;
+    color: var(--color-warning);
   }
 
   .priv-system {
-    @apply text-danger;
+    color: var(--color-error);
   }
 
   .priv-root {
-    @apply text-danger;
+    color: var(--color-error);
   }
 }
 
@@ -157,39 +205,48 @@ body {
 }
 
 .xterm-viewport::-webkit-scrollbar-track {
-  background: #151d30;
+  background: var(--bg-secondary);
 }
 
 .xterm-viewport::-webkit-scrollbar-thumb {
-  background: #3d4d6a;
+  background: var(--border-primary);
   border-radius: 4px;
 }
 
 /* Context menu styling */
 .context-menu {
-  @apply absolute z-50 bg-dark-700 border border-dark-500 rounded-lg shadow-xl py-1 min-w-[200px] animate-fade-in;
+  @apply absolute z-50 rounded-lg shadow-xl py-1 min-w-[200px] animate-fade-in;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-primary);
 }
 
 .context-menu-item {
-  @apply px-3 py-2 text-sm text-text-secondary hover:bg-dark-600 hover:text-text-primary cursor-pointer flex items-center gap-2 transition-colors;
+  @apply px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors;
+  color: var(--text-secondary);
+}
+
+.context-menu-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .context-menu-divider {
-  @apply border-t border-dark-600 my-1;
+  @apply my-1;
+  border-top: 1px solid var(--border-secondary);
 }
 
 .context-menu-header {
-  @apply px-3 py-1.5 text-xs font-semibold text-text-muted uppercase tracking-wider;
+  @apply px-3 py-1.5 text-xs font-semibold uppercase tracking-wider;
+  color: var(--text-muted);
 }
 
 /* Skeleton loading animation */
 .skeleton {
-  @apply bg-dark-600;
   background: linear-gradient(
     90deg,
-    #1e293b 0%,
-    #334155 50%,
-    #1e293b 100%
+    var(--bg-hover) 0%,
+    var(--bg-active) 50%,
+    var(--bg-hover) 100%
   );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite;
@@ -218,4 +275,81 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.15s ease-out;
+}
+
+/* Theme-aware utility classes */
+@layer utilities {
+  .bg-dark-900 {
+    background-color: var(--dark-900);
+  }
+  .bg-dark-800 {
+    background-color: var(--dark-800);
+  }
+  .bg-dark-700 {
+    background-color: var(--dark-700);
+  }
+  .bg-dark-600 {
+    background-color: var(--dark-600);
+  }
+  .bg-dark-500 {
+    background-color: var(--dark-500);
+  }
+
+  .border-dark-600 {
+    border-color: var(--border-primary);
+  }
+  .border-dark-500 {
+    border-color: var(--border-secondary);
+  }
+  .border-dark-400 {
+    border-color: var(--text-tertiary);
+  }
+
+  .text-text-primary {
+    color: var(--text-primary);
+  }
+  .text-text-secondary {
+    color: var(--text-secondary);
+  }
+  .text-text-muted {
+    color: var(--text-muted);
+  }
+
+  .text-ferox-green {
+    color: var(--color-ferox-green);
+  }
+  .bg-ferox-green {
+    background-color: var(--color-ferox-green);
+  }
+  .text-ferox-green-dark {
+    color: var(--color-ferox-green-dim);
+  }
+  .bg-ferox-green-dark {
+    background-color: var(--color-ferox-green-dim);
+  }
+
+  .text-danger {
+    color: var(--color-error);
+  }
+  .bg-danger {
+    background-color: var(--color-error);
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .text-info {
+    color: var(--color-info);
+  }
+  .bg-info {
+    background-color: var(--color-info);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+  .bg-success {
+    background-color: var(--color-success);
+  }
 }

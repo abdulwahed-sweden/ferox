@@ -4,30 +4,55 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Ferox brand colors
-        'ferox-green': '#00ff88',
-        'ferox-green-dark': '#00cc6a',
-        // Dark theme palette
+        // Ferox brand colors (CSS variables)
+        'ferox-green': 'var(--color-ferox-green)',
+        'ferox-green-dark': 'var(--color-ferox-green-dim)',
+        // Dark theme palette (CSS variables for theme support)
         dark: {
-          900: '#0a0e17',
-          800: '#0f1525',
-          700: '#151d30',
-          600: '#1a253d',
-          500: '#243049',
-          400: '#2e3b56',
-          300: '#3d4d6a',
+          900: 'var(--dark-900)',
+          800: 'var(--dark-800)',
+          700: 'var(--dark-700)',
+          600: 'var(--dark-600)',
+          500: 'var(--dark-500)',
+          400: 'var(--dark-400)',
+          300: 'var(--dark-300)',
         },
-        // Semantic colors
-        danger: '#ff3366',
-        warning: '#ffaa00',
-        info: '#00ccff',
-        success: '#00ff88',
-        // Text colors
+        // Semantic colors (CSS variables)
+        danger: 'var(--color-error)',
+        warning: 'var(--color-warning)',
+        info: 'var(--color-info)',
+        success: 'var(--color-success)',
+        // Text colors (CSS variables)
         text: {
-          primary: '#ffffff',
-          secondary: '#a0aec0',
-          muted: '#6b7a90',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
         },
+        // Additional theme-aware colors
+        primary: 'var(--color-primary)',
+        accent: 'var(--color-accent)',
+      },
+      backgroundColor: {
+        // Theme-aware background colors
+        'theme-primary': 'var(--bg-primary)',
+        'theme-secondary': 'var(--bg-secondary)',
+        'theme-panel': 'var(--bg-panel)',
+        'theme-hover': 'var(--bg-hover)',
+        'theme-active': 'var(--bg-active)',
+        'theme-input': 'var(--bg-input)',
+      },
+      borderColor: {
+        // Theme-aware border colors
+        'theme-primary': 'var(--border-primary)',
+        'theme-secondary': 'var(--border-secondary)',
+        'theme-focus': 'var(--border-focus)',
+      },
+      boxShadow: {
+        // Theme-aware shadows
+        'theme-sm': 'var(--shadow-sm)',
+        'theme-md': 'var(--shadow-md)',
+        'theme-lg': 'var(--shadow-lg)',
+        'theme-xl': 'var(--shadow-xl)',
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
