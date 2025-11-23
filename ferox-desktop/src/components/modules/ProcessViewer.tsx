@@ -1,65 +1,68 @@
-import { useState, useCallback, useMemo } from 'react';
+/**
+ * ProcessViewer - Simulated Process List
+ * For demo/training purposes only - no real process access
+ */
+
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Square,
   RefreshCw,
   Search,
   Cpu,
   HardDrive,
+  Activity,
+  Shield,
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import toast from 'react-hot-toast';
 import { Spinner } from '../Loading';
-
-interface ProcessInfo {
-  pid: number;
-  name: string;
-  user: string;
-  cpu: number;
-  memory: number;
-  status: 'running' | 'sleeping' | 'stopped';
-  command: string;
-}
+import { simulateProcessList } from '../../lib/tauri';
+import type { SimulatedProcess, ProcessListResult } from '../../types';
 
 interface ProcessViewerProps {
   sessionId: string;
 }
 
-// Mock data for demonstration
-const mockProcesses: ProcessInfo[] = [
-  { pid: 1, name: 'systemd', user: 'root', cpu: 0.1, memory: 0.5, status: 'running', command: '/sbin/init' },
-  { pid: 234, name: 'sshd', user: 'root', cpu: 0.0, memory: 0.3, status: 'running', command: '/usr/sbin/sshd -D' },
-  { pid: 456, name: 'bash', user: 'user', cpu: 0.0, memory: 0.2, status: 'sleeping', command: '-bash' },
-  { pid: 789, name: 'nginx', user: 'www-data', cpu: 0.5, memory: 1.2, status: 'running', command: 'nginx: worker process' },
-  { pid: 1024, name: 'python3', user: 'user', cpu: 2.3, memory: 4.5, status: 'running', command: 'python3 app.py' },
-  { pid: 1337, name: 'implant', user: 'user', cpu: 0.1, memory: 0.8, status: 'running', command: './update_service' },
-  { pid: 2048, name: 'mysql', user: 'mysql', cpu: 1.5, memory: 8.2, status: 'running', command: '/usr/sbin/mysqld' },
-  { pid: 3000, name: 'node', user: 'user', cpu: 3.2, memory: 5.6, status: 'running', command: 'node server.js' },
-];
-
 export function ProcessViewer({ sessionId }: ProcessViewerProps) {
-  const [processes, setProcesses] = useState<ProcessInfo[]>(mockProcesses);
+  const [result, setResult] = useState<ProcessListResult | null>(null);
+  const [processes, setProcesses] = useState<SimulatedProcess[]>([]);
   const [selectedPid, setSelectedPid] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState<keyof ProcessInfo>('cpu');
+  const [sortField, setSortField] = useState<keyof SimulatedProcess>('cpu');
   const [sortDesc, setSortDesc] = useState(true);
 
-  const handleRefresh = useCallback(() => {
+  const loadProcesses = useCallback(async () => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setProcesses(mockProcesses); // Would fetch from backend
+    try {
+      const data = await simulateProcessList(sessionId);
+      setResult(data);
+      setProcesses(data.processes);
+    } catch (error) {
+      console.error('Failed to load processes:', error);
+      toast.error('Failed to enumerate processes');
+    } finally {
       setLoading(false);
-    }, 500);
-  }, []);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    loadProcesses();
+  }, [loadProcesses]);
+
+  const handleRefresh = useCallback(() => {
+    loadProcesses();
+  }, [loadProcesses]);
 
   const handleKillProcess = useCallback(() => {
     if (selectedPid) {
-      console.log('Kill process:', selectedPid);
-      // Would send kill signal via Tauri
+      setProcesses(prev => prev.filter(p => p.pid !== selectedPid));
+      toast.success(`Process ${selectedPid} terminated (simulated)`);
+      setSelectedPid(null);
     }
   }, [selectedPid]);
 
-  const handleSort = useCallback((field: keyof ProcessInfo) => {
+  const handleSort = useCallback((field: keyof SimulatedProcess) => {
     if (sortField === field) {
       setSortDesc(!sortDesc);
     } else {
@@ -98,11 +101,20 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
     return result;
   }, [processes, searchQuery, sortField, sortDesc]);
 
-  const totalCpu = useMemo(() => processes.reduce((sum, p) => sum + p.cpu, 0), [processes]);
-  const totalMemory = useMemo(() => processes.reduce((sum, p) => sum + p.memory, 0), [processes]);
+  const totalCpu = result?.total_cpu ?? 0;
+  const totalMemory = result?.total_memory ?? 0;
 
   return (
     <div className="h-full flex flex-col bg-dark-900">
+      {/* Header */}
+      <div className="p-3 border-b border-dark-600 bg-dark-800">
+        <div className="flex items-center gap-2">
+          <Activity className="text-green-400" size={18} />
+          <h2 className="text-sm font-semibold text-text-primary">Process Viewer</h2>
+          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">SIMULATION</span>
+        </div>
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-2 bg-dark-800 border-b border-dark-600">
         <button
@@ -110,7 +122,7 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
           className="p-1.5 hover:bg-dark-600 rounded transition-colors"
           title="Refresh"
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </button>
         <button
           onClick={handleKillProcess}
@@ -137,12 +149,16 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
         {/* Stats */}
         <div className="flex items-center gap-3 pl-3 border-l border-dark-600 text-xs text-text-muted">
           <div className="flex items-center gap-1">
-            <Cpu size={12} />
+            <Cpu size={12} className={totalCpu > 50 ? 'text-red-400' : 'text-green-400'} />
             <span>{totalCpu.toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-1">
-            <HardDrive size={12} />
+            <HardDrive size={12} className={totalMemory > 50 ? 'text-red-400' : 'text-green-400'} />
             <span>{totalMemory.toFixed(1)}%</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Activity size={12} />
+            <span>{processes.length} procs</span>
           </div>
         </div>
       </div>
@@ -187,6 +203,7 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                 >
                   MEM% {sortField === 'memory' && (sortDesc ? '↓' : '↑')}
                 </th>
+                <th className="text-left p-2 font-medium w-20">Threads</th>
                 <th className="text-left p-2 font-medium">Status</th>
               </tr>
             </thead>
@@ -196,7 +213,8 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                   key={proc.pid}
                   className={clsx(
                     'cursor-pointer hover:bg-dark-700 transition-colors',
-                    selectedPid === proc.pid && 'bg-dark-600'
+                    selectedPid === proc.pid && 'bg-dark-600',
+                    proc.is_implant && 'bg-ferox-green/5'
                   )}
                   onClick={() => setSelectedPid(proc.pid)}
                 >
@@ -204,27 +222,33 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                   <td className="p-2">
                     <div className="flex items-center gap-2">
                       <span className="text-text-primary">{proc.name}</span>
-                      {proc.name === 'implant' && (
-                        <span className="text-xs px-1 bg-ferox-green/20 text-ferox-green rounded">
+                      {proc.is_implant && (
+                        <span className="text-xs px-1.5 py-0.5 bg-ferox-green/20 text-ferox-green rounded flex items-center gap-1">
+                          <Shield size={10} />
                           ours
                         </span>
                       )}
                     </div>
+                    <div className="text-xs text-text-muted truncate max-w-xs" title={proc.command}>
+                      {proc.command}
+                    </div>
                   </td>
                   <td className="p-2 text-text-muted">{proc.user}</td>
-                  <td className={clsx('p-2 text-right', proc.cpu > 2 && 'text-warning')}>
+                  <td className={clsx('p-2 text-right', proc.cpu > 2 && 'text-yellow-400', proc.cpu > 5 && 'text-red-400')}>
                     {proc.cpu.toFixed(1)}
                   </td>
-                  <td className={clsx('p-2 text-right', proc.memory > 5 && 'text-warning')}>
+                  <td className={clsx('p-2 text-right', proc.memory > 5 && 'text-yellow-400', proc.memory > 10 && 'text-red-400')}>
                     {proc.memory.toFixed(1)}
                   </td>
+                  <td className="p-2 text-text-muted">{proc.threads}</td>
                   <td className="p-2">
                     <span
                       className={clsx(
                         'text-xs px-1.5 py-0.5 rounded',
                         proc.status === 'running' && 'bg-ferox-green/20 text-ferox-green',
-                        proc.status === 'sleeping' && 'bg-info/20 text-info',
-                        proc.status === 'stopped' && 'bg-danger/20 text-danger'
+                        proc.status === 'sleeping' && 'bg-blue-500/20 text-blue-400',
+                        proc.status === 'stopped' && 'bg-red-500/20 text-red-400',
+                        proc.status === 'zombie' && 'bg-purple-500/20 text-purple-400'
                       )}
                     >
                       {proc.status}
@@ -244,3 +268,5 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
     </div>
   );
 }
+
+export default ProcessViewer;

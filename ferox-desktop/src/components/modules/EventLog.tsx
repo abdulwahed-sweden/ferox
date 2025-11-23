@@ -3,64 +3,64 @@
  * For demo/training purposes only
  */
 
-import { useState, useEffect, useRef } from 'react';
-import { FileText, Pause, Play, Trash2, Download } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { FileText, Pause, Play, Trash2, Download, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
+import toast from 'react-hot-toast';
+import { simulateEventLog } from '../../lib/tauri';
+import type { SimulatedLogEntry } from '../../types';
 
-interface LogEntry {
-  id: string;
-  timestamp: Date;
-  level: 'info' | 'warn' | 'error' | 'success' | 'debug';
-  module: string;
-  message: string;
-}
-
-const MODULES = ['Scanner', 'Payload', 'Session', 'C2', 'PrivEsc', 'Creds', 'System'];
-const MESSAGES = {
-  Scanner: ['Port scan completed', 'Host discovered: 192.168.1.x', 'Service identified: SSH', 'Scan timeout on host'],
-  Payload: ['Payload generated successfully', 'Obfuscation applied', 'Signature check passed', 'Build completed'],
-  Session: ['New session established', 'Session heartbeat received', 'Session migrated', 'Session terminated'],
-  C2: ['Beacon received', 'Command queued', 'Response encrypted', 'Channel established'],
-  PrivEsc: ['UAC bypass attempted', 'Token impersonation success', 'Privilege escalation to SYSTEM', 'Enumeration complete'],
-  Creds: ['Credential dump started', 'Hash extracted', 'Token captured', 'Browser passwords retrieved'],
-  System: ['Module loaded', 'Configuration updated', 'Database synced', 'Memory optimized'],
-};
+const MODULES = ['Scanner', 'Payload', 'Session', 'C2', 'PrivEsc', 'Creds', 'Lateral', 'Persist', 'System', 'Network'];
 
 interface EventLogProps {
   sessionId: string;
 }
 
 export function EventLog({ sessionId: _sessionId }: EventLogProps) {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logs, setLogs] = useState<SimulatedLogEntry[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
   const [levelFilter, setLevelFilter] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  // Generate random logs
+  const loadLogs = useCallback(async (append = false) => {
+    if (isPaused && append) return;
+
+    setIsLoading(true);
+    try {
+      const newLogs = await simulateEventLog(append ? 5 : 50);
+
+      if (append) {
+        setLogs(prev => {
+          const combined = [...newLogs.slice(0, 5), ...prev];
+          return combined.slice(0, 200); // Keep max 200 logs
+        });
+      } else {
+        setLogs(newLogs);
+      }
+    } catch (error) {
+      console.error('Failed to load logs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isPaused]);
+
+  // Initial load
+  useEffect(() => {
+    loadLogs(false);
+  }, []);
+
+  // Auto-refresh with simulated new logs
   useEffect(() => {
     if (isPaused) return;
 
     const interval = setInterval(() => {
-      const module = MODULES[Math.floor(Math.random() * MODULES.length)];
-      const messages = MESSAGES[module as keyof typeof MESSAGES];
-      const message = messages[Math.floor(Math.random() * messages.length)];
-      const levels: LogEntry['level'][] = ['info', 'info', 'info', 'success', 'warn', 'debug'];
-      const level = levels[Math.floor(Math.random() * levels.length)];
-
-      const newLog: LogEntry = {
-        id: `${Date.now()}-${Math.random()}`,
-        timestamp: new Date(),
-        level,
-        module,
-        message: message.replace('192.168.1.x', `192.168.1.${Math.floor(Math.random() * 255)}`),
-      };
-
-      setLogs(prev => [...prev.slice(-199), newLog]);
-    }, 1000 + Math.random() * 2000);
+      loadLogs(true);
+    }, 2000 + Math.random() * 2000);
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, loadLogs]);
 
   // Auto-scroll
   useEffect(() => {
@@ -97,11 +97,14 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
     }
   };
 
-  const clearLogs = () => setLogs([]);
+  const clearLogs = () => {
+    setLogs([]);
+    toast.success('Logs cleared');
+  };
 
   const exportLogs = () => {
     const content = filteredLogs
-      .map(log => `[${log.timestamp.toISOString()}] [${log.level.toUpperCase()}] [${log.module}] ${log.message}`)
+      .map(log => `[${new Date(log.timestamp).toISOString()}] [${log.level.toUpperCase()}] [${log.module}] ${log.message}`)
       .join('\n');
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -110,6 +113,7 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
     a.download = `ferox-logs-${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success('Logs exported');
   };
 
   return (
@@ -121,6 +125,7 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
           <h2 className="text-lg font-semibold text-text-primary">Event Log</h2>
           <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">SIMULATION</span>
           <span className="text-xs text-text-muted ml-2">{logs.length} entries</span>
+          {isLoading && <RefreshCw size={12} className="text-cyan-400 animate-spin ml-2" />}
         </div>
       </div>
 
@@ -199,13 +204,16 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
             {filteredLogs.map(log => (
               <div key={log.id} className={clsx('px-4 py-2 hover:bg-dark-800/50', getLevelBg(log.level))}>
                 <span className="text-text-muted">
-                  {log.timestamp.toLocaleTimeString()}
+                  {new Date(log.timestamp).toLocaleTimeString()}
                 </span>
                 <span className={clsx('mx-2 px-1.5 py-0.5 rounded text-[10px] uppercase', getLevelColor(log.level))}>
                   {log.level}
                 </span>
                 <span className="text-purple-400">[{log.module}]</span>
                 <span className="text-text-primary ml-2">{log.message}</span>
+                {log.session_id && (
+                  <span className="text-text-muted ml-2">({log.session_id})</span>
+                )}
               </div>
             ))}
             <div ref={logEndRef} />

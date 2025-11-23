@@ -1,4 +1,9 @@
-import { useState, useCallback } from 'react';
+/**
+ * FileBrowser - Simulated File Browser
+ * For demo/training purposes only - no real file system access
+ */
+
+import { useState, useCallback, useEffect } from 'react';
 import {
   Folder,
   File,
@@ -8,31 +13,19 @@ import {
   RefreshCw,
   Home,
   ArrowUp,
+  Eye,
+  EyeOff,
+  Lock,
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import toast from 'react-hot-toast';
 import { Spinner } from '../Loading';
-
-interface FileEntry {
-  name: string;
-  path: string;
-  type: 'file' | 'directory';
-  size: number;
-  modified: string;
-  permissions: string;
-}
+import { simulateDirectoryListing } from '../../lib/tauri';
+import type { SimulatedFileEntry, DirectoryListing } from '../../types';
 
 interface FileBrowserProps {
   sessionId: string;
 }
-
-// Mock data for demonstration
-const mockFiles: FileEntry[] = [
-  { name: 'Documents', path: '/home/user/Documents', type: 'directory', size: 0, modified: '2024-01-15', permissions: 'drwxr-xr-x' },
-  { name: 'Downloads', path: '/home/user/Downloads', type: 'directory', size: 0, modified: '2024-01-14', permissions: 'drwxr-xr-x' },
-  { name: '.bashrc', path: '/home/user/.bashrc', type: 'file', size: 3526, modified: '2024-01-10', permissions: '-rw-r--r--' },
-  { name: '.ssh', path: '/home/user/.ssh', type: 'directory', size: 0, modified: '2024-01-08', permissions: 'drwx------' },
-  { name: 'notes.txt', path: '/home/user/notes.txt', type: 'file', size: 1024, modified: '2024-01-12', permissions: '-rw-r--r--' },
-];
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return '-';
@@ -43,24 +36,37 @@ function formatSize(bytes: number): string {
 
 export function FileBrowser({ sessionId }: FileBrowserProps) {
   const [currentPath, setCurrentPath] = useState('/home/user');
-  const [files, setFiles] = useState<FileEntry[]>(mockFiles);
+  const [listing, setListing] = useState<DirectoryListing | null>(null);
+  const [files, setFiles] = useState<SimulatedFileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
 
-  const handleNavigate = useCallback((path: string) => {
+  const handleNavigate = useCallback(async (path: string) => {
     setLoading(true);
-    setCurrentPath(path);
-    // Simulate API call
-    setTimeout(() => {
-      setFiles(mockFiles); // Would fetch from backend
+    setSelectedFile(null);
+    try {
+      const result = await simulateDirectoryListing(path, sessionId);
+      setListing(result);
+      setFiles(result.entries);
+      setCurrentPath(result.path);
+    } catch (error) {
+      console.error('Failed to list directory:', error);
+      toast.error('Failed to access directory');
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    handleNavigate(currentPath);
   }, []);
 
   const handleGoUp = useCallback(() => {
-    const parentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
-    handleNavigate(parentPath);
-  }, [currentPath, handleNavigate]);
+    if (listing?.parent) {
+      handleNavigate(listing.parent);
+    }
+  }, [listing, handleNavigate]);
 
   const handleRefresh = useCallback(() => {
     handleNavigate(currentPath);
@@ -68,25 +74,35 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
 
   const handleDownload = useCallback(() => {
     if (selectedFile) {
-      console.log('Download:', selectedFile);
-      // Would trigger file download via Tauri
+      toast.success(`Simulated download: ${selectedFile}`);
     }
   }, [selectedFile]);
 
   const handleUpload = useCallback(() => {
-    console.log('Upload to:', currentPath);
-    // Would open file picker via Tauri
+    toast.success(`Simulated upload to: ${currentPath}`);
   }, [currentPath]);
 
   const handleDelete = useCallback(() => {
     if (selectedFile) {
-      console.log('Delete:', selectedFile);
-      // Would confirm and delete via Tauri
+      setFiles(prev => prev.filter(f => f.path !== selectedFile));
+      setSelectedFile(null);
+      toast.success('File deleted (simulated)');
     }
   }, [selectedFile]);
 
+  const filteredFiles = showHidden ? files : files.filter(f => !f.hidden);
+
   return (
     <div className="h-full flex flex-col bg-dark-900">
+      {/* Header */}
+      <div className="p-3 border-b border-dark-600 bg-dark-800">
+        <div className="flex items-center gap-2">
+          <Folder className="text-yellow-400" size={18} />
+          <h2 className="text-sm font-semibold text-text-primary">File Browser</h2>
+          <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">SIMULATION</span>
+        </div>
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-2 bg-dark-800 border-b border-dark-600">
         <button
@@ -98,7 +114,8 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
         </button>
         <button
           onClick={handleGoUp}
-          className="p-1.5 hover:bg-dark-600 rounded transition-colors"
+          disabled={!listing?.parent}
+          className="p-1.5 hover:bg-dark-600 rounded transition-colors disabled:opacity-50"
           title="Go up"
         >
           <ArrowUp size={16} />
@@ -108,7 +125,17 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
           className="p-1.5 hover:bg-dark-600 rounded transition-colors"
           title="Refresh"
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+        </button>
+        <button
+          onClick={() => setShowHidden(!showHidden)}
+          className={clsx(
+            'p-1.5 rounded transition-colors',
+            showHidden ? 'bg-purple-500/20 text-purple-400' : 'hover:bg-dark-600'
+          )}
+          title={showHidden ? 'Hide hidden files' : 'Show hidden files'}
+        >
+          {showHidden ? <Eye size={16} /> : <EyeOff size={16} />}
         </button>
 
         <div className="flex-1 px-2">
@@ -117,7 +144,7 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
             value={currentPath}
             onChange={(e) => setCurrentPath(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleNavigate(currentPath)}
-            className="w-full px-2 py-1 text-sm bg-dark-700 border border-dark-600 rounded text-text-primary"
+            className="w-full px-2 py-1 text-sm bg-dark-700 border border-dark-600 rounded text-text-primary font-mono"
           />
         </div>
 
@@ -160,34 +187,44 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
               <tr>
                 <th className="text-left p-2 font-medium">Name</th>
                 <th className="text-right p-2 font-medium w-24">Size</th>
-                <th className="text-left p-2 font-medium w-28">Modified</th>
-                <th className="text-left p-2 font-medium w-24">Permissions</th>
+                <th className="text-left p-2 font-medium w-40">Modified</th>
+                <th className="text-left p-2 font-medium w-28">Permissions</th>
+                <th className="text-left p-2 font-medium w-20">Owner</th>
               </tr>
             </thead>
             <tbody>
-              {files.map((file) => (
+              {filteredFiles.map((file) => (
                 <tr
                   key={file.path}
                   className={clsx(
                     'cursor-pointer hover:bg-dark-700 transition-colors',
-                    selectedFile === file.path && 'bg-dark-600'
+                    selectedFile === file.path && 'bg-dark-600',
+                    file.hidden && 'opacity-60'
                   )}
                   onClick={() => setSelectedFile(file.path)}
-                  onDoubleClick={() => file.type === 'directory' && handleNavigate(file.path)}
+                  onDoubleClick={() => file.file_type === 'directory' && handleNavigate(file.path)}
                 >
                   <td className="p-2">
                     <div className="flex items-center gap-2">
-                      {file.type === 'directory' ? (
-                        <Folder size={16} className="text-warning" />
+                      {file.file_type === 'directory' ? (
+                        <Folder size={16} className="text-yellow-400" />
                       ) : (
                         <File size={16} className="text-text-muted" />
                       )}
-                      <span className="text-text-primary">{file.name}</span>
+                      <span className={clsx('text-text-primary', file.hidden && 'italic')}>
+                        {file.name}
+                      </span>
+                      {file.permissions.includes('------') && (
+                        <span title="Restricted"><Lock size={12} className="text-red-400" /></span>
+                      )}
                     </div>
                   </td>
                   <td className="p-2 text-right text-text-muted">{formatSize(file.size)}</td>
-                  <td className="p-2 text-text-muted">{file.modified}</td>
+                  <td className="p-2 text-text-muted">
+                    {new Date(file.modified).toLocaleDateString()}
+                  </td>
                   <td className="p-2 text-text-muted font-mono text-xs">{file.permissions}</td>
+                  <td className="p-2 text-text-muted">{file.owner}</td>
                 </tr>
               ))}
             </tbody>
@@ -196,9 +233,12 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
       </div>
 
       {/* Status bar */}
-      <div className="px-3 py-1.5 bg-dark-800 border-t border-dark-600 text-xs text-text-muted">
-        {files.length} items | Session: {sessionId.slice(0, 8)}...
+      <div className="px-3 py-1.5 bg-dark-800 border-t border-dark-600 text-xs text-text-muted flex items-center justify-between">
+        <span>{filteredFiles.length} items {listing && `| ${formatSize(listing.total_size)}`}</span>
+        <span>Session: {sessionId.slice(0, 8)}...</span>
       </div>
     </div>
   );
 }
+
+export default FileBrowser;

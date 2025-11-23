@@ -4,93 +4,19 @@
  */
 
 import { useState } from 'react';
-import { Radar, Play, RefreshCw, Server, Wifi, Shield } from 'lucide-react';
+import { Radar, Play, RefreshCw, Server, Wifi, Shield, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
-
-interface SimulatedHost {
-  id: string;
-  ip: string;
-  hostname: string;
-  mac: string;
-  os: string;
-  ports: { port: number; service: string; state: string }[];
-  status: 'up' | 'down';
-}
-
-const SIMULATED_HOSTS: SimulatedHost[] = [
-  {
-    id: '1',
-    ip: '192.168.1.1',
-    hostname: 'gateway.local',
-    mac: 'AA:BB:CC:DD:EE:01',
-    os: 'Linux 4.x (Router)',
-    ports: [
-      { port: 22, service: 'SSH', state: 'open' },
-      { port: 80, service: 'HTTP', state: 'open' },
-      { port: 443, service: 'HTTPS', state: 'open' },
-    ],
-    status: 'up',
-  },
-  {
-    id: '2',
-    ip: '192.168.1.10',
-    hostname: 'dc01.corp.local',
-    mac: 'AA:BB:CC:DD:EE:02',
-    os: 'Windows Server 2019',
-    ports: [
-      { port: 53, service: 'DNS', state: 'open' },
-      { port: 88, service: 'Kerberos', state: 'open' },
-      { port: 135, service: 'MSRPC', state: 'open' },
-      { port: 389, service: 'LDAP', state: 'open' },
-      { port: 445, service: 'SMB', state: 'open' },
-      { port: 3389, service: 'RDP', state: 'open' },
-    ],
-    status: 'up',
-  },
-  {
-    id: '3',
-    ip: '192.168.1.20',
-    hostname: 'web01.corp.local',
-    mac: 'AA:BB:CC:DD:EE:03',
-    os: 'Ubuntu 22.04 LTS',
-    ports: [
-      { port: 22, service: 'SSH', state: 'open' },
-      { port: 80, service: 'HTTP', state: 'open' },
-      { port: 443, service: 'HTTPS', state: 'open' },
-      { port: 3306, service: 'MySQL', state: 'filtered' },
-    ],
-    status: 'up',
-  },
-  {
-    id: '4',
-    ip: '192.168.1.50',
-    hostname: 'workstation01',
-    mac: 'AA:BB:CC:DD:EE:04',
-    os: 'Windows 10 Pro',
-    ports: [
-      { port: 135, service: 'MSRPC', state: 'open' },
-      { port: 445, service: 'SMB', state: 'open' },
-      { port: 3389, service: 'RDP', state: 'closed' },
-    ],
-    status: 'up',
-  },
-  {
-    id: '5',
-    ip: '192.168.1.100',
-    hostname: 'unknown',
-    mac: 'AA:BB:CC:DD:EE:05',
-    os: 'Unknown',
-    ports: [],
-    status: 'down',
-  },
-];
+import toast from 'react-hot-toast';
+import { simulateNetworkScan } from '../../lib/tauri';
+import type { SimulatedHost, NetworkScanResult } from '../../types';
 
 interface NetworkScannerProps {
   sessionId: string;
 }
 
-export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
+export function NetworkScanner({ sessionId }: NetworkScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<NetworkScanResult | null>(null);
   const [hosts, setHosts] = useState<SimulatedHost[]>([]);
   const [selectedHost, setSelectedHost] = useState<SimulatedHost | null>(null);
   const [scanRange, setScanRange] = useState('192.168.1.0/24');
@@ -99,14 +25,26 @@ export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
     setIsScanning(true);
     setHosts([]);
     setSelectedHost(null);
+    setScanResult(null);
 
-    // Simulate progressive discovery
-    for (let i = 0; i < SIMULATED_HOSTS.length; i++) {
-      await new Promise(r => setTimeout(r, 500 + Math.random() * 500));
-      setHosts(prev => [...prev, SIMULATED_HOSTS[i]]);
+    try {
+      toast.loading('Scanning network...', { id: 'scan' });
+      const result = await simulateNetworkScan(scanRange, sessionId);
+
+      // Simulate progressive discovery for better UX
+      for (let i = 0; i < result.hosts.length; i++) {
+        await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
+        setHosts(prev => [...prev, result.hosts[i]]);
+      }
+
+      setScanResult(result);
+      toast.success(`Scan complete: ${result.hosts_up} hosts up`, { id: 'scan' });
+    } catch (error) {
+      console.error('Scan failed:', error);
+      toast.error('Scan failed', { id: 'scan' });
+    } finally {
+      setIsScanning(false);
     }
-
-    setIsScanning(false);
   };
 
   const getPortStateColor = (state: string) => {
@@ -116,6 +54,12 @@ export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
       case 'filtered': return 'text-yellow-400';
       default: return 'text-text-muted';
     }
+  };
+
+  const getLatencyColor = (ms: number) => {
+    if (ms < 10) return 'text-green-400';
+    if (ms < 50) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   return (
@@ -163,6 +107,16 @@ export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
             </>
           )}
         </button>
+        {scanResult && (
+          <div className="flex items-center gap-4 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {(scanResult.scan_duration_ms / 1000).toFixed(1)}s
+            </span>
+            <span className="text-green-400">{scanResult.hosts_up} up</span>
+            <span className="text-red-400">{scanResult.hosts_down} down</span>
+          </div>
+        )}
       </div>
 
       {/* Results */}
@@ -189,9 +143,19 @@ export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
                   <div className="flex items-center gap-2">
                     <Server size={14} className={host.status === 'up' ? 'text-green-400' : 'text-red-400'} />
                     <span className="text-sm font-medium text-text-primary">{host.ip}</span>
+                    {host.status === 'up' && (
+                      <span className={clsx('text-xs', getLatencyColor(host.latency_ms))}>
+                        {host.latency_ms.toFixed(1)}ms
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-text-muted mt-1">{host.hostname}</div>
                   <div className="text-xs text-text-muted">{host.os}</div>
+                  {host.status === 'up' && host.ports.length > 0 && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs text-green-400">{host.ports.filter(p => p.state === 'open').length} open</span>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -221,28 +185,56 @@ export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
                     <div className="text-sm text-text-primary">{selectedHost.os}</div>
                   </div>
                   <div>
+                    <div className="text-xs text-text-muted">OS Version</div>
+                    <div className="text-sm text-text-primary">{selectedHost.os_version}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-text-muted">Vendor</div>
+                    <div className="text-sm text-text-primary">{selectedHost.vendor}</div>
+                  </div>
+                  <div>
                     <div className="text-xs text-text-muted">Status</div>
                     <div className={clsx('text-sm', selectedHost.status === 'up' ? 'text-green-400' : 'text-red-400')}>
                       {selectedHost.status.toUpperCase()}
                     </div>
                   </div>
+                  {selectedHost.status === 'up' && (
+                    <>
+                      <div>
+                        <div className="text-xs text-text-muted">Latency</div>
+                        <div className={clsx('text-sm', getLatencyColor(selectedHost.latency_ms))}>
+                          {selectedHost.latency_ms.toFixed(2)} ms
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-text-muted">TTL</div>
+                        <div className="text-sm text-text-primary">{selectedHost.ttl}</div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
                 <h4 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
                   <Shield size={14} />
-                  Open Ports ({selectedHost.ports.length})
+                  Open Ports ({selectedHost.ports.filter(p => p.state === 'open').length})
                 </h4>
                 {selectedHost.ports.length > 0 ? (
                   <div className="space-y-2">
                     {selectedHost.ports.map((port, i) => (
-                      <div key={i} className="flex items-center gap-4 bg-dark-900 rounded p-2">
-                        <span className="text-sm font-mono text-text-primary w-16">{port.port}</span>
-                        <span className="text-sm text-text-secondary flex-1">{port.service}</span>
-                        <span className={clsx('text-xs', getPortStateColor(port.state))}>
-                          {port.state}
-                        </span>
+                      <div key={i} className="bg-dark-900 rounded p-3">
+                        <div className="flex items-center gap-4">
+                          <span className="text-sm font-mono text-text-primary w-16">{port.port}/{port.protocol}</span>
+                          <span className="text-sm text-text-secondary flex-1">{port.service}</span>
+                          <span className={clsx('text-xs px-2 py-0.5 rounded', getPortStateColor(port.state))}>
+                            {port.state}
+                          </span>
+                        </div>
+                        <div className="text-xs text-text-muted mt-1">{port.version}</div>
+                        {port.banner && (
+                          <div className="text-xs text-purple-400 mt-1 font-mono">Banner: {port.banner}</div>
+                        )}
                       </div>
                     ))}
                   </div>

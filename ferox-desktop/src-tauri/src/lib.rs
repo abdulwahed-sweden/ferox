@@ -10,7 +10,7 @@ pub mod session;
 pub mod terminal;
 
 use bridge::FeroxBridge;
-use commands::{module_commands, payload_commands, session_commands, terminal_commands};
+use commands::{module_commands, payload_commands, session_commands, simulation_commands, terminal_commands};
 use security::AuditLogger;
 use terminal::TerminalManager;
 
@@ -143,6 +143,14 @@ pub fn run() {
             payload_commands::generate_simulated_payload,
             payload_commands::get_payload_types,
             payload_commands::get_payload_formats,
+            // Telemetry simulation commands
+            simulation_commands::simulate_network_scan,
+            simulation_commands::simulate_credential_dump,
+            simulation_commands::simulate_event_log,
+            simulation_commands::simulate_scheduled_tasks,
+            simulation_commands::simulate_session_notes,
+            simulation_commands::simulate_directory_listing,
+            simulation_commands::simulate_process_list,
         ])
         .build(tauri::generate_context!())
         .expect("Failed to build Tauri application")

@@ -155,3 +155,62 @@ export async function getPayloadTypes(): Promise<PayloadTypeInfo[]> {
 export async function getPayloadFormats(): Promise<FormatInfo[]> {
   return invoke('get_payload_formats');
 }
+
+// ============================================================================
+// Simulation Telemetry Commands
+// ============================================================================
+
+import type {
+  NetworkScanResult,
+  CredentialDumpResult,
+  SimulatedLogEntry,
+  SimulatedTask,
+  SimulatedNote,
+  DirectoryListing,
+  ProcessListResult,
+} from '../types';
+
+export async function simulateNetworkScan(
+  subnet: string,
+  sessionId: string
+): Promise<NetworkScanResult> {
+  return invoke('simulate_network_scan', { subnet, sessionId });
+}
+
+export async function simulateCredentialDump(
+  sessionId: string,
+  sources: string[] = []
+): Promise<CredentialDumpResult> {
+  return invoke('simulate_credential_dump', { sessionId, sources });
+}
+
+export async function simulateEventLog(
+  count?: number
+): Promise<SimulatedLogEntry[]> {
+  return invoke('simulate_event_log', { count });
+}
+
+export async function simulateScheduledTasks(
+  sessionId: string
+): Promise<SimulatedTask[]> {
+  return invoke('simulate_scheduled_tasks', { sessionId });
+}
+
+export async function simulateSessionNotes(
+  sessionId: string
+): Promise<SimulatedNote[]> {
+  return invoke('simulate_session_notes', { sessionId });
+}
+
+export async function simulateDirectoryListing(
+  path: string,
+  sessionId: string
+): Promise<DirectoryListing> {
+  return invoke('simulate_directory_listing', { path, sessionId });
+}
+
+export async function simulateProcessList(
+  sessionId: string
+): Promise<ProcessListResult> {
+  return invoke('simulate_process_list', { sessionId });
+}

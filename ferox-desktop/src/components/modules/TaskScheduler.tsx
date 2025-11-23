@@ -3,62 +3,39 @@
  * For demo/training purposes only - tasks stored in memory
  */
 
-import { useState } from 'react';
-import { Clock, Plus, Trash2, Play, Pause, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Clock, Plus, Trash2, Play, Pause, CheckCircle, XCircle, AlertCircle, RefreshCw, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
-
-interface ScheduledTask {
-  id: string;
-  name: string;
-  command: string;
-  schedule: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
-  lastRun: Date | null;
-  nextRun: Date;
-  createdAt: Date;
-}
+import { simulateScheduledTasks } from '../../lib/tauri';
+import type { SimulatedTask } from '../../types';
 
 interface TaskSchedulerProps {
   sessionId: string;
 }
 
-export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
-  const [tasks, setTasks] = useState<ScheduledTask[]>([
-    {
-      id: '1',
-      name: 'Beacon Heartbeat',
-      command: 'send_heartbeat()',
-      schedule: 'Every 30 seconds',
-      status: 'running',
-      lastRun: new Date(Date.now() - 30000),
-      nextRun: new Date(Date.now() + 30000),
-      createdAt: new Date(Date.now() - 3600000),
-    },
-    {
-      id: '2',
-      name: 'Credential Harvest',
-      command: 'harvest_creds --all',
-      schedule: 'Every 5 minutes',
-      status: 'pending',
-      lastRun: null,
-      nextRun: new Date(Date.now() + 180000),
-      createdAt: new Date(Date.now() - 1800000),
-    },
-    {
-      id: '3',
-      name: 'Network Scan',
-      command: 'scan 192.168.1.0/24',
-      schedule: 'Once',
-      status: 'completed',
-      lastRun: new Date(Date.now() - 600000),
-      nextRun: new Date(Date.now() + 99999999),
-      createdAt: new Date(Date.now() - 7200000),
-    },
-  ]);
-
+export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
+  const [tasks, setTasks] = useState<SimulatedTask[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTask, setNewTask] = useState({ name: '', command: '', schedule: 'once' });
+
+  const loadTasks = async () => {
+    setIsLoading(true);
+    try {
+      const data = await simulateScheduledTasks(sessionId);
+      setTasks(data);
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+      toast.error('Failed to load scheduled tasks');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTasks();
+  }, [sessionId]);
 
   const handleAddTask = () => {
     if (!newTask.name || !newTask.command) {
@@ -66,15 +43,18 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
       return;
     }
 
-    const task: ScheduledTask = {
-      id: Date.now().toString(),
+    const task: SimulatedTask = {
+      id: `task-${Date.now()}`,
       name: newTask.name,
       command: newTask.command,
       schedule: newTask.schedule === 'once' ? 'Once' : `Every ${newTask.schedule}`,
       status: 'pending',
-      lastRun: null,
-      nextRun: new Date(Date.now() + 60000),
-      createdAt: new Date(),
+      last_run: null,
+      next_run: new Date(Date.now() + 60000).toISOString(),
+      created_at: new Date().toISOString(),
+      run_count: 0,
+      last_result: null,
+      priority: 'normal',
     };
 
     setTasks(prev => [...prev, task]);
@@ -94,7 +74,7 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
       return {
         ...t,
         status: t.status === 'paused' ? 'pending' : 'paused',
-      };
+      } as SimulatedTask;
     }));
   };
 
@@ -120,6 +100,16 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
     }
   };
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical': return 'text-red-400';
+      case 'high': return 'text-orange-400';
+      case 'normal': return 'text-blue-400';
+      case 'low': return 'text-text-muted';
+      default: return 'text-text-muted';
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-dark-900">
       {/* Header */}
@@ -129,14 +119,25 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
             <Clock className="text-orange-400" size={20} />
             <h2 className="text-lg font-semibold text-text-primary">Task Scheduler</h2>
             <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">SIMULATION</span>
+            {isLoading && <RefreshCw size={12} className="text-orange-400 animate-spin ml-2" />}
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-3 py-1.5 bg-orange-500 text-white rounded text-sm font-medium flex items-center gap-1.5 hover:bg-orange-600 transition-colors"
-          >
-            <Plus size={14} />
-            Add Task
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={loadTasks}
+              disabled={isLoading}
+              className="px-3 py-1.5 bg-dark-700 text-text-secondary rounded text-xs font-medium flex items-center gap-1.5 hover:text-text-primary transition-colors"
+            >
+              <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-3 py-1.5 bg-orange-500 text-white rounded text-sm font-medium flex items-center gap-1.5 hover:bg-orange-600 transition-colors"
+            >
+              <Plus size={14} />
+              Add Task
+            </button>
+          </div>
         </div>
         <p className="text-xs text-text-muted mt-1">Simulated task scheduling (memory only)</p>
       </div>
@@ -159,7 +160,10 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
                   <div className="flex items-center gap-3">
                     {getStatusIcon(task.status)}
                     <div>
-                      <div className="text-sm font-medium text-text-primary">{task.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-text-primary">{task.name}</span>
+                        <span title={task.priority}><Zap size={10} className={getPriorityColor(task.priority)} /></span>
+                      </div>
                       <code className="text-xs text-text-muted font-mono">{task.command}</code>
                     </div>
                   </div>
@@ -168,7 +172,7 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
                   </span>
                 </div>
 
-                <div className="mt-3 grid grid-cols-3 gap-4 text-xs">
+                <div className="mt-3 grid grid-cols-4 gap-4 text-xs">
                   <div>
                     <div className="text-text-muted">Schedule</div>
                     <div className="text-text-primary">{task.schedule}</div>
@@ -176,16 +180,29 @@ export function TaskScheduler({ sessionId: _sessionId }: TaskSchedulerProps) {
                   <div>
                     <div className="text-text-muted">Last Run</div>
                     <div className="text-text-primary">
-                      {task.lastRun ? task.lastRun.toLocaleTimeString() : 'Never'}
+                      {task.last_run ? new Date(task.last_run).toLocaleTimeString() : 'Never'}
                     </div>
                   </div>
                   <div>
                     <div className="text-text-muted">Next Run</div>
                     <div className="text-text-primary">
-                      {task.status === 'completed' ? 'N/A' : task.nextRun.toLocaleTimeString()}
+                      {task.status === 'completed' ? 'N/A' : new Date(task.next_run).toLocaleTimeString()}
                     </div>
                   </div>
+                  <div>
+                    <div className="text-text-muted">Run Count</div>
+                    <div className="text-text-primary">{task.run_count}</div>
+                  </div>
                 </div>
+
+                {task.last_result && (
+                  <div className="mt-2 text-xs">
+                    <span className="text-text-muted">Result: </span>
+                    <span className={task.last_result.includes('Error') ? 'text-red-400' : 'text-green-400'}>
+                      {task.last_result}
+                    </span>
+                  </div>
+                )}
 
                 <div className="mt-3 flex items-center gap-2 border-t border-dark-600 pt-3">
                   <button

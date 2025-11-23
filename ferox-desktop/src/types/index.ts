@@ -233,3 +233,145 @@ export interface FormatInfo {
   os: string[];
   description: string;
 }
+
+// ============================================================================
+// Simulation Telemetry Types
+// ============================================================================
+
+// Network Scanner
+export interface SimulatedPort {
+  port: number;
+  protocol: string;
+  service: string;
+  version: string;
+  state: 'open' | 'closed' | 'filtered';
+  banner: string | null;
+}
+
+export interface SimulatedHost {
+  id: string;
+  ip: string;
+  hostname: string;
+  mac: string;
+  os: string;
+  os_version: string;
+  vendor: string;
+  ports: SimulatedPort[];
+  status: 'up' | 'down';
+  latency_ms: number;
+  ttl: number;
+  last_seen: string;
+}
+
+export interface NetworkScanResult {
+  hosts: SimulatedHost[];
+  scan_duration_ms: number;
+  total_hosts_scanned: number;
+  hosts_up: number;
+  hosts_down: number;
+}
+
+// Credentials Viewer
+export interface SimulatedCredential {
+  id: string;
+  cred_type: 'password' | 'hash' | 'token' | 'certificate' | 'ticket';
+  username: string;
+  domain: string | null;
+  value: string;
+  source: string;
+  sensitivity: 'low' | 'medium' | 'high' | 'critical';
+  cracked: boolean;
+  cracked_value: string | null;
+  last_used: string | null;
+  expires_at: string | null;
+  notes: string | null;
+}
+
+export interface CredentialDumpResult {
+  credentials: SimulatedCredential[];
+  total_found: number;
+  by_type: Record<string, number>;
+  by_sensitivity: Record<string, number>;
+}
+
+// Event Log
+export interface SimulatedLogEntry {
+  id: string;
+  timestamp: string;
+  level: 'info' | 'warn' | 'error' | 'success' | 'debug';
+  module: string;
+  message: string;
+  details: string | null;
+  session_id: string | null;
+}
+
+// Task Scheduler
+export interface SimulatedTask {
+  id: string;
+  name: string;
+  command: string;
+  schedule: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
+  last_run: string | null;
+  next_run: string;
+  created_at: string;
+  run_count: number;
+  last_result: string | null;
+  priority: 'low' | 'normal' | 'high' | 'critical';
+}
+
+// Notes
+export interface SimulatedNote {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  pinned: boolean;
+  color: string | null;
+}
+
+// File Browser
+export interface SimulatedFileEntry {
+  name: string;
+  path: string;
+  file_type: 'file' | 'directory';
+  size: number;
+  modified: string;
+  permissions: string;
+  owner: string;
+  group: string;
+  hidden: boolean;
+  executable: boolean;
+}
+
+export interface DirectoryListing {
+  path: string;
+  entries: SimulatedFileEntry[];
+  total_size: number;
+  parent: string | null;
+}
+
+// Process Viewer
+export interface SimulatedProcess {
+  pid: number;
+  ppid: number;
+  name: string;
+  user: string;
+  cpu: number;
+  memory: number;
+  memory_bytes: number;
+  status: 'running' | 'sleeping' | 'stopped' | 'zombie';
+  command: string;
+  threads: number;
+  start_time: string;
+  is_implant: boolean;
+}
+
+export interface ProcessListResult {
+  processes: SimulatedProcess[];
+  total_cpu: number;
+  total_memory: number;
+  process_count: number;
+}
