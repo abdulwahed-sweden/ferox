@@ -1,7 +1,15 @@
 import { useAppStore } from '../store';
 import { Terminal } from './Terminal';
-import { FileBrowser, ProcessViewer } from './modules';
-import { Globe } from 'lucide-react';
+import {
+  FileBrowser,
+  ProcessViewer,
+  NetworkScanner,
+  CredentialsViewer,
+  EventLog,
+  TaskScheduler,
+  Notes
+} from './modules';
+import { PayloadBuilder } from './PayloadBuilder';
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -23,14 +31,20 @@ export function TabContent() {
       return <FileBrowser sessionId={activeTab.sessionId} />;
     case 'processes':
       return <ProcessViewer sessionId={activeTab.sessionId} />;
+    case 'payloads':
+      return <PayloadBuilder />;
     case 'network':
-      return (
-        <div className="h-full flex flex-col items-center justify-center text-text-muted bg-dark-900">
-          <Globe size={48} className="mb-4 opacity-30" />
-          <p className="text-lg">Network Discovery</p>
-          <p className="text-sm mt-2">Coming soon...</p>
-        </div>
-      );
+      return <NetworkScanner sessionId={activeTab.sessionId} />;
+    case 'scanner':
+      return <NetworkScanner sessionId={activeTab.sessionId} />;
+    case 'credentials':
+      return <CredentialsViewer sessionId={activeTab.sessionId} />;
+    case 'eventlog':
+      return <EventLog sessionId={activeTab.sessionId} />;
+    case 'scheduler':
+      return <TaskScheduler sessionId={activeTab.sessionId} />;
+    case 'notes':
+      return <Notes sessionId={activeTab.sessionId} />;
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">

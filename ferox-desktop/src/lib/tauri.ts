@@ -7,6 +7,10 @@ import type {
   CommandResult,
   PrivEscResult,
   CredentialHarvestResult,
+  PayloadConfig,
+  SimulatedPayload,
+  PayloadTypeInfo,
+  FormatInfo,
 } from '../types';
 
 // Session commands
@@ -132,4 +136,22 @@ export async function networkDiscovery(request: {
   ports?: number[];
 }): Promise<{ hosts: unknown[]; output: string }> {
   return invoke('network_discovery', { request });
+}
+
+// ============================================================================
+// Simulated Payload Commands (for demo/training)
+// ============================================================================
+
+export async function generateSimulatedPayload(
+  config: PayloadConfig
+): Promise<SimulatedPayload> {
+  return invoke('generate_simulated_payload', { config });
+}
+
+export async function getPayloadTypes(): Promise<PayloadTypeInfo[]> {
+  return invoke('get_payload_types');
+}
+
+export async function getPayloadFormats(): Promise<FormatInfo[]> {
+  return invoke('get_payload_formats');
 }

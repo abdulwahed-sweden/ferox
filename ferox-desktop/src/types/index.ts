@@ -58,7 +58,17 @@ export interface HistoryEntry {
 }
 
 // Tab types
-export type TabType = 'terminal' | 'filebrowser' | 'processes' | 'network';
+export type TabType =
+  | 'terminal'
+  | 'filebrowser'
+  | 'processes'
+  | 'network'
+  | 'payloads'
+  | 'scanner'
+  | 'credentials'
+  | 'eventlog'
+  | 'scheduler'
+  | 'notes';
 
 export interface Tab {
   id: string;
@@ -133,4 +143,93 @@ export interface CredentialHarvestResult {
   total_found: number;
   by_type: Record<string, number>;
   output: string;
+}
+
+// ============================================================================
+// Simulated Payload Types (for demo/training)
+// ============================================================================
+
+export interface PayloadConfig {
+  payload_type: string;
+  lhost: string;
+  lport: number;
+  target_os: string;
+  format: string;
+  architecture: string;
+  obfuscation: boolean;
+  signing: boolean;
+  staged: boolean;
+  name?: string;
+}
+
+export interface BuildLogEntry {
+  timestamp: string;
+  level: 'info' | 'warn' | 'success';
+  message: string;
+}
+
+export interface RiskFactor {
+  name: string;
+  score: number;
+  description: string;
+}
+
+export interface RiskAnalysis {
+  risk_score: number;
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
+  factors: RiskFactor[];
+  recommendations: string[];
+}
+
+export interface DetectionAnalysis {
+  estimated_detection_rate: number;
+  likely_detectors: string[];
+  behavioral_indicators: string[];
+  network_indicators: string[];
+  evasion_notes: string[];
+}
+
+export interface MitreMapping {
+  technique_id: string;
+  technique_name: string;
+  tactic: string;
+  description: string;
+}
+
+export interface ExecutionHint {
+  name: string;
+  command: string;
+  description: string;
+  os: string;
+}
+
+export interface SimulatedPayload {
+  id: string;
+  name: string;
+  config: PayloadConfig;
+  simulated_path: string;
+  simulated_size_bytes: number;
+  simulated_hash: string;
+  created_at: string;
+  build_log: BuildLogEntry[];
+  risk_analysis: RiskAnalysis;
+  detection_analysis: DetectionAnalysis;
+  mitre_mapping: MitreMapping[];
+  execution_hints: ExecutionHint[];
+}
+
+export interface PayloadTypeInfo {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  risk_level: string;
+}
+
+export interface FormatInfo {
+  id: string;
+  name: string;
+  extension: string;
+  os: string[];
+  description: string;
 }

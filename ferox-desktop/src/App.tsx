@@ -12,7 +12,8 @@ import { Spinner } from './components/Loading';
 import { useTauriEvents } from './hooks/useTauriEvents';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useResizable } from './hooks/useResizable';
-import { Shield, Search, X } from 'lucide-react';
+import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { clsx } from 'clsx';
 
 // Lazy load heavy components for better initial load time
@@ -30,7 +31,33 @@ function App() {
     setSessionsLoading,
     setSessionsError,
     setSidebarWidth,
+    addTab,
+    tabs,
   } = useAppStore();
+
+  // Tools dropdown state
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsRef = useRef<HTMLDivElement>(null);
+
+  // Generic tab opener
+  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes', title: string, icon: string) => {
+    const existing = tabs.find(t => t.type === type);
+    if (existing) {
+      useAppStore.getState().setActiveTab(existing.id);
+      setToolsOpen(false);
+      return;
+    }
+
+    addTab({
+      id: `${type}-${Date.now()}`,
+      type,
+      sessionId: '',
+      title,
+      icon,
+    });
+    setToolsOpen(false);
+  };
+
 
   // Resizable sidebar
   const { size: sidebarWidth, isResizing, handleMouseDown } = useResizable({
@@ -86,17 +113,21 @@ function App() {
     };
   }, [setSessions, setSessionTree, setSessionsLoading, setSessionsError]);
 
-  // Close context menu on click outside
+  // Close context menu and tools dropdown on click outside
   useEffect(() => {
-    const handleClick = () => {
+    const handleClick = (e: MouseEvent) => {
       if (contextMenu.visible) {
         hideContextMenu();
+      }
+      // Close tools dropdown when clicking outside
+      if (toolsOpen && toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
+        setToolsOpen(false);
       }
     };
 
     window.addEventListener('click', handleClick);
     return () => window.removeEventListener('click', handleClick);
-  }, [contextMenu.visible, hideContextMenu]);
+  }, [contextMenu.visible, hideContextMenu, toolsOpen]);
 
   return (
     <div className="h-screen flex flex-col bg-dark-900 text-text-primary">
@@ -113,9 +144,62 @@ function App() {
           <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
             Session
           </button>
-          <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
-            Tools
-          </button>
+          <div className="relative" ref={toolsRef}>
+            <button
+              onClick={() => setToolsOpen(!toolsOpen)}
+              className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
+            >
+              Tools
+              <ChevronDown size={12} className={clsx('transition-transform', toolsOpen && 'rotate-180')} />
+            </button>
+            {toolsOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-xl py-1 min-w-48 z-50">
+                <button
+                  onClick={() => openToolTab('payloads', 'Payload Builder', 'package')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Package size={14} className="text-purple-400" />
+                  Payload Builder
+                </button>
+                <button
+                  onClick={() => openToolTab('scanner', 'Network Scanner', 'radar')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Radar size={14} className="text-blue-400" />
+                  Network Scanner
+                </button>
+                <button
+                  onClick={() => openToolTab('credentials', 'Credentials Viewer', 'key-round')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <KeyRound size={14} className="text-yellow-400" />
+                  Credentials Viewer
+                </button>
+                <div className="h-px bg-dark-600 my-1" />
+                <button
+                  onClick={() => openToolTab('eventlog', 'Event Log', 'file-text')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <FileText size={14} className="text-cyan-400" />
+                  Event Log
+                </button>
+                <button
+                  onClick={() => openToolTab('scheduler', 'Task Scheduler', 'clock')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Clock size={14} className="text-orange-400" />
+                  Task Scheduler
+                </button>
+                <button
+                  onClick={() => openToolTab('notes', 'Notes', 'sticky-note')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <StickyNote size={14} className="text-pink-400" />
+                  Notes
+                </button>
+              </div>
+            )}
+          </div>
           <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
             View
           </button>
