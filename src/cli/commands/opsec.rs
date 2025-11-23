@@ -8,7 +8,7 @@ use clap::{Args, Subcommand, ValueEnum};
 use crate::cli::theme::Theme;
 use crate::core::module::Platform;
 use crate::modules::evasion::opsec::{
-    EdrDetector, EdrType, LolbinExecutor, LogEvasion, MonitoredAction, OpsecConfig, OpsecEngine,
+    EdrDetector, LolbinExecutor, LogEvasion, MonitoredAction, OpsecConfig, OpsecEngine,
     StealthLevel,
 };
 

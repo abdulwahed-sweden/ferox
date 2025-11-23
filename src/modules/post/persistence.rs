@@ -169,7 +169,7 @@ impl PersistenceMethod for RegistryRunPersistence {
         }
     }
 
-    async fn install(&self, session: &Session, payload_path: &str, persistence_name: &str, safe_mode: bool) -> Result<InstallResult> {
+    async fn install(&self, _session: &Session, payload_path: &str, persistence_name: &str, safe_mode: bool) -> Result<InstallResult> {
         let key_path = if self.use_hklm {
             "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
         } else {
@@ -1306,7 +1306,7 @@ impl PersistenceMethod for LoginItemsPersistence {
         bail!("Production mode requires explicit authorization")
     }
 
-    async fn verify(&self, handle: &PersistenceHandle, safe_mode: bool) -> Result<VerifyResult> {
+    async fn verify(&self, _handle: &PersistenceHandle, safe_mode: bool) -> Result<VerifyResult> {
         let cmd = "osascript -e 'tell application \"System Events\" to get the name of every login item'";
 
         if safe_mode {

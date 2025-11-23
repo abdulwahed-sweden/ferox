@@ -37,7 +37,7 @@ impl FeroxDashboard {
                 Constraint::Min(0),
                 Constraint::Length(3),
             ])
-            .split(frame.size());
+            .split(frame.area());
 
         render_header(
             frame,
