@@ -23,8 +23,12 @@ ferox-desktop/src-tauri/gen/
 # ==========================================
 # Node / Frontend
 # ==========================================
+# All node_modules directories (any depth)
+node_modules
 node_modules/
 **/node_modules/
+**/node_modules
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
