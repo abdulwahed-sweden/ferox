@@ -19,10 +19,8 @@ import {
   Loader2,
   FileCode,
   Target,
-  Cpu,
   Lock,
   Eye,
-  EyeOff,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
@@ -36,7 +34,6 @@ import type {
   SimulatedPayload,
   PayloadTypeInfo,
   FormatInfo,
-  BuildLogEntry,
 } from '../types';
 
 export function PayloadBuilder() {
