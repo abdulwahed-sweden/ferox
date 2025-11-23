@@ -1,108 +1,112 @@
 /* ==========================================
-   Ferox Desktop - Enhanced Readability Theme
-   Focus: Maximum text contrast & larger fonts
+   Ferox Desktop - Professional Theme System
+   "Arctic Professional" (Light) + "Midnight Operations" (Dark)
+   Optimized for security tools & extended use
    ========================================== */
 
 @layer base {
   :root {
-    /* Light Theme - ENHANCED CONTRAST */
+    /* ==========================================
+       LIGHT THEME - "Arctic Professional"
+       Clean, corporate, high readability
+       ========================================== */
 
-    /* Backgrounds - Keep light and clean */
-    --background: 220 20% 97%;           /* Light blue-gray */
-    --foreground: 222 47% 11%;           /* VERY DARK - Almost black (previously too light!) */
+    /* Backgrounds - Cool, clean blue-gray */
+    --background: 210 20% 96%;           /* Crisp light gray with cool undertone */
+    --foreground: 220 25% 12%;           /* Soft dark (not pure black - easier on eyes) */
 
-    /* Cards & Panels */
+    /* Cards & Panels - Pure white for clear hierarchy */
     --card: 0 0% 100%;                   /* Pure white */
-    --card-foreground: 222 47% 11%;      /* VERY DARK text on cards */
+    --card-foreground: 220 25% 12%;      /* Matching dark text */
 
     /* Popovers & Dropdowns */
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;   /* VERY DARK */
+    --popover-foreground: 220 25% 12%;
 
-    /* Primary Brand - Darker blue for better contrast */
-    --primary: 217 91% 45%;              /* DARKER blue (was 52%, now 45%) */
-    --primary-foreground: 210 20% 98%;
+    /* Primary Brand - Trustworthy corporate blue */
+    --primary: 215 85% 48%;              /* Professional blue */
+    --primary-foreground: 0 0% 100%;     /* White text on blue */
 
-    /* Secondary Elements - Darker */
-    --secondary: 210 30% 94%;
-    --secondary-foreground: 222 47% 15%; /* MUCH DARKER (was 10%, now 15%) */
+    /* Secondary Elements - Clean, not muddy */
+    --secondary: 210 15% 92%;            /* Light, clean gray */
+    --secondary-foreground: 220 20% 18%; /* Readable dark */
 
-    /* Muted/Subtle - Still readable */
-    --muted: 210 30% 94%;
-    --muted-foreground: 215 16% 35%;     /* DARKER gray (was 46%, now 35%) */
+    /* Muted/Subtle - Balanced visibility */
+    --muted: 210 15% 92%;
+    --muted-foreground: 215 15% 38%;     /* Sweet spot - visible but subtle */
 
-    /* Accent Color */
-    --accent: 210 30% 94%;
-    --accent-foreground: 222 47% 15%;    /* DARKER */
+    /* Accent Color - Subtle blue tint */
+    --accent: 210 25% 90%;
+    --accent-foreground: 220 20% 18%;
 
-    /* Destructive/Error - Darker red */
-    --destructive: 0 84% 50%;            /* DARKER (was 60%, now 50%) */
-    --destructive-foreground: 0 0% 98%;
+    /* Destructive/Error - Refined red */
+    --destructive: 0 72% 48%;            /* Professional, not aggressive */
+    --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs - More visible */
-    --border: 214 31% 70%;               /* DARKER border (was 80%, now 70%) */
-    --input: 214 31% 70%;
-    --ring: 217 91% 45%;                 /* Match primary */
+    /* Borders & Inputs */
+    --border: 214 20% 78%;               /* Visible but not harsh */
+    --input: 214 20% 78%;
+    --ring: 215 85% 48%;                 /* Match primary */
 
-    /* Sidebar - Dark sidebar always */
-    --sidebar-background: 222 47% 11%;   /* Very dark blue-gray */
-    --sidebar-foreground: 210 40% 98%;   /* Light text */
-    --sidebar-primary: 210 40% 98%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 216 34% 17%;       /* Slightly lighter */
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 216 34% 17%;
-    --sidebar-ring: 210 40% 98%;
+    /* Sidebar - Dark sidebar for contrast */
+    --sidebar-background: 220 20% 12%;   /* Deep slate */
+    --sidebar-foreground: 210 15% 95%;   /* Soft white */
+    --sidebar-primary: 210 15% 95%;
+    --sidebar-primary-foreground: 220 20% 12%;
+    --sidebar-accent: 220 18% 18%;
+    --sidebar-accent-foreground: 210 15% 95%;
+    --sidebar-border: 220 18% 18%;
+    --sidebar-ring: 210 15% 95%;
 
-    /* Chart Colors - Darker for visibility */
-    --chart-1: 12 76% 50%;               /* Darker orange */
-    --chart-2: 173 58% 35%;              /* Darker teal */
-    --chart-3: 197 37% 20%;              /* Darker blue */
-    --chart-4: 43 74% 55%;               /* Darker yellow */
-    --chart-5: 27 87% 55%;               /* Darker coral */
+    /* Chart Colors - Professional palette */
+    --chart-1: 215 85% 48%;              /* Primary blue */
+    --chart-2: 162 60% 38%;              /* Teal */
+    --chart-3: 25 85% 45%;               /* Burnt orange */
+    --chart-4: 270 50% 50%;              /* Purple */
+    --chart-5: 152 55% 38%;              /* Green */
 
-    /* Ferox Brand - Professional green, darker */
-    --ferox-green: 160 84% 35%;          /* DARKER emerald (was 39%, now 35%) */
-    --ferox-green-hover: 160 84% 30%;
-    --ferox-green-bright: 160 84% 45%;   /* For special emphasis */
+    /* Ferox Brand - Sophisticated teal-green */
+    --ferox-green: 162 72% 32%;          /* Deep, professional teal */
+    --ferox-green-hover: 162 72% 28%;    /* Darker on hover */
+    --ferox-green-bright: 162 72% 42%;   /* For emphasis */
 
-    /* Status Colors - Darker for light backgrounds */
-    --status-online: 142 76% 32%;        /* DARKER green */
-    --status-offline: 0 84% 50%;         /* DARKER red */
-    --status-idle: 38 92% 45%;           /* DARKER amber */
-    --status-away: 262 83% 50%;          /* DARKER purple */
+    /* Status Colors - Clear, professional */
+    --status-online: 152 60% 32%;        /* Deep green - authority */
+    --status-offline: 0 72% 48%;         /* Refined red */
+    --status-idle: 25 85% 42%;           /* Burnt orange - professional */
+    --status-away: 270 50% 45%;          /* Muted purple */
 
-    /* Icon Colors - MUCH DARKER for visibility */
-    --icon-primary: 222 47% 11%;         /* Very dark (same as foreground) */
-    --icon-secondary: 215 16% 35%;       /* Dark gray */
-    --icon-tertiary: 215 16% 50%;        /* Medium gray */
+    /* Icon Colors - High contrast for visibility */
+    --icon-primary: 220 25% 12%;         /* Match foreground */
+    --icon-secondary: 215 15% 38%;       /* Match muted-foreground */
+    --icon-tertiary: 215 12% 52%;        /* Lighter */
 
-    /* Text Size Scale - LARGER */
-    --text-xs: 0.8125rem;     /* 13px (was 12px) */
-    --text-sm: 0.9375rem;     /* 15px (was 14px) */
-    --text-base: 1.0625rem;   /* 17px (was 16px) */
-    --text-lg: 1.1875rem;     /* 19px (was 18px) */
-    --text-xl: 1.3125rem;     /* 21px (was 20px) */
-    --text-2xl: 1.5625rem;    /* 25px (was 24px) */
+    /* Text Size Scale */
+    --text-xs: 0.8125rem;     /* 13px */
+    --text-sm: 0.9375rem;     /* 15px */
+    --text-base: 1.0625rem;   /* 17px */
+    --text-lg: 1.1875rem;     /* 19px */
+    --text-xl: 1.3125rem;     /* 21px */
+    --text-2xl: 1.5625rem;    /* 25px */
 
-    /* Line Height - More comfortable */
+    /* Line Height */
     --leading-tight: 1.3;
-    --leading-normal: 1.6;     /* Increased from 1.5 */
-    --leading-relaxed: 1.75;   /* Increased from 1.625 */
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.75;
 
     /* Border Radius */
     --radius: 0.5rem;
 
     /* ==========================================
-       Legacy Ferox Variable Mappings
+       Legacy Ferox Variable Mappings (Light)
        ========================================== */
 
     /* Backgrounds */
     --bg-primary: hsl(var(--background));
     --bg-secondary: hsl(var(--secondary));
     --bg-panel: hsl(var(--card));
-    --bg-hover: hsl(210 30% 90%);
-    --bg-active: hsl(210 30% 86%);
+    --bg-hover: hsl(210 18% 88%);
+    --bg-active: hsl(210 18% 84%);
     --bg-input: hsl(var(--card));
 
     /* Text Colors */
@@ -119,17 +123,17 @@
 
     /* Borders */
     --border-primary: hsl(var(--border));
-    --border-secondary: hsl(214.3 31.8% 80%);
-    --border-strong: hsl(214.3 31.8% 60%);
+    --border-secondary: hsl(214 18% 85%);
+    --border-strong: hsl(214 20% 65%);
     --border-focus: hsl(var(--primary));
 
     /* Brand Colors */
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: hsl(217 91% 38%);
-    --color-primary-light: hsl(217 91% 60%);
+    --color-primary-hover: hsl(215 85% 42%);
+    --color-primary-light: hsl(215 85% 58%);
 
     --color-accent: hsl(var(--accent));
-    --color-accent-hover: hsl(210 30% 88%);
+    --color-accent-hover: hsl(210 25% 85%);
 
     /* Semantic Colors */
     --color-success: hsl(var(--status-online));
@@ -142,92 +146,97 @@
     --color-ferox-green-hover: hsl(var(--ferox-green-hover));
     --color-ferox-green-dim: hsl(var(--ferox-green-bright));
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    /* Shadows - Subtle for light theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 
-    /* Dark theme specific colors (for components - inverted for light) */
+    /* Component colors */
     --dark-900: hsl(var(--background));
     --dark-800: hsl(var(--secondary));
-    --dark-700: hsl(210 30% 90%);
+    --dark-700: hsl(210 18% 88%);
     --dark-600: hsl(var(--border));
-    --dark-500: hsl(214.3 31.8% 60%);
+    --dark-500: hsl(214 20% 65%);
     --dark-400: hsl(var(--muted-foreground));
     --dark-300: hsl(var(--secondary-foreground));
   }
 
   [data-theme='dark'] {
-    /* Dark Theme - Keep good contrast */
-    --background: 222 47% 11%;           /* Dark blue-gray */
-    --foreground: 210 40% 98%;           /* Very light text */
+    /* ==========================================
+       DARK THEME - "Midnight Operations"
+       Neutral dark, optimized for long sessions
+       ========================================== */
 
-    /* Cards & Panels */
-    --card: 216 34% 17%;                 /* Lighter than background */
-    --card-foreground: 210 40% 98%;
+    /* Backgrounds - Neutral dark, easy on eyes */
+    --background: 220 18% 10%;           /* Near-black with subtle blue */
+    --foreground: 210 15% 95%;           /* Soft white (not pure white) */
+
+    /* Cards & Panels - Clear layer separation */
+    --card: 220 15% 15%;                 /* Distinct from background */
+    --card-foreground: 210 15% 95%;
 
     /* Popovers & Dropdowns */
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 15% 95%;
 
-    /* Primary Brand */
-    --primary: 217 91% 60%;              /* Brighter blue for dark */
-    --primary-foreground: 222 47% 11%;
+    /* Primary Brand - Bright comfortable blue */
+    --primary: 215 80% 58%;              /* Vibrant but not harsh */
+    --primary-foreground: 220 18% 10%;   /* Dark text on blue */
 
-    /* Secondary Elements */
-    --secondary: 216 34% 17%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary Elements - Subtle elevation */
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 210 15% 92%;
 
     /* Muted/Subtle */
-    --muted: 216 34% 17%;
-    --muted-foreground: 215 28% 70%;     /* Brighter gray for dark */
+    --muted: 220 12% 18%;
+    --muted-foreground: 215 12% 62%;     /* Good contrast ratio */
 
     /* Accent Color */
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 220 15% 20%;
+    --accent-foreground: 210 15% 92%;
 
     /* Destructive/Error */
-    --destructive: 0 63% 40%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 65% 52%;
+    --destructive-foreground: 210 15% 95%;
 
-    /* Borders & Inputs */
-    --border: 216 34% 25%;               /* More visible in dark */
-    --input: 216 34% 25%;
-    --ring: 217 91% 60%;
+    /* Borders & Inputs - Subtle but visible */
+    --border: 220 12% 22%;
+    --input: 220 12% 22%;
+    --ring: 215 80% 58%;
 
-    /* Sidebar */
-    --sidebar-background: 222 47% 8%;    /* Slightly darker than background */
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 40% 98%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 216 34% 20%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 216 34% 20%;
-    --sidebar-ring: 210 40% 98%;
+    /* Sidebar - Slightly darker than background */
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 15% 95%;
+    --sidebar-primary: 210 15% 95%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 210 15% 95%;
+    --sidebar-border: 220 15% 15%;
+    --sidebar-ring: 210 15% 95%;
 
-    /* Chart Colors - Bright for dark theme */
-    --chart-1: 12 76% 65%;
-    --chart-2: 173 58% 50%;
-    --chart-3: 197 37% 35%;
-    --chart-4: 43 74% 70%;
-    --chart-5: 27 87% 70%;
+    /* Chart Colors - Vibrant for dark backgrounds */
+    --chart-1: 215 80% 62%;              /* Bright blue */
+    --chart-2: 160 65% 52%;              /* Teal */
+    --chart-3: 35 85% 58%;               /* Warm orange */
+    --chart-4: 280 55% 62%;              /* Purple */
+    --chart-5: 152 60% 52%;              /* Green */
 
-    /* Ferox Brand - Brighter in dark */
-    --ferox-green: 160 84% 50%;
-    --ferox-green-hover: 160 84% 55%;
-    --ferox-green-bright: 160 84% 60%;
+    /* Ferox Brand - Vibrant but not harsh */
+    --ferox-green: 160 70% 48%;          /* Balanced brightness */
+    --ferox-green-hover: 160 70% 55%;    /* Brighter on hover */
+    --ferox-green-bright: 160 70% 58%;   /* For emphasis */
 
-    /* Status Colors - Brighter for dark */
-    --status-online: 142 76% 45%;
-    --status-offline: 0 84% 65%;
-    --status-idle: 38 92% 60%;
-    --status-away: 262 83% 65%;
+    /* Status Colors - Softer for dark mode */
+    --status-online: 152 55% 48%;        /* Soft green */
+    --status-offline: 0 65% 55%;         /* Soft red */
+    --status-idle: 35 80% 55%;           /* Warm amber */
+    --status-away: 270 55% 62%;          /* Soft purple */
 
     /* Icon Colors - Bright for dark theme */
-    --icon-primary: 210 40% 98%;
-    --icon-secondary: 215 28% 70%;
-    --icon-tertiary: 215 28% 55%;
+    --icon-primary: 210 15% 95%;         /* Match foreground */
+    --icon-secondary: 215 12% 62%;       /* Match muted-foreground */
+    --icon-tertiary: 215 10% 48%;        /* Dimmer */
 
     /* Text sizes - Same as light */
     --text-xs: 0.8125rem;
@@ -250,8 +259,8 @@
     --bg-primary: hsl(var(--background));
     --bg-secondary: hsl(var(--secondary));
     --bg-panel: hsl(var(--card));
-    --bg-hover: hsl(216 34% 22%);
-    --bg-active: hsl(216 34% 27%);
+    --bg-hover: hsl(220 14% 20%);
+    --bg-active: hsl(220 14% 24%);
     --bg-input: hsl(var(--card));
 
     /* Text Colors */
@@ -267,49 +276,49 @@
     --icon-color-subtle: hsl(var(--icon-tertiary));
 
     /* Borders */
-    --border-primary: hsl(216 34% 25%);
+    --border-primary: hsl(220 12% 25%);
     --border-secondary: hsl(var(--border));
-    --border-strong: hsl(216 34% 32%);
+    --border-strong: hsl(220 12% 32%);
     --border-focus: hsl(var(--ring));
 
     /* Brand Colors */
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: hsl(217 91% 65%);
-    --color-primary-light: hsl(217 91% 70%);
+    --color-primary-hover: hsl(215 80% 65%);
+    --color-primary-light: hsl(215 80% 70%);
 
     --color-accent: hsl(var(--accent));
-    --color-accent-hover: hsl(216 34% 25%);
+    --color-accent-hover: hsl(220 15% 25%);
 
     /* Semantic Colors */
     --color-success: hsl(var(--status-online));
     --color-warning: hsl(var(--status-idle));
     --color-error: hsl(var(--destructive));
-    --color-info: hsl(199 89% 48%);
+    --color-info: hsl(200 80% 55%);
 
     /* Ferox Brand mapped */
     --color-ferox-green: hsl(var(--ferox-green));
     --color-ferox-green-hover: hsl(var(--ferox-green-hover));
     --color-ferox-green-dim: hsl(var(--ferox-green-bright));
 
-    /* Shadows - Darker */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    /* Shadows - Deeper for dark theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 
-    /* Dark theme specific colors (for components) */
+    /* Component colors */
     --dark-900: hsl(var(--background));
     --dark-800: hsl(var(--secondary));
     --dark-700: hsl(var(--card));
-    --dark-600: hsl(216 34% 25%);
-    --dark-500: hsl(216 34% 32%);
-    --dark-400: hsl(216 34% 40%);
+    --dark-600: hsl(220 12% 25%);
+    --dark-500: hsl(220 12% 32%);
+    --dark-400: hsl(220 12% 40%);
     --dark-300: hsl(var(--muted-foreground));
   }
 }
 
 /* ==========================================
-   Base Typography - LARGER FONTS
+   Base Typography
    ========================================== */
 
 @layer base {
@@ -320,12 +329,11 @@
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-size: var(--text-base);      /* 17px base (was 16px) */
+    font-size: var(--text-base);
     line-height: var(--leading-normal);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Headings - Larger */
   h1 {
     font-size: var(--text-2xl);
     line-height: var(--leading-tight);
@@ -344,18 +352,15 @@
     font-weight: 600;
   }
 
-  /* Paragraphs - More spacing */
   p {
     line-height: var(--leading-relaxed);
     margin-bottom: 1rem;
   }
 
-  /* Small text - Still readable */
   small {
     font-size: var(--text-xs);
   }
 
-  /* Smooth theme transitions */
   *:not(.no-transition) {
     transition: background-color 0.2s ease,
                 color 0.2s ease,
@@ -363,31 +368,28 @@
                 box-shadow 0.2s ease;
   }
 
-  /* Disable transitions during theme toggle */
   .theme-transitioning * {
     transition: none !important;
   }
 }
 
 /* ==========================================
-   Icon Utilities - ENHANCED VISIBILITY
+   Icon Utilities
    ========================================== */
 
 @layer utilities {
-  /* Icon stroke widths - Thicker for better visibility */
   .icon-primary,
   .icon-secondary,
   .icon-tertiary {
-    stroke-width: 2;          /* Thicker (was 1.5) */
+    stroke-width: 2;
   }
 
   [data-theme='dark'] .icon-primary,
   [data-theme='dark'] .icon-secondary,
   [data-theme='dark'] .icon-tertiary {
-    stroke-width: 1.75;       /* Slightly thicker in dark */
+    stroke-width: 1.75;
   }
 
-  /* Icon colors */
   .icon-primary {
     color: hsl(var(--icon-primary));
   }
@@ -400,17 +402,15 @@
     color: hsl(var(--icon-tertiary));
   }
 
-  /* Icon sizes - Slightly larger */
-  .icon-xs { width: 0.9375rem; height: 0.9375rem; }  /* 15px (was 14px) */
-  .icon-sm { width: 1.125rem; height: 1.125rem; }    /* 18px (was 16px) */
-  .icon-md { width: 1.3125rem; height: 1.3125rem; }  /* 21px (was 20px) */
-  .icon-lg { width: 1.5625rem; height: 1.5625rem; }  /* 25px (was 24px) */
+  .icon-xs { width: 0.9375rem; height: 0.9375rem; }
+  .icon-sm { width: 1.125rem; height: 1.125rem; }
+  .icon-md { width: 1.3125rem; height: 1.3125rem; }
+  .icon-lg { width: 1.5625rem; height: 1.5625rem; }
 
-  /* Status badges - Larger & darker */
   .status-online {
     background-color: hsl(var(--status-online));
-    padding: 0.375rem 0.75rem;  /* Larger padding */
-    font-size: var(--text-sm);  /* Larger text */
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-sm);
   }
 
   .status-offline {
@@ -431,7 +431,6 @@
     font-size: var(--text-sm);
   }
 
-  /* Text size utilities */
   .text-xs { font-size: var(--text-xs); }
   .text-sm { font-size: var(--text-sm); }
   .text-base { font-size: var(--text-base); }
@@ -445,14 +444,14 @@
    ========================================== */
 
 @layer components {
-  /* Button styles - Larger & more readable */
   .btn-primary {
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
     border: 1px solid hsl(var(--primary));
-    font-size: var(--text-base);       /* Larger */
-    padding: 0.625rem 1.25rem;         /* More padding */
+    font-size: var(--text-base);
+    padding: 0.625rem 1.25rem;
     font-weight: 500;
+    border-radius: var(--radius);
   }
 
   .btn-primary:hover {
@@ -466,28 +465,27 @@
     font-size: var(--text-base);
     padding: 0.625rem 1.25rem;
     font-weight: 500;
+    border-radius: var(--radius);
   }
 
   .btn-secondary:hover {
     background-color: hsl(var(--secondary) / 0.8);
   }
 
-  /* Card/Panel styles */
   .card {
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
     border: 1px solid hsl(var(--border));
-    padding: 1.25rem;                  /* More padding */
+    padding: 1.25rem;
     border-radius: var(--radius);
   }
 
-  /* Input styles - Larger */
   .input {
     background-color: var(--bg-input);
     color: var(--text-primary);
     border: 1px solid hsl(var(--input));
-    font-size: var(--text-base);       /* Larger */
-    padding: 0.625rem 0.875rem;        /* More padding */
+    font-size: var(--text-base);
+    padding: 0.625rem 0.875rem;
     line-height: var(--leading-normal);
     border-radius: var(--radius);
   }
@@ -499,10 +497,9 @@
   .input:focus {
     border-color: hsl(var(--ring));
     outline: none;
-    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.15);
   }
 
-  /* Label styles - Darker & larger */
   .label {
     color: var(--text-primary);
     font-size: var(--text-sm);
@@ -511,7 +508,6 @@
     display: block;
   }
 
-  /* Sidebar styles */
   .sidebar {
     background-color: hsl(var(--sidebar-background));
     color: hsl(var(--sidebar-foreground));
@@ -519,8 +515,8 @@
   }
 
   .sidebar-item {
-    padding: 0.75rem 1rem;             /* More padding */
-    font-size: var(--text-base);       /* Larger text */
+    padding: 0.75rem 1rem;
+    font-size: var(--text-base);
     font-weight: 500;
   }
 
@@ -528,7 +524,6 @@
     background-color: hsl(var(--sidebar-accent));
   }
 
-  /* Badge styles */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -539,22 +534,22 @@
   }
 
   .badge-success {
-    background-color: hsl(var(--status-online) / 0.2);
+    background-color: hsl(var(--status-online) / 0.15);
     color: hsl(var(--status-online));
   }
 
   .badge-warning {
-    background-color: hsl(var(--status-idle) / 0.2);
+    background-color: hsl(var(--status-idle) / 0.15);
     color: hsl(var(--status-idle));
   }
 
   .badge-danger {
-    background-color: hsl(var(--status-offline) / 0.2);
+    background-color: hsl(var(--status-offline) / 0.15);
     color: hsl(var(--status-offline));
   }
 
   .badge-info {
-    background-color: hsl(var(--primary) / 0.2);
+    background-color: hsl(var(--primary) / 0.15);
     color: hsl(var(--primary));
   }
 
@@ -563,7 +558,6 @@
     color: var(--text-secondary);
   }
 
-  /* Session status indicators */
   .status-dot {
     width: 0.5rem;
     height: 0.5rem;
@@ -583,7 +577,6 @@
     background-color: var(--color-error);
   }
 
-  /* Privilege colors */
   .priv-user {
     color: var(--text-secondary);
   }
@@ -600,7 +593,6 @@
     color: var(--color-error);
   }
 
-  /* Ghost button */
   .btn-ghost {
     background-color: transparent;
     color: var(--text-secondary);
@@ -615,7 +607,6 @@
     color: var(--text-primary);
   }
 
-  /* Outline button */
   .btn-outline {
     background-color: transparent;
     border: 1px solid var(--border-primary);
@@ -631,7 +622,6 @@
     color: var(--color-ferox-green);
   }
 
-  /* Danger button */
   .btn-danger {
     background-color: var(--color-error);
     color: white;
@@ -645,7 +635,6 @@
     filter: brightness(1.1);
   }
 
-  /* Context menu styling */
   .context-menu {
     position: absolute;
     z-index: 50;
@@ -709,13 +698,13 @@
   background-color: hsl(var(--ferox-green-hover));
 }
 
-/* Terminal styles - Larger fonts */
+/* Terminal styles */
 .terminal {
   background-color: hsl(var(--card));
   color: var(--text-primary);
   border: 1px solid hsl(var(--border));
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  font-size: 0.9375rem;              /* 15px (was 14px) */
+  font-size: 0.9375rem;
   line-height: 1.6;
   padding: 1rem;
 }
@@ -743,9 +732,9 @@
   border-radius: 4px;
 }
 
-/* Scrollbar styling - Larger */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;                         /* Wider (was 8px) */
+  width: 10px;
   height: 10px;
 }
 
@@ -762,7 +751,7 @@
   background: var(--text-tertiary);
 }
 
-/* Table styles - Better readability */
+/* Table styles */
 table {
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
@@ -777,17 +766,17 @@ td {
   padding: 0.75rem 1rem;
 }
 
-/* Code blocks - Larger */
+/* Code blocks */
 code {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.9375rem;              /* 15px */
+  font-size: 0.9375rem;
   background-color: var(--bg-secondary);
   padding: 0.25rem 0.5rem;
   border-radius: calc(var(--radius) / 2);
 }
 
 pre code {
-  font-size: 0.875rem;               /* 14px for code blocks */
+  font-size: 0.875rem;
 }
 
 /* Focus styles */
@@ -798,7 +787,7 @@ pre code {
 
 /* Selection color */
 ::selection {
-  background: hsl(var(--primary) / 0.3);
+  background: hsl(var(--primary) / 0.25);
 }
 
 [data-theme='dark'] ::selection {
@@ -810,7 +799,6 @@ svg {
   color: inherit;
 }
 
-/* Default icon styling when no color class is applied */
 svg:not([class*="text-"]):not([class*="icon-"]) {
   color: var(--icon-color);
 }
@@ -836,7 +824,6 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   }
 }
 
-/* Fade in animation */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -852,7 +839,6 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   animation: fade-in 0.15s ease-out;
 }
 
-/* Pulse animation for status dots */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -938,7 +924,6 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     background-color: var(--color-success);
   }
 
-  /* Legacy icon utilities */
   .icon-default {
     color: var(--icon-color);
   }
@@ -946,7 +931,6 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     color: var(--icon-color-muted);
   }
 
-  /* Border strength utilities */
   .border-strong {
     border-color: var(--border-strong);
   }
