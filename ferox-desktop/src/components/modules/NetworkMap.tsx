@@ -1,22 +1,62 @@
 /**
- * NetworkMap - Network Topology Visualization (Placeholder)
+ * NetworkMap - Interactive Cyber-Neon Network Visualization
  * For demo/training purposes only
  */
 
-import { Globe, Monitor, Server, Router, Wifi, RefreshCw } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Globe, RefreshCw, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { mockNodes, mockEdges } from '../../data/mockNetwork';
+import type { NetworkNode as NodeType } from '../../data/mockNetwork';
+import { NetworkNode } from '../network/NetworkNode';
+import { NetworkEdge } from '../network/NetworkEdge';
+import { NetworkLegend } from '../network/NetworkLegend';
+import { NodeTooltip } from '../network/NodeTooltip';
+import '../../styles/network-glow.css';
 
 interface NetworkMapProps {
   sessionId?: string;
 }
 
 export function NetworkMap({ sessionId: _sessionId }: NetworkMapProps) {
-  // Mock network stats
-  const mockStats = {
-    totalNodes: 24,
-    activeConnections: 18,
-    subnets: 3,
-    compromised: 5,
+  const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
+
+  // Update dimensions on resize
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  // Calculate stats
+  const stats = {
+    total: mockNodes.length,
+    compromised: mockNodes.filter(n => n.status === 'exploited' || n.type === 'compromised').length,
+    active: mockNodes.filter(n => n.status === 'active' || n.status === 'scanning').length,
+    connections: mockEdges.filter(e => e.active).length,
   };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 2000);
+  };
+
+  const handleZoomIn = () => setZoom(z => Math.min(2, z + 0.2));
+  const handleZoomOut = () => setZoom(z => Math.max(0.5, z - 0.2));
+  const handleResetZoom = () => setZoom(1);
 
   return (
     <div className="h-full flex flex-col bg-dark-900">
@@ -24,95 +64,165 @@ export function NetworkMap({ sessionId: _sessionId }: NetworkMapProps) {
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Globe className="text-cyan-400" size={22} />
+            <motion.div
+              animate={{ rotate: isRefreshing ? 360 : 0 }}
+              transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
+            >
+              <Globe className="text-cyan-400" size={22} style={{ filter: 'drop-shadow(0 0 8px #00d4ff)' }} />
+            </motion.div>
             <h2 className="text-lg font-semibold text-text-primary">Network Topology</h2>
-            <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">PLACEHOLDER</span>
+            <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">LIVE</span>
           </div>
-          <button
-            disabled
-            className="px-3 py-1.5 bg-dark-700 border border-dark-600 text-text-muted rounded text-xs font-medium flex items-center gap-1.5 cursor-not-allowed opacity-50"
-          >
-            <RefreshCw size={12} />
-            Refresh
-          </button>
-        </div>
-        <p className="text-xs text-text-muted mt-2">
-          Interactive network visualization coming soon
-        </p>
-      </div>
 
-      {/* Stats Summary */}
-      <div className="p-4 border-b border-dark-600 grid grid-cols-4 gap-3">
-        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-cyan-400">{mockStats.totalNodes}</div>
-          <div className="text-xs text-text-muted">Total Nodes</div>
-        </div>
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-green-400">{mockStats.activeConnections}</div>
-          <div className="text-xs text-text-muted">Active Connections</div>
-        </div>
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-blue-400">{mockStats.subnets}</div>
-          <div className="text-xs text-text-muted">Subnets</div>
-        </div>
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-red-400">{mockStats.compromised}</div>
-          <div className="text-xs text-text-muted">Compromised</div>
+          {/* Stats badges */}
+          <div className="flex items-center gap-3">
+            <StatBadge label="Nodes" value={stats.total} color="#00d4ff" />
+            <StatBadge label="Compromised" value={stats.compromised} color="#ff3366" />
+            <StatBadge label="Active" value={stats.active} color="#00ff88" />
+            <StatBadge label="Links" value={stats.connections} color="#a855f7" />
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-1">
+            <ControlButton icon={ZoomOut} onClick={handleZoomOut} title="Zoom Out" />
+            <span className="text-xs text-text-muted px-2">{Math.round(zoom * 100)}%</span>
+            <ControlButton icon={ZoomIn} onClick={handleZoomIn} title="Zoom In" />
+            <ControlButton icon={Maximize2} onClick={handleResetZoom} title="Reset" />
+            <div className="w-px h-6 bg-dark-600 mx-2" />
+            <ControlButton
+              icon={RefreshCw}
+              onClick={handleRefresh}
+              spinning={isRefreshing}
+              title="Refresh"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Placeholder Content */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <div className="relative mb-8">
-            {/* Mock network diagram */}
-            <div className="flex justify-center items-center gap-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full bg-dark-700 border-2 border-cyan-500/30 flex items-center justify-center">
-                  <Router size={24} className="text-cyan-400" />
-                </div>
-                <span className="text-xs text-text-muted">Gateway</span>
-              </div>
-              <div className="w-16 h-px bg-dark-600" />
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full bg-dark-700 border-2 border-green-500/30 flex items-center justify-center">
-                  <Server size={24} className="text-green-400" />
-                </div>
-                <span className="text-xs text-text-muted">Server</span>
-              </div>
-              <div className="w-16 h-px bg-dark-600" />
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full bg-dark-700 border-2 border-red-500/30 flex items-center justify-center">
-                  <Monitor size={24} className="text-red-400" />
-                </div>
-                <span className="text-xs text-text-muted">Target</span>
-              </div>
-            </div>
-          </div>
+      {/* Map Container */}
+      <div
+        ref={containerRef}
+        className="flex-1 relative overflow-hidden network-grid network-vignette"
+        style={{ backgroundColor: '#0a0f1a' }}
+      >
+        {/* Scan line effect */}
+        <div className="network-scanline" />
 
-          <Globe size={48} className="mx-auto mb-4 text-cyan-400/30" />
-          <h3 className="text-lg font-medium text-text-primary mb-2">Network Visualization Coming Soon</h3>
-          <p className="text-sm text-text-muted">
-            This module will provide interactive network topology mapping with real-time
-            visualization of discovered hosts, connections, and attack paths.
-          </p>
+        {/* SVG Network Visualization */}
+        <motion.svg
+          className="w-full h-full"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: 'center center'
+          }}
+          animate={{ scale: zoom }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
+          {/* Defs for gradients and filters */}
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-          {/* Feature preview */}
-          <div className="mt-6 grid grid-cols-2 gap-3 text-left">
-            <div className="bg-dark-800 rounded-lg p-3 border border-dark-600">
-              <Wifi size={16} className="text-cyan-400 mb-2" />
-              <div className="text-xs font-medium text-text-primary">Auto-Discovery</div>
-              <div className="text-xs text-text-muted">Automatic network scanning</div>
-            </div>
-            <div className="bg-dark-800 rounded-lg p-3 border border-dark-600">
-              <Server size={16} className="text-green-400 mb-2" />
-              <div className="text-xs font-medium text-text-primary">Service Detection</div>
-              <div className="text-xs text-text-muted">Identify running services</div>
-            </div>
-          </div>
+          {/* Render edges first (behind nodes) */}
+          <g className="edges">
+            {mockEdges.map(edge => (
+              <NetworkEdge
+                key={edge.id}
+                edge={edge}
+                nodes={mockNodes}
+                containerWidth={dimensions.width}
+                containerHeight={dimensions.height}
+              />
+            ))}
+          </g>
+
+          {/* Render nodes */}
+          <g className="nodes">
+            {mockNodes.map(node => (
+              <NetworkNode
+                key={node.id}
+                node={node}
+                selected={selectedNode?.id === node.id}
+                onClick={setSelectedNode}
+                containerWidth={dimensions.width}
+                containerHeight={dimensions.height}
+              />
+            ))}
+          </g>
+        </motion.svg>
+
+        {/* Legend */}
+        <NetworkLegend />
+
+        {/* Node Tooltip */}
+        <AnimatePresence>
+          {selectedNode && (
+            <NodeTooltip
+              node={selectedNode}
+              onClose={() => setSelectedNode(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Watermark */}
+        <div className="absolute bottom-4 right-4 text-[10px] text-text-muted/30 font-mono">
+          FEROX NETWORK MAPPER v1.0
         </div>
       </div>
     </div>
+  );
+}
+
+// Stat Badge Component
+function StatBadge({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="flex items-center gap-1.5 text-xs">
+      <div
+        className="w-2 h-2 rounded-full"
+        style={{
+          backgroundColor: color,
+          boxShadow: `0 0 6px ${color}`
+        }}
+      />
+      <span className="text-text-muted">{label}:</span>
+      <span className="font-semibold" style={{ color }}>{value}</span>
+    </div>
+  );
+}
+
+// Control Button Component
+function ControlButton({
+  icon: Icon,
+  onClick,
+  spinning,
+  title
+}: {
+  icon: typeof ZoomIn;
+  onClick: () => void;
+  spinning?: boolean;
+  title: string;
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className="p-2 bg-dark-700 border border-dark-600 rounded hover:bg-dark-600 hover:border-dark-500 transition-colors"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      title={title}
+    >
+      <motion.div
+        animate={{ rotate: spinning ? 360 : 0 }}
+        transition={{ duration: 1, repeat: spinning ? Infinity : 0, ease: 'linear' }}
+      >
+        <Icon size={14} className="text-text-secondary" />
+      </motion.div>
+    </motion.button>
   );
 }
 
