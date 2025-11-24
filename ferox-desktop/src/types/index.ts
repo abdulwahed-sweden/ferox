@@ -68,7 +68,8 @@ export type TabType =
   | 'credentials'
   | 'eventlog'
   | 'scheduler'
-  | 'notes';
+  | 'notes'
+  | 'postexploitation';
 
 export interface Tab {
   id: string;

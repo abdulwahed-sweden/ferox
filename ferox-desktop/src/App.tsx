@@ -12,7 +12,7 @@ import { Spinner } from './components/Loading';
 import { useTauriEvents } from './hooks/useTauriEvents';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useResizable } from './hooks/useResizable';
-import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown } from 'lucide-react';
+import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown, Crosshair } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { clsx } from 'clsx';
 
@@ -40,7 +40,7 @@ function App() {
   const toolsRef = useRef<HTMLDivElement>(null);
 
   // Generic tab opener
-  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes', title: string, icon: string) => {
+  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes' | 'postexploitation', title: string, icon: string) => {
     const existing = tabs.find(t => t.type === type);
     if (existing) {
       useAppStore.getState().setActiveTab(existing.id);
@@ -196,6 +196,14 @@ function App() {
                 >
                   <StickyNote size={14} className="text-pink-400" />
                   Notes
+                </button>
+                <div className="h-px bg-dark-600 my-1" />
+                <button
+                  onClick={() => openToolTab('postexploitation', 'Post-Exploitation', 'crosshair')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Crosshair size={14} className="text-red-400" />
+                  Post-Exploitation
                 </button>
               </div>
             )}

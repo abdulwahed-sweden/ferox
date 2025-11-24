@@ -10,6 +10,7 @@ import {
   Notes
 } from './modules';
 import { PayloadBuilder } from './PayloadBuilder';
+import { PostExploitation } from './post_exploitation';
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -45,6 +46,8 @@ export function TabContent() {
       return <TaskScheduler sessionId={activeTab.sessionId} />;
     case 'notes':
       return <Notes sessionId={activeTab.sessionId} />;
+    case 'postexploitation':
+      return <PostExploitation sessionId={activeTab.sessionId} />;
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">
