@@ -56,7 +56,7 @@ pub async fn simulate_network_scan(
     // Simulate scan delay
     tokio::time::sleep(tokio::time::Duration::from_millis(800)).await;
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut hosts = Vec::new();
 
     // Generate realistic simulated hosts
@@ -136,7 +136,7 @@ pub async fn simulate_network_scan(
 
     for (i, (hostname, os, os_ver, vendor, ports)) in host_templates.iter().enumerate() {
         let ip = format!("{}{}", base, i + 1);
-        let is_up = rng.gen_bool(0.85); // 85% chance host is up
+        let is_up = rng.random_bool(0.85); // 85% chance host is up
 
         let simulated_ports: Vec<SimulatedPort> = ports.iter().map(|(port, svc, ver, state)| {
             SimulatedPort {
@@ -145,7 +145,7 @@ pub async fn simulate_network_scan(
                 service: svc.to_string(),
                 version: ver.to_string(),
                 state: state.to_string(),
-                banner: if *state == "open" && rng.gen_bool(0.3) {
+                banner: if *state == "open" && rng.random_bool(0.3) {
                     Some(format!("{} ready", svc))
                 } else {
                     None
@@ -158,15 +158,15 @@ pub async fn simulate_network_scan(
             ip,
             hostname: hostname.to_string(),
             mac: format!("{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
-                rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>(),
-                rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()),
+                rng.random::<u8>(), rng.random::<u8>(), rng.random::<u8>(),
+                rng.random::<u8>(), rng.random::<u8>(), rng.random::<u8>()),
             os: os.to_string(),
             os_version: os_ver.to_string(),
             vendor: vendor.to_string(),
             ports: if is_up { simulated_ports } else { vec![] },
             status: if is_up { "up".into() } else { "down".into() },
-            latency_ms: if is_up { rng.gen_range(0.5..50.0) } else { 0.0 },
-            ttl: if is_up { rng.gen_range(32..128) } else { 0 },
+            latency_ms: if is_up { rng.random_range(0.5..50.0) } else { 0.0 },
+            ttl: if is_up { rng.random_range(32..128) } else { 0 },
             last_seen: Utc::now(),
         });
     }
@@ -175,7 +175,7 @@ pub async fn simulate_network_scan(
 
     Ok(NetworkScanResult {
         hosts,
-        scan_duration_ms: rng.gen_range(2000..8000),
+        scan_duration_ms: rng.random_range(2000..8000),
         total_hosts_scanned: host_templates.len() as u32,
         hosts_up,
         hosts_down: host_templates.len() as u32 - hosts_up,
@@ -217,7 +217,7 @@ pub async fn simulate_credential_dump(
 ) -> Result<CredentialDumpResult, String> {
     tokio::time::sleep(tokio::time::Duration::from_millis(600)).await;
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut credentials = Vec::new();
 
     // Simulated credential templates
@@ -254,13 +254,13 @@ pub async fn simulate_credential_dump(
             sensitivity: sensitivity.to_string(),
             cracked: *cracked,
             cracked_value: cracked_val.map(|v| v.to_string()),
-            last_used: if rng.gen_bool(0.6) {
-                Some(Utc::now() - Duration::hours(rng.gen_range(1..720)))
+            last_used: if rng.random_bool(0.6) {
+                Some(Utc::now() - Duration::hours(rng.random_range(1..720)))
             } else {
                 None
             },
             expires_at: if *cred_type == "ticket" || *cred_type == "token" {
-                Some(Utc::now() + Duration::hours(rng.gen_range(1..168)))
+                Some(Utc::now() + Duration::hours(rng.random_range(1..168)))
             } else {
                 None
             },
@@ -303,7 +303,7 @@ pub struct SimulatedLogEntry {
 pub async fn simulate_event_log(
     count: Option<u32>,
 ) -> Result<Vec<SimulatedLogEntry>, String> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let count = count.unwrap_or(50).min(200);
     let mut logs = Vec::new();
 
@@ -395,41 +395,41 @@ pub async fn simulate_event_log(
     let level_weights = [30, 30, 20, 10, 5, 4, 1]; // Weighted distribution
 
     for i in 0..count {
-        let module = modules[rng.gen_range(0..modules.len())];
+        let module = modules[rng.random_range(0..modules.len())];
         let templates = messages_by_module.get(module).unwrap();
-        let template = templates[rng.gen_range(0..templates.len())];
+        let template = templates[rng.random_range(0..templates.len())];
 
         // Generate message with placeholder replacements
         let message = template
-            .replace("{ip}", &format!("192.168.1.{}", rng.gen_range(1..255)))
-            .replace("{port}", &rng.gen_range(1..65535).to_string())
-            .replace("{os}", &["Windows 10", "Ubuntu 22.04", "Windows Server 2019"][rng.gen_range(0..3)])
-            .replace("{service}", &["SSH", "HTTP", "SMB", "RDP", "MySQL"][rng.gen_range(0..5)])
-            .replace("{n}", &rng.gen_range(1..50).to_string())
-            .replace("{cve}", &format!("CVE-2024-{}", rng.gen_range(1000..9999)))
-            .replace("{type}", &["reverse_tcp", "reverse_https", "bind_tcp"][rng.gen_range(0..3)])
-            .replace("{size}", &rng.gen_range(10000..100000).to_string())
-            .replace("{method}", &["CMSTP", "Fodhelper", "EventViewer"][rng.gen_range(0..3)])
-            .replace("{encoder}", &["shikata_ga_nai", "xor", "base64"][rng.gen_range(0..3)])
-            .replace("{pid}", &rng.gen_range(100..10000).to_string())
-            .replace("{priv}", &["Administrator", "SYSTEM", "root"][rng.gen_range(0..3)])
-            .replace("{id}", &format!("session-{}", rng.gen_range(1..100)))
-            .replace("{cmd}", &["whoami", "ipconfig", "netstat"][rng.gen_range(0..3)])
-            .replace("{protocol}", &["HTTPS", "DNS", "ICMP"][rng.gen_range(0..3)])
-            .replace("{jitter}", &rng.gen_range(5..30).to_string())
-            .replace("{seconds}", &rng.gen_range(30..300).to_string())
-            .replace("{user}", &["Administrator", "john.doe", "svc_backup"][rng.gen_range(0..3)])
-            .replace("{host}", &format!("192.168.1.{}", rng.gen_range(1..255)))
-            .replace("{share}", &["C$", "ADMIN$", "IPC$"][rng.gen_range(0..3)])
-            .replace("{name}", &["UpdateTask", "SystemCheck", "Maintenance"][rng.gen_range(0..3)])
-            .replace("{service}", &["UpdateService", "SystemHelper"][rng.gen_range(0..2)])
-            .replace("{module}", &["scanner", "payload", "session"][rng.gen_range(0..3)])
-            .replace("{domain}", &["corp.local", "example.com"][rng.gen_range(0..2)])
-            .replace("{proxy}", &format!("socks5://127.0.0.1:{}", rng.gen_range(1080..9050)));
+            .replace("{ip}", &format!("192.168.1.{}", rng.random_range(1..255)))
+            .replace("{port}", &rng.random_range(1..65535).to_string())
+            .replace("{os}", &["Windows 10", "Ubuntu 22.04", "Windows Server 2019"][rng.random_range(0..3)])
+            .replace("{service}", &["SSH", "HTTP", "SMB", "RDP", "MySQL"][rng.random_range(0..5)])
+            .replace("{n}", &rng.random_range(1..50).to_string())
+            .replace("{cve}", &format!("CVE-2024-{}", rng.random_range(1000..9999)))
+            .replace("{type}", &["reverse_tcp", "reverse_https", "bind_tcp"][rng.random_range(0..3)])
+            .replace("{size}", &rng.random_range(10000..100000).to_string())
+            .replace("{method}", &["CMSTP", "Fodhelper", "EventViewer"][rng.random_range(0..3)])
+            .replace("{encoder}", &["shikata_ga_nai", "xor", "base64"][rng.random_range(0..3)])
+            .replace("{pid}", &rng.random_range(100..10000).to_string())
+            .replace("{priv}", &["Administrator", "SYSTEM", "root"][rng.random_range(0..3)])
+            .replace("{id}", &format!("session-{}", rng.random_range(1..100)))
+            .replace("{cmd}", &["whoami", "ipconfig", "netstat"][rng.random_range(0..3)])
+            .replace("{protocol}", &["HTTPS", "DNS", "ICMP"][rng.random_range(0..3)])
+            .replace("{jitter}", &rng.random_range(5..30).to_string())
+            .replace("{seconds}", &rng.random_range(30..300).to_string())
+            .replace("{user}", &["Administrator", "john.doe", "svc_backup"][rng.random_range(0..3)])
+            .replace("{host}", &format!("192.168.1.{}", rng.random_range(1..255)))
+            .replace("{share}", &["C$", "ADMIN$", "IPC$"][rng.random_range(0..3)])
+            .replace("{name}", &["UpdateTask", "SystemCheck", "Maintenance"][rng.random_range(0..3)])
+            .replace("{service}", &["UpdateService", "SystemHelper"][rng.random_range(0..2)])
+            .replace("{module}", &["scanner", "payload", "session"][rng.random_range(0..3)])
+            .replace("{domain}", &["corp.local", "example.com"][rng.random_range(0..2)])
+            .replace("{proxy}", &format!("socks5://127.0.0.1:{}", rng.random_range(1080..9050)));
 
         // Select level with weights
         let total_weight: i32 = level_weights.iter().sum();
-        let mut random_weight = rng.gen_range(0..total_weight);
+        let mut random_weight = rng.random_range(0..total_weight);
         let mut selected_level = "info";
         for (level, &weight) in levels.iter().zip(level_weights.iter()) {
             random_weight -= weight;
@@ -441,12 +441,12 @@ pub async fn simulate_event_log(
 
         logs.push(SimulatedLogEntry {
             id: format!("log-{}-{}", Utc::now().timestamp_millis(), i),
-            timestamp: Utc::now() - Duration::seconds((count - i) as i64 * rng.gen_range(1..5)),
+            timestamp: Utc::now() - Duration::seconds((count - i) as i64 * rng.random_range(1..5)),
             level: selected_level.to_string(),
             module: module.to_string(),
             message,
-            details: if rng.gen_bool(0.2) { Some("Additional context available".into()) } else { None },
-            session_id: if rng.gen_bool(0.7) { Some(format!("session-{}", rng.gen_range(1..10))) } else { None },
+            details: if rng.random_bool(0.2) { Some("Additional context available".into()) } else { None },
+            session_id: if rng.random_bool(0.7) { Some(format!("session-{}", rng.random_range(1..10))) } else { None },
         });
     }
 
@@ -479,7 +479,7 @@ pub struct SimulatedTask {
 pub async fn simulate_scheduled_tasks(
     _session_id: String,
 ) -> Result<Vec<SimulatedTask>, String> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let task_templates = vec![
         ("Beacon Heartbeat", "send_heartbeat()", "Every 30 seconds", "running", "critical"),
@@ -495,9 +495,9 @@ pub async fn simulate_scheduled_tasks(
     ];
 
     let tasks: Vec<SimulatedTask> = task_templates.iter().enumerate().map(|(i, (name, cmd, schedule, status, priority))| {
-        let created_at = Utc::now() - Duration::hours(rng.gen_range(1..168));
+        let created_at = Utc::now() - Duration::hours(rng.random_range(1..168));
         let last_run = if *status != "pending" {
-            Some(Utc::now() - Duration::minutes(rng.gen_range(1..60)))
+            Some(Utc::now() - Duration::minutes(rng.random_range(1..60)))
         } else {
             None
         };
@@ -509,9 +509,9 @@ pub async fn simulate_scheduled_tasks(
             schedule: schedule.to_string(),
             status: status.to_string(),
             last_run,
-            next_run: Utc::now() + Duration::seconds(rng.gen_range(30..3600)),
+            next_run: Utc::now() + Duration::seconds(rng.random_range(30..3600)),
             created_at,
-            run_count: rng.gen_range(0..100),
+            run_count: rng.random_range(0..100),
             last_result: if *status == "completed" {
                 Some("Success".into())
             } else if *status == "failed" {
@@ -546,7 +546,7 @@ pub struct SimulatedNote {
 pub async fn simulate_session_notes(
     _session_id: String,
 ) -> Result<Vec<SimulatedNote>, String> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let note_templates = vec![
         ("Initial Access Vector", "Gained access via phishing email to john.doe@corp.local\n\nAttachment: invoice_march.docx.exe\nExecution time: 2024-01-15 14:32:00 UTC\nInitial beacon to C2 confirmed.", vec!["initial-access", "phishing"], true),
@@ -558,17 +558,17 @@ pub async fn simulate_session_notes(
     ];
 
     let notes: Vec<SimulatedNote> = note_templates.iter().enumerate().map(|(i, (title, content, tags, pinned))| {
-        let created = Utc::now() - Duration::hours(rng.gen_range(1..720));
+        let created = Utc::now() - Duration::hours(rng.random_range(1..720));
         SimulatedNote {
             id: format!("note-{}", i + 1),
             title: title.to_string(),
             content: content.to_string(),
             tags: tags.iter().map(|t| t.to_string()).collect(),
             created_at: created,
-            updated_at: created + Duration::minutes(rng.gen_range(0..120)),
+            updated_at: created + Duration::minutes(rng.random_range(0..120)),
             pinned: *pinned,
-            color: if rng.gen_bool(0.3) {
-                Some(["#ff6b6b", "#4ecdc4", "#ffe66d", "#95e1d3"][rng.gen_range(0..4)].into())
+            color: if rng.random_bool(0.3) {
+                Some(["#ff6b6b", "#4ecdc4", "#ffe66d", "#95e1d3"][rng.random_range(0..4)].into())
             } else {
                 None
             },
@@ -611,7 +611,7 @@ pub async fn simulate_directory_listing(
 ) -> Result<DirectoryListing, String> {
     tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     // Simulated directory structures based on path
     let entries = match path.as_str() {
@@ -650,7 +650,7 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             path: format!("{}{}{}", base_path, sep, "Documents"),
             file_type: "directory".into(),
             size: 0,
-            modified: Utc::now() - Duration::days(rng.gen_range(1..30)),
+            modified: Utc::now() - Duration::days(rng.random_range(1..30)),
             permissions: if is_windows { "drwxr-xr-x".into() } else { "drwxr-xr-x".into() },
             owner: "user".into(),
             group: "user".into(),
@@ -662,7 +662,7 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             path: format!("{}{}{}", base_path, sep, "Downloads"),
             file_type: "directory".into(),
             size: 0,
-            modified: Utc::now() - Duration::hours(rng.gen_range(1..72)),
+            modified: Utc::now() - Duration::hours(rng.random_range(1..72)),
             permissions: "drwxr-xr-x".into(),
             owner: "user".into(),
             group: "user".into(),
@@ -674,7 +674,7 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             path: format!("{}{}{}", base_path, sep, "Desktop"),
             file_type: "directory".into(),
             size: 0,
-            modified: Utc::now() - Duration::hours(rng.gen_range(1..24)),
+            modified: Utc::now() - Duration::hours(rng.random_range(1..24)),
             permissions: "drwxr-xr-x".into(),
             owner: "user".into(),
             group: "user".into(),
@@ -686,7 +686,7 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             path: format!("{}{}{}", base_path, sep, ".ssh"),
             file_type: "directory".into(),
             size: 0,
-            modified: Utc::now() - Duration::days(rng.gen_range(30..365)),
+            modified: Utc::now() - Duration::days(rng.random_range(30..365)),
             permissions: "drwx------".into(),
             owner: "user".into(),
             group: "user".into(),
@@ -697,8 +697,8 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             name: if is_windows { "NTUSER.DAT" } else { ".bashrc" }.into(),
             path: format!("{}{}{}", base_path, sep, if is_windows { "NTUSER.DAT" } else { ".bashrc" }),
             file_type: "file".into(),
-            size: rng.gen_range(1000..50000),
-            modified: Utc::now() - Duration::days(rng.gen_range(1..60)),
+            size: rng.random_range(1000..50000),
+            modified: Utc::now() - Duration::days(rng.random_range(1..60)),
             permissions: "-rw-r--r--".into(),
             owner: "user".into(),
             group: "user".into(),
@@ -709,8 +709,8 @@ fn generate_home_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simulated
             name: if is_windows { "ntuser.ini" } else { ".bash_history" }.into(),
             path: format!("{}{}{}", base_path, sep, if is_windows { "ntuser.ini" } else { ".bash_history" }),
             file_type: "file".into(),
-            size: rng.gen_range(5000..100000),
-            modified: Utc::now() - Duration::minutes(rng.gen_range(1..60)),
+            size: rng.random_range(5000..100000),
+            modified: Utc::now() - Duration::minutes(rng.random_range(1..60)),
             permissions: "-rw-------".into(),
             owner: "user".into(),
             group: "user".into(),
@@ -737,7 +737,7 @@ fn generate_documents_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simu
             path: format!("{}{}{}", base_path, sep, name),
             file_type: if *is_dir { "directory" } else { "file" }.into(),
             size: *size,
-            modified: Utc::now() - Duration::days(rng.gen_range(1..90)),
+            modified: Utc::now() - Duration::days(rng.random_range(1..90)),
             permissions: perms.to_string(),
             owner: "user".into(),
             group: "user".into(),
@@ -762,7 +762,7 @@ fn generate_ssh_directory(rng: &mut impl Rng, base_path: &str) -> Vec<SimulatedF
             path: format!("{}{}{}", base_path, sep, name),
             file_type: "file".into(),
             size: *size,
-            modified: Utc::now() - Duration::days(rng.gen_range(30..365)),
+            modified: Utc::now() - Duration::days(rng.random_range(30..365)),
             permissions: perms.to_string(),
             owner: "user".into(),
             group: "user".into(),
@@ -787,7 +787,7 @@ fn generate_desktop_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simula
             path: format!("{}{}{}", base_path, sep, name),
             file_type: "file".into(),
             size: *size,
-            modified: Utc::now() - Duration::hours(rng.gen_range(1..168)),
+            modified: Utc::now() - Duration::hours(rng.random_range(1..168)),
             permissions: perms.to_string(),
             owner: "user".into(),
             group: "user".into(),
@@ -812,7 +812,7 @@ fn generate_downloads_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simu
             path: format!("{}{}{}", base_path, sep, name),
             file_type: "file".into(),
             size: *size,
-            modified: Utc::now() - Duration::days(rng.gen_range(1..30)),
+            modified: Utc::now() - Duration::days(rng.random_range(1..30)),
             permissions: perms.to_string(),
             owner: "user".into(),
             group: "user".into(),
@@ -836,7 +836,7 @@ fn generate_generic_directory(rng: &mut impl Rng, base_path: &str) -> Vec<Simula
             path: format!("{}{}{}", base_path, sep, name),
             file_type: if *size == 0 && perms.starts_with('d') { "directory" } else { "file" }.into(),
             size: *size,
-            modified: Utc::now() - Duration::days(rng.gen_range(1..60)),
+            modified: Utc::now() - Duration::days(rng.random_range(1..60)),
             permissions: perms.to_string(),
             owner: "user".into(),
             group: "user".into(),
@@ -878,7 +878,7 @@ pub struct ProcessListResult {
 pub async fn simulate_process_list(
     _session_id: String,
 ) -> Result<ProcessListResult, String> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let process_templates = vec![
         (1, 0, "systemd", "root", 0.1, 0.5, "running", "/sbin/init", false),
@@ -909,13 +909,13 @@ pub async fn simulate_process_list(
             ppid: *ppid,
             name: name.to_string(),
             user: user.to_string(),
-            cpu: cpu + rng.gen_range(-0.1..0.5) as f32,
-            memory: mem + rng.gen_range(-0.2..0.5) as f32,
-            memory_bytes: (mem * 1024.0 * 1024.0 * 10.0) as u64 + rng.gen_range(0..1000000),
+            cpu: cpu + rng.random_range(-0.1..0.5) as f32,
+            memory: mem + rng.random_range(-0.2..0.5) as f32,
+            memory_bytes: (mem * 1024.0 * 1024.0 * 10.0) as u64 + rng.random_range(0..1000000),
             status: status.to_string(),
             command: cmd.to_string(),
-            threads: rng.gen_range(1..20),
-            start_time: Utc::now() - Duration::hours(rng.gen_range(1..720)),
+            threads: rng.random_range(1..20),
+            start_time: Utc::now() - Duration::hours(rng.random_range(1..720)),
             is_implant: *is_implant,
         }
     }).collect();
