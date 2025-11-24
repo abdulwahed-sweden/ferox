@@ -5,3 +5,6 @@ export { CredentialsViewer } from './CredentialsViewer';
 export { EventLog } from './EventLog';
 export { TaskScheduler } from './TaskScheduler';
 export { Notes } from './Notes';
+export { NetworkMap } from './NetworkMap';
+export { MitreAttack } from './MitreAttack';
+export { Reports } from './Reports';

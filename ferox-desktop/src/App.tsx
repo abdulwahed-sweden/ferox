@@ -12,7 +12,7 @@ import { Spinner } from './components/Loading';
 import { useTauriEvents } from './hooks/useTauriEvents';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useResizable } from './hooks/useResizable';
-import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown, Crosshair } from 'lucide-react';
+import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown, Crosshair, Globe, Grid3X3, ClipboardList } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { clsx } from 'clsx';
 
@@ -40,7 +40,7 @@ function App() {
   const toolsRef = useRef<HTMLDivElement>(null);
 
   // Generic tab opener
-  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes' | 'postexploitation', title: string, icon: string) => {
+  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes' | 'postexploitation' | 'networkmap' | 'mitre' | 'reports', title: string, icon: string) => {
     const existing = tabs.find(t => t.type === type);
     if (existing) {
       useAppStore.getState().setActiveTab(existing.id);
@@ -204,6 +204,28 @@ function App() {
                 >
                   <Crosshair size={14} className="text-red-400" />
                   Post-Exploitation
+                </button>
+                <div className="h-px bg-dark-600 my-1" />
+                <button
+                  onClick={() => openToolTab('networkmap', 'Network Map', 'globe')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Globe size={14} className="text-cyan-400" />
+                  Network Map
+                </button>
+                <button
+                  onClick={() => openToolTab('mitre', 'MITRE ATT&CK', 'grid')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Grid3X3 size={14} className="text-purple-400" />
+                  MITRE ATT&CK
+                </button>
+                <button
+                  onClick={() => openToolTab('reports', 'Reports', 'clipboard-list')}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <ClipboardList size={14} className="text-emerald-400" />
+                  Reports
                 </button>
               </div>
             )}

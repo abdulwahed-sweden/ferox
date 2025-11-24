@@ -7,7 +7,10 @@ import {
   CredentialsViewer,
   EventLog,
   TaskScheduler,
-  Notes
+  Notes,
+  NetworkMap,
+  MitreAttack,
+  Reports
 } from './modules';
 import { PayloadBuilder } from './PayloadBuilder';
 import { PostExploitation } from './post_exploitation';
@@ -48,6 +51,12 @@ export function TabContent() {
       return <Notes sessionId={activeTab.sessionId} />;
     case 'postexploitation':
       return <PostExploitation sessionId={activeTab.sessionId} />;
+    case 'networkmap':
+      return <NetworkMap sessionId={activeTab.sessionId} />;
+    case 'mitre':
+      return <MitreAttack sessionId={activeTab.sessionId} />;
+    case 'reports':
+      return <Reports sessionId={activeTab.sessionId} />;
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">

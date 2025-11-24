@@ -69,7 +69,10 @@ export type TabType =
   | 'eventlog'
   | 'scheduler'
   | 'notes'
-  | 'postexploitation';
+  | 'postexploitation'
+  | 'networkmap'
+  | 'mitre'
+  | 'reports';
 
 export interface Tab {
   id: string;

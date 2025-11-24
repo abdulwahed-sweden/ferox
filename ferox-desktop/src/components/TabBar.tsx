@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAppStore } from '../store';
-import { Terminal, FolderOpen, Activity, Network, X, Plus, Package, Radar, KeyRound, FileText, Clock, StickyNote, Crosshair } from 'lucide-react';
+import { Terminal, FolderOpen, Activity, Network, X, Plus, Package, Radar, KeyRound, FileText, Clock, StickyNote, Crosshair, Globe, Grid3X3, ClipboardList } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { TabType } from '../types';
 
@@ -16,6 +16,9 @@ const tabIcons: Record<TabType, typeof Terminal> = {
   scheduler: Clock,
   notes: StickyNote,
   postexploitation: Crosshair,
+  networkmap: Globe,
+  mitre: Grid3X3,
+  reports: ClipboardList,
 };
 
 export function TabBar() {
