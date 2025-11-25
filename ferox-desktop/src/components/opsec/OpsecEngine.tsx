@@ -14,9 +14,9 @@ import { clsx } from 'clsx';
 
 import { ThreatGauge } from './ThreatGauge';
 import { ThreatList, Threat } from './ThreatList';
-import { CountermeasureCard, Countermeasure } from './CountermeasureCard';
-import { EnvironmentPanel, EnvironmentAnalysis } from './EnvironmentPanel';
-import { TrafficMonitor, TrafficAnalysis } from './TrafficMonitor';
+import { CountermeasureCard } from './CountermeasureCard';
+import { EnvironmentPanel } from './EnvironmentPanel';
+import { TrafficMonitor } from './TrafficMonitor';
 import { useOpsec } from '../../hooks/useOpsec';
 
 interface OpsecEngineProps {
@@ -27,11 +27,12 @@ export function OpsecEngine({ className }: OpsecEngineProps) {
   const {
     status,
     countermeasures,
-    trafficAnalysis,
-    isLoading,
+    traffic: trafficAnalysis,
+    loading: isLoading,
     error,
     checkOpsec,
-    toggleCountermeasure,
+    activateCountermeasure,
+    deactivateCountermeasure,
     analyzeTraffic,
     goDark,
   } = useOpsec();
@@ -74,7 +75,11 @@ export function OpsecEngine({ className }: OpsecEngineProps) {
   };
 
   const handleToggleCountermeasure = async (id: string, enabled: boolean) => {
-    await toggleCountermeasure(id, enabled);
+    if (enabled) {
+      await activateCountermeasure(id);
+    } else {
+      await deactivateCountermeasure(id);
+    }
     toast.success(`Countermeasure ${enabled ? 'activated' : 'deactivated'}`, { duration: 2000 });
   };
 

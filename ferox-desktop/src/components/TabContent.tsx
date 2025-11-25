@@ -14,6 +14,7 @@ import {
 } from './modules';
 import { PayloadBuilder } from './PayloadBuilder';
 import { PostExploitation } from './post_exploitation';
+import { OpsecEngine } from './opsec/OpsecEngine';
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -57,6 +58,8 @@ export function TabContent() {
       return <MitreAttack sessionId={activeTab.sessionId} />;
     case 'reports':
       return <Reports sessionId={activeTab.sessionId} />;
+    case 'opsec':
+      return <OpsecEngine />;
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">

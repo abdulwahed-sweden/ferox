@@ -1,49 +1,53 @@
 /**
- * NetworkScanner - Simulated Network Scan Results
- * For demo/training purposes only - no real network access
+ * NetworkScanner - Network Scan with Real Backend Support
+ * Connects to Tauri backend for actual port scanning
  */
 
 import { useState } from 'react';
-import { Radar, Play, RefreshCw, Server, Wifi, Shield, Clock } from 'lucide-react';
+import { Radar, Play, RefreshCw, Server, Wifi, Shield, Clock, AlertTriangle } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
-import { simulateNetworkScan } from '../../lib/tauri';
-import type { SimulatedHost, NetworkScanResult } from '../../types';
+import { useScan } from '../../hooks/useScan';
+import type { HostScanResult } from '../../services/types';
 
 interface NetworkScannerProps {
   sessionId: string;
 }
 
-export function NetworkScanner({ sessionId }: NetworkScannerProps) {
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<NetworkScanResult | null>(null);
-  const [hosts, setHosts] = useState<SimulatedHost[]>([]);
-  const [selectedHost, setSelectedHost] = useState<SimulatedHost | null>(null);
-  const [scanRange, setScanRange] = useState('192.168.1.0/24');
+export function NetworkScanner({ sessionId: _sessionId }: NetworkScannerProps) {
+  const { loading, error, portResult, scanPorts, clearError } = useScan();
+  const [hosts, setHosts] = useState<HostScanResult[]>([]);
+  const [selectedHost, setSelectedHost] = useState<HostScanResult | null>(null);
+  const [scanRange, setScanRange] = useState('127.0.0.1');
+  const [portRange, setPortRange] = useState('22,80,443,3000,8080');
 
   const handleScan = async () => {
-    setIsScanning(true);
     setHosts([]);
     setSelectedHost(null);
-    setScanResult(null);
+    clearError();
 
     try {
-      toast.loading('Scanning network...', { id: 'scan' });
-      const result = await simulateNetworkScan(scanRange, sessionId);
+      toast.loading('Scanning ports...', { id: 'scan' });
+      const result = await scanPorts({
+        hosts: scanRange,
+        ports: portRange,
+        threads: 10,
+        timeout: 3000,
+      });
 
-      // Simulate progressive discovery for better UX
-      for (let i = 0; i < result.hosts.length; i++) {
-        await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
-        setHosts(prev => [...prev, result.hosts[i]]);
+      if (result) {
+        // Progressive discovery for better UX
+        for (let i = 0; i < result.hosts.length; i++) {
+          await new Promise(r => setTimeout(r, 100));
+          setHosts(prev => [...prev, result.hosts[i]]);
+        }
+        toast.success(`Scan complete: ${result.hosts_up} hosts up`, { id: 'scan' });
+      } else {
+        toast.error('Scan returned no results', { id: 'scan' });
       }
-
-      setScanResult(result);
-      toast.success(`Scan complete: ${result.hosts_up} hosts up`, { id: 'scan' });
-    } catch (error) {
-      console.error('Scan failed:', error);
+    } catch (err) {
+      console.error('Scan failed:', err);
       toast.error('Scan failed', { id: 'scan' });
-    } finally {
-      setIsScanning(false);
     }
   };
 
@@ -63,39 +67,75 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-dark-900">
+    <div className="h-full flex flex-col bg-dark-900 relative">
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-dark-900/80 z-50 flex items-center justify-center">
+          <div className="text-center">
+            <RefreshCw size={48} className="mx-auto mb-4 text-blue-400 animate-spin" />
+            <p className="text-text-primary font-medium">Scanning ports...</p>
+            <p className="text-xs text-text-muted mt-1">Target: {scanRange}</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
           <Radar className="text-blue-400" size={20} />
           <h2 className="text-lg font-semibold text-text-primary">Network Scanner</h2>
-          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">LIVE</span>
         </div>
-        <p className="text-xs text-text-muted mt-1">Simulated network discovery for demo/training</p>
+        <p className="text-xs text-text-muted mt-1">Real port scanning via Tauri backend</p>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-3 bg-red-500/10 border-b border-red-500/30">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={14} className="text-red-400" />
+            <span className="text-xs text-red-400">{error}</span>
+            <button onClick={clearError} className="ml-auto text-xs text-red-400 hover:text-red-300">Dismiss</button>
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="p-4 border-b border-dark-600 flex items-center gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={scanRange}
-            onChange={e => setScanRange(e.target.value)}
-            placeholder="192.168.1.0/24"
-            className="w-full max-w-xs px-3 py-2 bg-dark-700 border border-dark-600 rounded text-sm text-text-primary focus:border-blue-400/50 focus:outline-none"
-          />
+        <div className="flex items-center gap-2">
+          <div>
+            <label className="text-xs text-text-muted block mb-1">Target IP</label>
+            <input
+              type="text"
+              value={scanRange}
+              onChange={e => setScanRange(e.target.value)}
+              placeholder="127.0.0.1"
+              className="w-40 px-3 py-2 bg-dark-700 border border-dark-600 rounded text-sm text-text-primary focus:border-blue-400/50 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-text-muted block mb-1">Ports</label>
+            <input
+              type="text"
+              value={portRange}
+              onChange={e => setPortRange(e.target.value)}
+              placeholder="22,80,443"
+              className="w-48 px-3 py-2 bg-dark-700 border border-dark-600 rounded text-sm text-text-primary focus:border-blue-400/50 focus:outline-none"
+            />
+          </div>
         </div>
+        <div className="flex-1" />
         <button
           onClick={handleScan}
-          disabled={isScanning}
+          disabled={loading}
           className={clsx(
             'px-4 py-2 rounded font-medium text-sm flex items-center gap-2 transition-colors',
-            isScanning
+            loading
               ? 'bg-dark-600 text-text-muted cursor-not-allowed'
               : 'bg-blue-500 text-white hover:bg-blue-600'
           )}
         >
-          {isScanning ? (
+          {loading ? (
             <>
               <RefreshCw size={16} className="animate-spin" />
               Scanning...
@@ -107,14 +147,14 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
             </>
           )}
         </button>
-        {scanResult && (
+        {portResult && (
           <div className="flex items-center gap-4 text-xs text-text-muted">
             <span className="flex items-center gap-1">
               <Clock size={12} />
-              {(scanResult.scan_duration_ms / 1000).toFixed(1)}s
+              {(portResult.duration_ms / 1000).toFixed(1)}s
             </span>
-            <span className="text-green-400">{scanResult.hosts_up} up</span>
-            <span className="text-red-400">{scanResult.hosts_down} down</span>
+            <span className="text-green-400">{portResult.hosts_up} up</span>
+            <span className="text-text-muted">{portResult.total_hosts - portResult.hosts_up} down</span>
           </div>
         )}
       </div>
@@ -133,11 +173,11 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
             <div className="divide-y divide-dark-600">
               {hosts.map(host => (
                 <button
-                  key={host.id}
+                  key={host.ip}
                   onClick={() => setSelectedHost(host)}
                   className={clsx(
                     'w-full p-3 text-left hover:bg-dark-700 transition-colors',
-                    selectedHost?.id === host.id && 'bg-dark-700 border-l-2 border-l-blue-400'
+                    selectedHost?.ip === host.ip && 'bg-dark-700 border-l-2 border-l-blue-400'
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -149,8 +189,8 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-text-muted mt-1">{host.hostname}</div>
-                  <div className="text-xs text-text-muted">{host.os}</div>
+                  <div className="text-xs text-text-muted mt-1">{host.hostname || 'Unknown'}</div>
+                  <div className="text-xs text-text-muted">{host.os_guess || 'Unknown OS'}</div>
                   {host.status === 'up' && host.ports.length > 0 && (
                     <div className="flex items-center gap-1 mt-1">
                       <span className="text-xs text-green-400">{host.ports.filter(p => p.state === 'open').length} open</span>
@@ -174,23 +214,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <div className="text-xs text-text-muted">Hostname</div>
-                    <div className="text-sm text-text-primary">{selectedHost.hostname}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-text-muted">MAC Address</div>
-                    <div className="text-sm text-text-primary font-mono">{selectedHost.mac}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-text-muted">Operating System</div>
-                    <div className="text-sm text-text-primary">{selectedHost.os}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-text-muted">OS Version</div>
-                    <div className="text-sm text-text-primary">{selectedHost.os_version}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-text-muted">Vendor</div>
-                    <div className="text-sm text-text-primary">{selectedHost.vendor}</div>
+                    <div className="text-sm text-text-primary">{selectedHost.hostname || 'Unknown'}</div>
                   </div>
                   <div>
                     <div className="text-xs text-text-muted">Status</div>
@@ -198,19 +222,17 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                       {selectedHost.status.toUpperCase()}
                     </div>
                   </div>
+                  <div>
+                    <div className="text-xs text-text-muted">OS Guess</div>
+                    <div className="text-sm text-text-primary">{selectedHost.os_guess || 'Unknown'}</div>
+                  </div>
                   {selectedHost.status === 'up' && (
-                    <>
-                      <div>
-                        <div className="text-xs text-text-muted">Latency</div>
-                        <div className={clsx('text-sm', getLatencyColor(selectedHost.latency_ms))}>
-                          {selectedHost.latency_ms.toFixed(2)} ms
-                        </div>
+                    <div>
+                      <div className="text-xs text-text-muted">Latency</div>
+                      <div className={clsx('text-sm', getLatencyColor(selectedHost.latency_ms))}>
+                        {selectedHost.latency_ms.toFixed(2)} ms
                       </div>
-                      <div>
-                        <div className="text-xs text-text-muted">TTL</div>
-                        <div className="text-sm text-text-primary">{selectedHost.ttl}</div>
-                      </div>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -225,13 +247,13 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                     {selectedHost.ports.map((port, i) => (
                       <div key={i} className="bg-dark-900 rounded p-3">
                         <div className="flex items-center gap-4">
-                          <span className="text-sm font-mono text-text-primary w-16">{port.port}/{port.protocol}</span>
-                          <span className="text-sm text-text-secondary flex-1">{port.service}</span>
+                          <span className="text-sm font-mono text-text-primary w-16">{port.port}/tcp</span>
+                          <span className="text-sm text-text-secondary flex-1">{port.service || 'unknown'}</span>
                           <span className={clsx('text-xs px-2 py-0.5 rounded', getPortStateColor(port.state))}>
                             {port.state}
                           </span>
                         </div>
-                        <div className="text-xs text-text-muted mt-1">{port.version}</div>
+                        {port.version && <div className="text-xs text-text-muted mt-1">{port.version}</div>}
                         {port.banner && (
                           <div className="text-xs text-purple-400 mt-1 font-mono">Banner: {port.banner}</div>
                         )}
