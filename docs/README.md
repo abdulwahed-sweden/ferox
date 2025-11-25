@@ -18,6 +18,7 @@ docs/
 │   ├── dashboard.md
 │   ├── sessions.md
 │   ├── modules.md
+│   ├── reports.md       # NEW: Report generation (JSON, HTML, PDF)
 │   ├── maintenance.md
 │   └── troubleshooting.md
 │
@@ -25,6 +26,7 @@ docs/
 │   ├── architecture.md
 │   ├── c2.md
 │   ├── console.md
+│   ├── examples.md      # NEW: Test examples documentation
 │   └── memory-forensics.md
 │
 ├── api/                 # API documentation
@@ -44,12 +46,14 @@ docs/
 2. **First Steps**: Follow the [Getting Started Guide](user-guide/getting-started.md)
 3. **Understanding Sessions**: Learn about [Session Management](user-guide/sessions.md)
 4. **Post-Exploitation**: Explore [Available Modules](user-guide/modules.md)
+5. **Report Generation**: Learn about [Report Export](user-guide/reports.md) (JSON, HTML, PDF)
 
 ## For Developers
 
 - [Architecture Overview](developer/architecture.md) - System design and components
 - [C2 Protocol](developer/c2.md) - Command and control communication
 - [Memory Forensics](developer/memory-forensics.md) - Memory analysis capabilities
+- [Test Examples](developer/examples.md) - Report generation test examples
 
 ## Support
 

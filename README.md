@@ -14,7 +14,12 @@
 ```bash
 git clone https://github.com/abdulwahed-sweden/ferox
 cd ferox
+
+# Standard build
 cargo build --release --features memory-forensics
+
+# With PDF export support
+cargo build --release --features "memory-forensics,pdf-export"
 ```
 
 ### First Run
@@ -56,6 +61,13 @@ cargo build --release --features memory-forensics
 - High-speed scanning
 - Exploitation (authorized)
 - Post-exploitation: credentials, persistence, lateral movement
+
+### 📊 Report Generation (Phase 7)
+- **Multi-format export**: JSON, HTML, PDF
+- **PDF Export**: Professional reports via printpdf v0.8.2
+- **HTML Reports**: Cyber-neon themed with responsive design
+- **JSON Reports**: Structured data for automation and integration
+- **Comprehensive content**: Executive summary, results, sessions, timestamps
 
 ### 🔒 Post-Exploitation Engines (Phase 5)
 - **Persistence Engine**: Multi-platform persistence with 14 methods
@@ -188,6 +200,26 @@ ferox creds describe lsass_memory
 ferox creds show
 ```
 
+### Report Generation
+```bash
+# Export results from console
+ferox> results
+ferox> export json /path/to/report.json
+ferox> export html /path/to/report.html
+ferox> export pdf /path/to/report.pdf    # Requires pdf-export feature
+
+# Programmatic export via library API
+use ferox::core::reporter::{JsonReporter, HtmlReporter, PdfReporter, Reporter};
+let report_data = ReportData::new(results, sessions);
+JsonReporter.export(&report_data, Path::new("report.json"))?;
+HtmlReporter.export(&report_data, Path::new("report.html"))?;
+PdfReporter.export(&report_data, Path::new("report.pdf"))?;
+
+# Run test examples
+cargo run --example test_multi_module --features pdf-export
+cargo run --example test_advanced_modules --features pdf-export
+```
+
 ## 🎨 Interface — Mixed Predator Theme
 - Dark, high-contrast security palette
 - Minimal animations (calm UI)
@@ -305,6 +337,7 @@ See [Desktop Documentation](docs/developer/architecture.md) for details.
 - [x] **Phase 4** – Smart Payload System with execution command generators
 - [x] **Phase 5** – Post-Exploitation Engines (Persistence, PrivEsc, Credentials)
 - [x] **Phase 6** – Ferox Desktop (Tauri + React operations console)
+- [x] **Phase 7** – Report Generation (JSON, HTML, PDF export)
 - [ ] Signed plugin marketplace
 - [ ] Hardware-backed credential vault
 - [ ] Extended evasion techniques
