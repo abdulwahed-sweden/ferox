@@ -3,14 +3,28 @@
 //! Tests all major Ferox modules and generates reports
 //! Run with: cargo run --example test_multi_module --features pdf-export -- [REPORT_DIR]
 
+#[cfg(feature = "pdf-export")]
 use chrono::Utc;
+#[cfg(feature = "pdf-export")]
 use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
+#[cfg(feature = "pdf-export")]
 use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+#[cfg(feature = "pdf-export")]
 use ferox::core::result_store::StoredResult;
+#[cfg(feature = "pdf-export")]
 use std::collections::HashMap;
+#[cfg(feature = "pdf-export")]
 use std::path::Path;
+#[cfg(feature = "pdf-export")]
 use uuid::Uuid;
 
+#[cfg(not(feature = "pdf-export"))]
+fn main() {
+    println!("Multi-module test example requires the 'pdf-export' feature.");
+    println!("Run with: cargo run --example test_multi_module --features pdf-export -- [REPORT_DIR]");
+}
+
+#[cfg(feature = "pdf-export")]
 fn main() {
     let base_dir = std::env::args()
         .nth(1)
@@ -148,6 +162,7 @@ fn main() {
     }
 }
 
+#[cfg(feature = "pdf-export")]
 fn test_module(base_dir: &str, module_name: &str, category: &str, description: &str, test_results: Vec<(&str, bool, &str)>) {
     println!("Testing: {}/{}", category, module_name);
 

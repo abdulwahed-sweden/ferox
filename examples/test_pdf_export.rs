@@ -2,18 +2,26 @@
 //!
 //! Run with: cargo run --example test_pdf_export --features pdf-export
 
-use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
-use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
-use ferox::core::result_store::StoredResult;
-use std::collections::HashMap;
-use std::path::Path;
-use uuid::Uuid;
+#[cfg(feature = "pdf-export")]
 use chrono::Utc;
+#[cfg(feature = "pdf-export")]
+use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
+#[cfg(feature = "pdf-export")]
+use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+#[cfg(feature = "pdf-export")]
+use ferox::core::result_store::StoredResult;
+#[cfg(feature = "pdf-export")]
+use std::collections::HashMap;
+#[cfg(feature = "pdf-export")]
+use std::path::Path;
+#[cfg(feature = "pdf-export")]
+use uuid::Uuid;
 
+#[cfg(feature = "pdf-export")]
 fn main() {
     let report_dir = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "/Users/mansour/Desktop/ferox-reports-20251125-162108".to_string());
+        .unwrap_or_else(|| "/tmp/ferox-reports".to_string());
 
     println!("Generating test reports to: {}", report_dir);
 
@@ -69,6 +77,7 @@ fn main() {
     println!("\nDone! Check the reports in: {}", report_dir);
 }
 
+#[cfg(feature = "pdf-export")]
 fn create_result(name: &str, category: &str, success: bool, message: &str) -> StoredResult {
     StoredResult {
         id: Uuid::new_v4(),
@@ -86,4 +95,10 @@ fn create_result(name: &str, category: &str, success: bool, message: &str) -> St
             ModuleResult::error(message)
         },
     }
+}
+
+#[cfg(not(feature = "pdf-export"))]
+fn main() {
+    println!("PDF export example requires the 'pdf-export' feature.");
+    println!("Run with: cargo run --example test_pdf_export --features pdf-export");
 }

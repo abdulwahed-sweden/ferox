@@ -9,15 +9,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pdf-export: [enabled, disabled]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+      - name: Set feature flags
+        id: features
+        run: |
+          if [ "${{ matrix.pdf-export }}" = "enabled" ]; then
+            echo "CARGO_FEATURES=--features pdf-export" >> $GITHUB_OUTPUT
+          else
+            echo "CARGO_FEATURES=" >> $GITHUB_OUTPUT
+          fi
       - name: Check
-        run: cargo check --all-targets
+        run: cargo check --all-targets ${{ steps.features.outputs.CARGO_FEATURES }}
       - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets ${{ steps.features.outputs.CARGO_FEATURES }} -- -D warnings
       - name: Test
-        run: cargo test --all -- --quiet
-
+        run: cargo test --all ${{ steps.features.outputs.CARGO_FEATURES }} -- --quiet
