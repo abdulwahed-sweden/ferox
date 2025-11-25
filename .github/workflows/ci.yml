@@ -15,9 +15,9 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
       - name: Check
-        run: cargo check --all-targets
+        run: cargo check --all-targets --features pdf-export
       - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets --features pdf-export -- -D warnings
       - name: Test
-        run: cargo test --all -- --quiet
+        run: cargo test --all --features pdf-export -- --quiet
 
