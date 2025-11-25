@@ -5,14 +5,28 @@
 //!
 //! Run with: cargo run --example test_advanced_modules --features pdf-export -- [REPORT_DIR]
 
+#[cfg(feature = "pdf-export")]
 use chrono::Utc;
+#[cfg(feature = "pdf-export")]
 use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
+#[cfg(feature = "pdf-export")]
 use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+#[cfg(feature = "pdf-export")]
 use ferox::core::result_store::StoredResult;
+#[cfg(feature = "pdf-export")]
 use std::collections::HashMap;
+#[cfg(feature = "pdf-export")]
 use std::path::Path;
+#[cfg(feature = "pdf-export")]
 use uuid::Uuid;
 
+#[cfg(not(feature = "pdf-export"))]
+fn main() {
+    println!("Advanced modules test example requires the 'pdf-export' feature.");
+    println!("Run with: cargo run --example test_advanced_modules --features pdf-export -- [REPORT_DIR]");
+}
+
+#[cfg(feature = "pdf-export")]
 fn main() {
     let timestamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
     let base_dir = std::env::args()
@@ -155,6 +169,7 @@ fn main() {
     println!("📁 Reports saved to: {}", base_dir);
 }
 
+#[cfg(feature = "pdf-export")]
 fn test_module(
     base_dir: &str,
     module_name: &str,
@@ -245,6 +260,7 @@ fn test_module(
     }
 }
 
+#[cfg(feature = "pdf-export")]
 fn create_summary(base_dir: &str, modules: &[(&str, &str)]) {
     let summary_path = format!("{}/SUMMARY.md", base_dir);
     let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
@@ -289,7 +305,7 @@ fn create_summary(base_dir: &str, modules: &[(&str, &str)]) {
 "#,
         timestamp,
         base_dir,
-        base_dir.split('/').last().unwrap_or("ferox-advanced-test")
+        base_dir.split('/').next_back().unwrap_or("ferox-advanced-test")
     );
 
     // Add file tree
