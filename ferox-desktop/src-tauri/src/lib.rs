@@ -10,7 +10,11 @@ pub mod session;
 pub mod terminal;
 
 use bridge::FeroxBridge;
-use commands::{module_commands, payload_commands, session_commands, simulation_commands, terminal_commands};
+use commands::{
+    module_commands, payload_commands, session_commands, simulation_commands, terminal_commands,
+    // Phase 2: New command modules
+    scanner_commands, recon_commands, opsec_commands, network_commands,
+};
 use security::AuditLogger;
 use terminal::TerminalManager;
 
@@ -151,6 +155,29 @@ pub fn run() {
             simulation_commands::simulate_session_notes,
             simulation_commands::simulate_directory_listing,
             simulation_commands::simulate_process_list,
+            // Phase 2: Scanner commands
+            scanner_commands::scan_ports,
+            scanner_commands::scan_http,
+            // Phase 2: Recon commands
+            recon_commands::dns_enum,
+            recon_commands::whois_lookup,
+            recon_commands::subdomain_enum,
+            recon_commands::asn_lookup,
+            // Phase 2: OPSEC commands
+            opsec_commands::check_opsec,
+            opsec_commands::get_countermeasures,
+            opsec_commands::activate_countermeasure,
+            opsec_commands::deactivate_countermeasure,
+            opsec_commands::analyze_environment,
+            opsec_commands::analyze_traffic,
+            // Phase 2: Network commands
+            network_commands::get_topology,
+            network_commands::discover_hosts,
+            network_commands::add_topology_node,
+            network_commands::add_topology_connection,
+            network_commands::remove_topology_node,
+            network_commands::update_node_status,
+            network_commands::mark_compromised,
         ])
         .build(tauri::generate_context!())
         .expect("Failed to build Tauri application")
