@@ -491,231 +491,445 @@ impl PdfReporter {
     const PAGE_WIDTH: f32 = 210.0; // A4 width in mm
     const PAGE_HEIGHT: f32 = 297.0; // A4 height in mm
     const MARGIN: f32 = 20.0;
-    const LINE_HEIGHT: f32 = 6.0;
+    const CONTENT_WIDTH: f32 = 170.0; // PAGE_WIDTH - 2*MARGIN
 
-    fn add_text(
-        layer: &PdfLayerReference,
-        text: &str,
-        x: f32,
-        y: f32,
-        font: &IndirectFontRef,
-        size: f32,
-    ) {
-        layer.use_text(text, size, Mm(x), Mm(y), font);
+    /// Helper to write text with builtin font
+    fn write_text(text: &str, font: BuiltinFont) -> Op {
+        Op::WriteTextBuiltinFont {
+            items: vec![TextItem::Text(text.to_string())],
+            font,
+        }
+    }
+
+    /// Helper to set font size for builtin font
+    fn set_font(font: BuiltinFont, size: f32) -> Op {
+        Op::SetFontSizeBuiltinFont {
+            font,
+            size: Pt(size),
+        }
+    }
+
+    /// Helper to set RGB fill color
+    fn set_color(r: f32, g: f32, b: f32) -> Op {
+        Op::SetFillColor {
+            col: Color::Rgb(Rgb {
+                r,
+                g,
+                b,
+                icc_profile: None,
+            }),
+        }
+    }
+
+    /// Build PDF operations for the report content
+    fn build_operations(data: &ReportData) -> Vec<Op> {
+        let mut ops = Vec::new();
+
+        // Initialize text section
+        ops.push(Op::SaveGraphicsState);
+        ops.push(Op::StartTextSection);
+
+        // Position cursor at top of page (from bottom-left origin)
+        ops.push(Op::SetTextCursor {
+            pos: Point::new(Mm(Self::MARGIN), Mm(Self::PAGE_HEIGHT - Self::MARGIN)),
+        });
+
+        // ========== TITLE ==========
+        ops.push(Self::set_font(BuiltinFont::HelveticaBold, 24.0));
+        ops.push(Op::SetLineHeight { lh: Pt(28.0) });
+        ops.push(Self::set_color(0.9, 0.3, 0.2)); // Ferox red
+        ops.push(Self::write_text("FEROX FRAMEWORK REPORT", BuiltinFont::HelveticaBold));
+        ops.push(Op::AddLineBreak);
+
+        // Subtitle
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 12.0));
+        ops.push(Op::SetLineHeight { lh: Pt(16.0) });
+        ops.push(Self::set_color(0.4, 0.4, 0.4));
+        ops.push(Self::write_text("Security Assessment Results", BuiltinFont::Helvetica));
+        ops.push(Op::AddLineBreak);
+        ops.push(Op::AddLineBreak);
+
+        // ========== METADATA ==========
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 10.0));
+        ops.push(Op::SetLineHeight { lh: Pt(14.0) });
+        ops.push(Self::set_color(0.3, 0.3, 0.3));
+        ops.push(Self::write_text(
+            &format!(
+                "Generated: {}",
+                data.generated_at.format("%Y-%m-%d %H:%M:%S UTC")
+            ),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+        ops.push(Self::write_text(
+            &format!("Ferox Version: {}", data.ferox_version),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+        ops.push(Op::AddLineBreak);
+
+        // ========== EXECUTIVE SUMMARY ==========
+        ops.push(Self::set_font(BuiltinFont::HelveticaBold, 14.0));
+        ops.push(Op::SetLineHeight { lh: Pt(18.0) });
+        ops.push(Self::set_color(0.2, 0.2, 0.2));
+        ops.push(Self::write_text("EXECUTIVE SUMMARY", BuiltinFont::HelveticaBold));
+        ops.push(Op::AddLineBreak);
+
+        // Draw a separator line effect with dashes
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+        ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+        ops.push(Self::set_color(0.8, 0.8, 0.8));
+        ops.push(Self::write_text(
+            "--------------------------------------------------------------------------------",
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+
+        // Summary stats
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 11.0));
+        ops.push(Op::SetLineHeight { lh: Pt(16.0) });
+        ops.push(Self::set_color(0.2, 0.2, 0.2));
+
+        // Total Results
+        ops.push(Self::write_text(
+            &format!("Total Results:     {}", data.summary.total_results),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+
+        // Successful (green)
+        ops.push(Self::set_color(0.1, 0.6, 0.3));
+        ops.push(Self::write_text(
+            &format!("Successful:        {}", data.summary.successful_results),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+
+        // Failed (red)
+        ops.push(Self::set_color(0.8, 0.2, 0.2));
+        ops.push(Self::write_text(
+            &format!("Failed:            {}", data.summary.failed_results),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+
+        // Sessions (blue)
+        ops.push(Self::set_color(0.2, 0.4, 0.8));
+        ops.push(Self::write_text(
+            &format!(
+                "Active Sessions:   {} / {}",
+                data.summary.active_sessions, data.summary.total_sessions
+            ),
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+        ops.push(Op::AddLineBreak);
+
+        // ========== MODULES USED ==========
+        if !data.summary.modules_used.is_empty() {
+            ops.push(Self::set_font(BuiltinFont::HelveticaBold, 14.0));
+            ops.push(Op::SetLineHeight { lh: Pt(18.0) });
+            ops.push(Self::set_color(0.2, 0.2, 0.2));
+            ops.push(Self::write_text("MODULES USED", BuiltinFont::HelveticaBold));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+            ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+            ops.push(Self::set_color(0.8, 0.8, 0.8));
+            ops.push(Self::write_text(
+                "--------------------------------------------------------------------------------",
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 10.0));
+            ops.push(Op::SetLineHeight { lh: Pt(14.0) });
+            ops.push(Self::set_color(0.3, 0.5, 0.7));
+
+            for module in &data.summary.modules_used {
+                ops.push(Self::write_text(&format!("  * {}", module), BuiltinFont::Helvetica));
+                ops.push(Op::AddLineBreak);
+            }
+            ops.push(Op::AddLineBreak);
+        }
+
+        // ========== TIME RANGE ==========
+        if let Some(ref time_range) = data.summary.time_range {
+            ops.push(Self::set_font(BuiltinFont::HelveticaBold, 14.0));
+            ops.push(Op::SetLineHeight { lh: Pt(18.0) });
+            ops.push(Self::set_color(0.2, 0.2, 0.2));
+            ops.push(Self::write_text("TIME RANGE", BuiltinFont::HelveticaBold));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+            ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+            ops.push(Self::set_color(0.8, 0.8, 0.8));
+            ops.push(Self::write_text(
+                "--------------------------------------------------------------------------------",
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 10.0));
+            ops.push(Op::SetLineHeight { lh: Pt(14.0) });
+            ops.push(Self::set_color(0.3, 0.3, 0.3));
+            ops.push(Self::write_text(
+                &format!(
+                    "Start: {}",
+                    time_range.start.format("%Y-%m-%d %H:%M:%S UTC")
+                ),
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+            ops.push(Self::write_text(
+                &format!("End:   {}", time_range.end.format("%Y-%m-%d %H:%M:%S UTC")),
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+            ops.push(Op::AddLineBreak);
+        }
+
+        // ========== DETAILED RESULTS ==========
+        if !data.results.is_empty() {
+            ops.push(Self::set_font(BuiltinFont::HelveticaBold, 14.0));
+            ops.push(Op::SetLineHeight { lh: Pt(18.0) });
+            ops.push(Self::set_color(0.2, 0.2, 0.2));
+            ops.push(Self::write_text(
+                &format!("EXECUTION RESULTS ({})", data.results.len()),
+                BuiltinFont::HelveticaBold,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+            ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+            ops.push(Self::set_color(0.8, 0.8, 0.8));
+            ops.push(Self::write_text(
+                "--------------------------------------------------------------------------------",
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            // Show up to 10 results with details
+            let max_results = 10.min(data.results.len());
+            for (idx, result) in data.results.iter().take(max_results).enumerate() {
+                let status_text = if result.result.success {
+                    "SUCCESS"
+                } else {
+                    "FAILED"
+                };
+                let module_path =
+                    format!("{}/{}", result.module_info.category, result.module_info.name);
+
+                // Result header with status
+                ops.push(Self::set_font(BuiltinFont::HelveticaBold, 11.0));
+                ops.push(Op::SetLineHeight { lh: Pt(15.0) });
+
+                if result.result.success {
+                    ops.push(Self::set_color(0.1, 0.6, 0.3)); // Green
+                } else {
+                    ops.push(Self::set_color(0.8, 0.2, 0.2)); // Red
+                }
+
+                ops.push(Self::write_text(
+                    &format!("{}. [{}] {}", idx + 1, status_text, module_path),
+                    BuiltinFont::HelveticaBold,
+                ));
+                ops.push(Op::AddLineBreak);
+
+                // Module info
+                ops.push(Self::set_font(BuiltinFont::Helvetica, 9.0));
+                ops.push(Op::SetLineHeight { lh: Pt(12.0) });
+                ops.push(Self::set_color(0.4, 0.4, 0.4));
+                ops.push(Self::write_text(
+                    &format!(
+                        "   Module: {} v{} by {}",
+                        result.module_info.name, result.module_info.version, result.module_info.author
+                    ),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+
+                // Timestamp
+                ops.push(Self::write_text(
+                    &format!(
+                        "   Time: {}",
+                        result.result.timestamp.format("%Y-%m-%d %H:%M:%S UTC")
+                    ),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+
+                // Message
+                ops.push(Self::set_color(0.2, 0.2, 0.2));
+                ops.push(Self::write_text(
+                    &format!("   Message: {}", result.result.message),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+
+                // Description (truncated)
+                let desc = if result.module_info.description.len() > 80 {
+                    format!("{}...", &result.module_info.description[..77])
+                } else {
+                    result.module_info.description.clone()
+                };
+                ops.push(Self::set_color(0.5, 0.5, 0.5));
+                ops.push(Self::write_text(
+                    &format!("   Desc: {}", desc),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+                ops.push(Op::AddLineBreak);
+            }
+
+            // Show remaining count
+            if data.results.len() > max_results {
+                ops.push(Self::set_font(BuiltinFont::Helvetica, 10.0));
+                ops.push(Op::SetLineHeight { lh: Pt(14.0) });
+                ops.push(Self::set_color(0.5, 0.5, 0.5));
+                ops.push(Self::write_text(
+                    &format!(
+                        "... and {} more results (see JSON/HTML export for full details)",
+                        data.results.len() - max_results
+                    ),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+            }
+        }
+
+        // ========== SESSIONS ==========
+        if !data.sessions.is_empty() {
+            ops.push(Op::AddLineBreak);
+            ops.push(Self::set_font(BuiltinFont::HelveticaBold, 14.0));
+            ops.push(Op::SetLineHeight { lh: Pt(18.0) });
+            ops.push(Self::set_color(0.2, 0.2, 0.2));
+            ops.push(Self::write_text(
+                &format!("SESSIONS ({})", data.sessions.len()),
+                BuiltinFont::HelveticaBold,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+            ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+            ops.push(Self::set_color(0.8, 0.8, 0.8));
+            ops.push(Self::write_text(
+                "--------------------------------------------------------------------------------",
+                BuiltinFont::Helvetica,
+            ));
+            ops.push(Op::AddLineBreak);
+
+            let max_sessions = 5.min(data.sessions.len());
+            for session in data.sessions.iter().take(max_sessions) {
+                ops.push(Self::set_font(BuiltinFont::Helvetica, 10.0));
+                ops.push(Op::SetLineHeight { lh: Pt(14.0) });
+
+                if session.active {
+                    ops.push(Self::set_color(0.1, 0.6, 0.3)); // Green for active
+                } else {
+                    ops.push(Self::set_color(0.5, 0.5, 0.5)); // Gray for inactive
+                }
+
+                let status = if session.active { "ACTIVE" } else { "INACTIVE" };
+                ops.push(Self::write_text(
+                    &format!(
+                        "[{}] {} - {} @ {}",
+                        status, session.id, session.module, session.target
+                    ),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+
+                ops.push(Self::set_color(0.4, 0.4, 0.4));
+                ops.push(Self::set_font(BuiltinFont::Helvetica, 9.0));
+                ops.push(Op::SetLineHeight { lh: Pt(12.0) });
+
+                let user_info = session
+                    .user
+                    .as_ref()
+                    .map(|u| format!(" | User: {}", u))
+                    .unwrap_or_default();
+                ops.push(Self::write_text(
+                    &format!(
+                        "   Platform: {:?} | Established: {}{}",
+                        session.platform,
+                        session.established_at.format("%Y-%m-%d %H:%M:%S"),
+                        user_info
+                    ),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+            }
+
+            if data.sessions.len() > max_sessions {
+                ops.push(Self::set_color(0.5, 0.5, 0.5));
+                ops.push(Self::write_text(
+                    &format!("... and {} more sessions", data.sessions.len() - max_sessions),
+                    BuiltinFont::Helvetica,
+                ));
+                ops.push(Op::AddLineBreak);
+            }
+        }
+
+        // End text section for main content
+        ops.push(Op::EndTextSection);
+        ops.push(Op::RestoreGraphicsState);
+
+        // ========== FOOTER (separate text section at fixed position) ==========
+        ops.push(Op::SaveGraphicsState);
+        ops.push(Op::StartTextSection);
+        ops.push(Op::SetTextCursor {
+            pos: Point::new(Mm(Self::MARGIN), Mm(15.0)),
+        });
+
+        // Footer separator
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 8.0));
+        ops.push(Op::SetLineHeight { lh: Pt(10.0) });
+        ops.push(Self::set_color(0.7, 0.7, 0.7));
+        ops.push(Self::write_text(
+            "________________________________________________________________________________",
+            BuiltinFont::Helvetica,
+        ));
+        ops.push(Op::AddLineBreak);
+
+        ops.push(Self::set_font(BuiltinFont::HelveticaBold, 9.0));
+        ops.push(Op::SetLineHeight { lh: Pt(12.0) });
+        ops.push(Self::set_color(0.9, 0.3, 0.2));
+        ops.push(Self::write_text("Ferox Framework", BuiltinFont::HelveticaBold));
+
+        ops.push(Self::set_font(BuiltinFont::Helvetica, 9.0));
+        ops.push(Self::set_color(0.5, 0.5, 0.5));
+        ops.push(Self::write_text(
+            &format!(" v{} - Fast. Fierce. Fearless.", data.ferox_version),
+            BuiltinFont::Helvetica,
+        ));
+
+        ops.push(Op::EndTextSection);
+        ops.push(Op::RestoreGraphicsState);
+
+        ops
     }
 }
 
 #[cfg(feature = "pdf-export")]
 impl Reporter for PdfReporter {
     fn export(&self, data: &ReportData, output_path: &Path) -> Result<()> {
-        let (doc, page1, layer1) = PdfDocument::new(
-            "Ferox Framework Report",
-            Mm(Self::PAGE_WIDTH),
-            Mm(Self::PAGE_HEIGHT),
-            "Layer 1",
-        );
+        // Create a new PDF document with the printpdf 0.8.x API
+        let mut doc = PdfDocument::new("Ferox Framework Report");
 
-        let current_layer = doc.get_page(page1).get_layer(layer1);
+        // Build operations for the page content
+        let ops = Self::build_operations(data);
 
-        // Add fonts
-        let font = doc.add_builtin_font(BuiltinFont::Helvetica)?;
-        let font_bold = doc.add_builtin_font(BuiltinFont::HelveticaBold)?;
+        // Create a page with A4 dimensions and our operations
+        let page = PdfPage::new(Mm(Self::PAGE_WIDTH), Mm(Self::PAGE_HEIGHT), ops);
 
-        let mut y_pos = Self::PAGE_HEIGHT - Self::MARGIN;
+        // Save the document
+        let bytes = doc
+            .with_pages(vec![page])
+            .save(&PdfSaveOptions::default(), &mut Vec::new());
 
-        // Title
-        Self::add_text(
-            &current_layer,
-            "FEROX FRAMEWORK REPORT",
-            Self::MARGIN,
-            y_pos,
-            &font_bold,
-            20.0,
-        );
-        y_pos -= Self::LINE_HEIGHT * 2.0;
-
-        // Metadata
-        Self::add_text(
-            &current_layer,
-            &format!(
-                "Generated: {}",
-                data.generated_at.format("%Y-%m-%d %H:%M:%S UTC")
-            ),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT;
-
-        Self::add_text(
-            &current_layer,
-            &format!("Ferox Version: {}", data.ferox_version),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT * 2.0;
-
-        // Summary
-        Self::add_text(
-            &current_layer,
-            "SUMMARY",
-            Self::MARGIN,
-            y_pos,
-            &font_bold,
-            14.0,
-        );
-        y_pos -= Self::LINE_HEIGHT * 1.5;
-
-        Self::add_text(
-            &current_layer,
-            &format!("Total Results: {}", data.summary.total_results),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT;
-
-        Self::add_text(
-            &current_layer,
-            &format!("Successful: {}", data.summary.successful_results),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT;
-
-        Self::add_text(
-            &current_layer,
-            &format!("Failed: {}", data.summary.failed_results),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT;
-
-        Self::add_text(
-            &current_layer,
-            &format!(
-                "Sessions: {} active / {} total",
-                data.summary.active_sessions, data.summary.total_sessions
-            ),
-            Self::MARGIN,
-            y_pos,
-            &font,
-            10.0,
-        );
-        y_pos -= Self::LINE_HEIGHT * 2.0;
-
-        // Modules used
-        if !data.summary.modules_used.is_empty() {
-            Self::add_text(
-                &current_layer,
-                "MODULES USED",
-                Self::MARGIN,
-                y_pos,
-                &font_bold,
-                14.0,
-            );
-            y_pos -= Self::LINE_HEIGHT * 1.5;
-
-            for module in &data.summary.modules_used {
-                Self::add_text(
-                    &current_layer,
-                    &format!("• {}", module),
-                    Self::MARGIN,
-                    y_pos,
-                    &font,
-                    10.0,
-                );
-                y_pos -= Self::LINE_HEIGHT;
-            }
-            y_pos -= Self::LINE_HEIGHT;
-        }
-
-        // Results summary (limited to first few to fit on page)
-        if !data.results.is_empty() {
-            Self::add_text(
-                &current_layer,
-                "RESULTS",
-                Self::MARGIN,
-                y_pos,
-                &font_bold,
-                14.0,
-            );
-            y_pos -= Self::LINE_HEIGHT * 1.5;
-
-            let max_results = 5.min(data.results.len());
-            for result in data.results.iter().take(max_results) {
-                let status = if result.result.success {
-                    "SUCCESS"
-                } else {
-                    "FAILED"
-                };
-                let module = format!(
-                    "{}/{}",
-                    result.module_info.category, result.module_info.name
-                );
-
-                Self::add_text(
-                    &current_layer,
-                    &format!("[{}] {}", status, module),
-                    Self::MARGIN,
-                    y_pos,
-                    &font_bold,
-                    10.0,
-                );
-                y_pos -= Self::LINE_HEIGHT;
-
-                Self::add_text(
-                    &current_layer,
-                    &format!("  {}", result.result.message),
-                    Self::MARGIN,
-                    y_pos,
-                    &font,
-                    9.0,
-                );
-                y_pos -= Self::LINE_HEIGHT * 1.5;
-
-                if y_pos < Self::MARGIN + 20.0 {
-                    break; // Stop if we're running out of space
-                }
-            }
-
-            if data.results.len() > max_results {
-                Self::add_text(
-                    &current_layer,
-                    &format!("... and {} more results", data.results.len() - max_results),
-                    Self::MARGIN,
-                    y_pos,
-                    &font,
-                    9.0,
-                );
-            }
-        }
-
-        // Footer
-        Self::add_text(
-            &current_layer,
-            "Generated by Ferox Framework - Fast. Fierce. Fearless.",
-            Self::MARGIN,
-            Self::MARGIN,
-            &font,
-            8.0,
-        );
-
-        // Save document
-        let file = File::create(output_path)
-            .with_context(|| format!("Failed to create PDF file: {}", output_path.display()))?;
-
-        let mut writer = BufWriter::new(file);
-        doc.save(&mut writer)
-            .with_context(|| "Failed to save PDF document")?;
+        std::fs::write(output_path, bytes)
+            .with_context(|| format!("Failed to write PDF to {}", output_path.display()))?;
 
         Ok(())
     }
