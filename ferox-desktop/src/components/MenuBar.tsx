@@ -68,7 +68,7 @@ function MenuItem({ icon, label, shortcut, onClick, disabled, danger }: MenuItem
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        'w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors',
+        'w-full px-3 py-1.5 text-left text-sm whitespace-nowrap flex items-center gap-2 transition-colors',
         disabled
           ? 'text-text-muted cursor-not-allowed'
           : danger
@@ -76,7 +76,7 @@ function MenuItem({ icon, label, shortcut, onClick, disabled, danger }: MenuItem
           : 'hover:bg-dark-700 text-text-secondary hover:text-text-primary'
       )}
     >
-      {icon && <span className="w-4 h-4 flex items-center justify-center">{icon}</span>}
+      {icon && <span className="w-3.5 h-3.5 flex items-center justify-center">{icon}</span>}
       <span className="flex-1">{label}</span>
       {shortcut && <span className="text-xs text-text-muted">{shortcut}</span>}
     </button>
