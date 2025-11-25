@@ -5,7 +5,9 @@
 
 use chrono::Utc;
 use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
-use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+#[cfg(feature = "pdf-export")]
+use ferox::core::reporter::PdfReporter;
+use ferox::core::reporter::{HtmlReporter, JsonReporter, ReportData, Reporter};
 use ferox::core::result_store::StoredResult;
 use std::collections::HashMap;
 use std::path::Path;
@@ -223,9 +225,16 @@ fn test_module(base_dir: &str, module_name: &str, category: &str, description: &
     }
 
     // Export PDF
-    let pdf_path = format!("{}/report.pdf", module_dir);
-    match PdfReporter.export(&report_data, Path::new(&pdf_path)) {
-        Ok(_) => println!("PDF"),
-        Err(e) => println!("PDF(err:{})", e),
+    #[cfg(feature = "pdf-export")]
+    {
+        let pdf_path = format!("{}/report.pdf", module_dir);
+        match PdfReporter.export(&report_data, Path::new(&pdf_path)) {
+            Ok(_) => println!("PDF"),
+            Err(e) => println!("PDF(err:{})", e),
+        }
+    }
+    #[cfg(not(feature = "pdf-export"))]
+    {
+        println!("PDF(disabled)");
     }
 }

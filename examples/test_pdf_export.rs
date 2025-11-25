@@ -3,7 +3,9 @@
 //! Run with: cargo run --example test_pdf_export --features pdf-export
 
 use ferox::core::module::{ModuleInfo, ModuleResult, ModuleType, Platform, Session};
-use ferox::core::reporter::{HtmlReporter, JsonReporter, PdfReporter, ReportData, Reporter};
+#[cfg(feature = "pdf-export")]
+use ferox::core::reporter::PdfReporter;
+use ferox::core::reporter::{HtmlReporter, JsonReporter, ReportData, Reporter};
 use ferox::core::result_store::StoredResult;
 use std::collections::HashMap;
 use std::path::Path;
@@ -60,10 +62,17 @@ fn main() {
     }
 
     // Export PDF
-    let pdf_path = format!("{}/scan-test.pdf", report_dir);
-    match PdfReporter.export(&report_data, Path::new(&pdf_path)) {
-        Ok(_) => println!("✓ PDF exported: {}", pdf_path),
-        Err(e) => println!("✗ PDF export failed: {}", e),
+    #[cfg(feature = "pdf-export")]
+    {
+        let pdf_path = format!("{}/scan-test.pdf", report_dir);
+        match PdfReporter.export(&report_data, Path::new(&pdf_path)) {
+            Ok(_) => println!("✓ PDF exported: {}", pdf_path),
+            Err(e) => println!("✗ PDF export failed: {}", e),
+        }
+    }
+    #[cfg(not(feature = "pdf-export"))]
+    {
+        println!("⚠ PDF export disabled (compile with --features pdf-export)");
     }
 
     println!("\nDone! Check the reports in: {}", report_dir);
