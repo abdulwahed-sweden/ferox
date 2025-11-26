@@ -249,7 +249,7 @@ pub async fn opsec_find_targets(criteria: String) -> Result<Vec<TargetProcess>, 
 pub async fn opsec_inject(
     technique: String,
     target_pid: u32,
-    shellcode: Option<String>,
+    _shellcode: Option<String>,
 ) -> Result<InjectionResult, String> {
     tracing::info!("Executing injection: {} -> PID {}", technique, target_pid);
 
@@ -342,8 +342,8 @@ pub async fn opsec_start_exfil(
     endpoint: String,
     chunk_size: usize,
     delay_ms: u64,
-    jitter_percent: u8,
-    encryption: bool,
+    _jitter_percent: u8,
+    _encryption: bool,
     data: String,
 ) -> Result<ExfilSession, String> {
     tracing::info!(

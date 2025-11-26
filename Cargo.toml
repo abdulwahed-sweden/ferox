@@ -4,7 +4,7 @@ resolver = "2"
 
 [package]
 name = "ferox"
-version = "3.0.0"
+version = "3.1.1"
 edition = "2024"
 authors = ["Abdulwahed Mansour <abdulwahed.mansour@gmail.com>"]
 description = "Ferocious security framework built in Rust - Fast, Fierce, Fearless"
