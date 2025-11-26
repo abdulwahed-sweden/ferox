@@ -72,7 +72,8 @@ export type TabType =
   | 'postexploitation'
   | 'networkmap'
   | 'mitre'
-  | 'reports';
+  | 'reports'
+  | 'opsec';
 
 export interface Tab {
   id: string;

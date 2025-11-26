@@ -7,3 +7,4 @@ pub mod terminal_commands;
 pub mod module_commands;
 pub mod payload_commands;
 pub mod simulation_commands;
+pub mod opsec_commands;

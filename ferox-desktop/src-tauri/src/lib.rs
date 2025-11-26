@@ -10,7 +10,7 @@ pub mod session;
 pub mod terminal;
 
 use bridge::FeroxBridge;
-use commands::{module_commands, payload_commands, session_commands, simulation_commands, terminal_commands};
+use commands::{module_commands, opsec_commands, payload_commands, session_commands, simulation_commands, terminal_commands};
 use security::AuditLogger;
 use terminal::TerminalManager;
 
@@ -151,6 +151,19 @@ pub fn run() {
             simulation_commands::simulate_session_notes,
             simulation_commands::simulate_directory_listing,
             simulation_commands::simulate_process_list,
+            // OPSEC commands
+            opsec_commands::opsec_scan_edr,
+            opsec_commands::opsec_scan_environment,
+            opsec_commands::opsec_bypass_amsi,
+            opsec_commands::opsec_patch_etw,
+            opsec_commands::opsec_memory_evasion,
+            opsec_commands::opsec_find_targets,
+            opsec_commands::opsec_inject,
+            opsec_commands::opsec_list_exfil_channels,
+            opsec_commands::opsec_start_exfil,
+            opsec_commands::opsec_get_exfil_sessions,
+            opsec_commands::opsec_set_stealth_level,
+            opsec_commands::opsec_get_status,
         ])
         .build(tauri::generate_context!())
         .expect("Failed to build Tauri application")
