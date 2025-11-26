@@ -1,0 +1,266 @@
+/* ferox-desktop/src/styles/glow.css */
+/* Glow effects and visual enhancements */
+
+/* === Glow Classes === */
+.glow-cyan {
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.2),
+    0 0 30px rgba(34, 211, 238, 0.1);
+}
+
+.glow-cyan-lg {
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4), 0 0 30px rgba(34, 211, 238, 0.3),
+    0 0 45px rgba(34, 211, 238, 0.2);
+}
+
+.glow-green {
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2),
+    0 0 30px rgba(74, 222, 128, 0.1);
+}
+
+.glow-green-lg {
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.4), 0 0 30px rgba(74, 222, 128, 0.3),
+    0 0 45px rgba(74, 222, 128, 0.2);
+}
+
+.glow-red {
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.3), 0 0 20px rgba(248, 113, 113, 0.2),
+    0 0 30px rgba(248, 113, 113, 0.1);
+}
+
+.glow-red-lg {
+  box-shadow: 0 0 15px rgba(248, 113, 113, 0.4), 0 0 30px rgba(248, 113, 113, 0.3),
+    0 0 45px rgba(248, 113, 113, 0.2);
+}
+
+.glow-yellow {
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.3), 0 0 20px rgba(250, 204, 21, 0.2),
+    0 0 30px rgba(250, 204, 21, 0.1);
+}
+
+.glow-purple {
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3), 0 0 20px rgba(168, 85, 247, 0.2),
+    0 0 30px rgba(168, 85, 247, 0.1);
+}
+
+/* === Text Glow === */
+.text-glow-cyan {
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5), 0 0 20px rgba(34, 211, 238, 0.3);
+}
+
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5), 0 0 20px rgba(74, 222, 128, 0.3);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.5), 0 0 20px rgba(248, 113, 113, 0.3);
+}
+
+/* === Animated Glow === */
+@keyframes pulse-glow-cyan {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.5), 0 0 30px rgba(34, 211, 238, 0.3);
+  }
+}
+
+@keyframes pulse-glow-green {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.5), 0 0 30px rgba(74, 222, 128, 0.3);
+  }
+}
+
+@keyframes pulse-glow-red {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.3), 0 0 20px rgba(248, 113, 113, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(248, 113, 113, 0.5), 0 0 30px rgba(248, 113, 113, 0.3);
+  }
+}
+
+.animate-glow-cyan {
+  animation: pulse-glow-cyan 2s ease-in-out infinite;
+}
+
+.animate-glow-green {
+  animation: pulse-glow-green 2s ease-in-out infinite;
+}
+
+.animate-glow-red {
+  animation: pulse-glow-red 1.5s ease-in-out infinite;
+}
+
+/* === Border Glow === */
+.border-glow-cyan {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 5px rgba(34, 211, 238, 0.3) inset, 0 0 10px rgba(34, 211, 238, 0.2);
+}
+
+.border-glow-green {
+  border-color: rgba(74, 222, 128, 0.5);
+  box-shadow: 0 0 5px rgba(74, 222, 128, 0.3) inset, 0 0 10px rgba(74, 222, 128, 0.2);
+}
+
+.border-glow-red {
+  border-color: rgba(248, 113, 113, 0.5);
+  box-shadow: 0 0 5px rgba(248, 113, 113, 0.3) inset, 0 0 10px rgba(248, 113, 113, 0.2);
+}
+
+/* === Hover Effects === */
+.hover-glow-cyan:hover {
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow-green:hover {
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+/* === Gradient Glow Background === */
+.gradient-glow-cyan {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 211, 238, 0.1) 0%,
+    rgba(34, 211, 238, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+.gradient-glow-green {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 222, 128, 0.1) 0%,
+    rgba(74, 222, 128, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+/* === Scanning Line Effect === */
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.scan-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.8) 50%,
+    transparent 100%
+  );
+  animation: scan-line 2s linear infinite;
+}
+
+/* === Shimmer Effect === */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* === Loading Skeleton === */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* === Glass Morphism === */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* === Card Hover Effects === */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* === Focus Ring === */
+.focus-glow:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3), 0 0 10px rgba(34, 211, 238, 0.2);
+}
+
+/* === Progress Bar Glow === */
+.progress-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 1s ease-in-out infinite;
+}
