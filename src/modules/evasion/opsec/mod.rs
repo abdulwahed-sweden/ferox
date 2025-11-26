@@ -14,6 +14,10 @@
 //! - **memory_evasion**: Memory forensics evasion (T1055.012, T1027)
 //! - **thread_hider**: Thread hiding techniques
 //! - **pe_manipulator**: PE header manipulation
+//! - **vm_signatures**: VM detection signatures (T1497)
+//! - **sandbox_signatures**: Sandbox detection signatures (T1497)
+//! - **timing_checks**: Timing-based evasion detection (T1497.003)
+//! - **env_detector**: Environment detection engine (T1497)
 //!
 //! ## MITRE ATT&CK Coverage
 //!
@@ -35,6 +39,7 @@
 //!     EtwPatcher, EtwProvider,
 //!     EdrDetector, EdrAdaptor, ScanDepth,
 //!     MemoryEvasion, ThreadHider, PeManipulator,
+//!     EnvironmentDetector, VmType, SandboxType,
 //! };
 //!
 //! // Create OPSEC engine with ghost mode
@@ -68,6 +73,12 @@ pub mod edr_signatures;
 pub mod memory_evasion;
 pub mod pe_manipulator;
 pub mod thread_hider;
+
+// Anti-VM / Anti-Sandbox detection (Phase 4)
+pub mod env_detector;
+pub mod sandbox_signatures;
+pub mod timing_checks;
+pub mod vm_signatures;
 
 // Re-export core engine types
 pub use engine::{
@@ -106,6 +117,14 @@ pub use memory_evasion::{
 };
 pub use pe_manipulator::{PeManipResult, PeManipulator, PeOperation, PeSection};
 pub use thread_hider::{ThreadHideResult, ThreadHideTechnique, ThreadHider};
+
+// Re-export Anti-VM / Anti-Sandbox types (Phase 4)
+pub use env_detector::{DetectionSensitivity, EnvironmentDetector, EnvironmentReport};
+pub use sandbox_signatures::{
+    get_sandbox_signatures, AnalysisArtifacts, SandboxSignature, SandboxType,
+};
+pub use timing_checks::{TimingCheckResult, TimingChecker};
+pub use vm_signatures::{get_vm_signatures, VmSignature, VmType};
 
 // ============================================================================
 // Integrated OPSEC Operations
