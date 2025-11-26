@@ -280,8 +280,8 @@ impl OpsecCommandHandler {
         ];
 
         println!(
-            "{:<12} {:<25} {:<10} {:<10} {:<8} {}",
-            "LEVEL", "DESCRIPTION", "SLEEP", "JITTER", "PACKETS", "FEATURES"
+            "{:<12} {:<25} {:<10} {:<10} {:<8} FEATURES",
+            "LEVEL", "DESCRIPTION", "SLEEP", "JITTER", "PACKETS"
         );
         println!("{}", "-".repeat(100));
 
@@ -320,8 +320,8 @@ impl OpsecCommandHandler {
 
         Theme::section("Detected Security Software");
         println!(
-            "{:<25} {:<20} {:<15} {}",
-            "EDR/AV", "RECOMMENDED", "MITRE ID", "PROCESSES"
+            "{:<25} {:<20} {:<15} PROCESSES",
+            "EDR/AV", "RECOMMENDED", "MITRE ID"
         );
         println!("{}", "-".repeat(80));
 
@@ -381,8 +381,8 @@ impl OpsecCommandHandler {
         }
 
         println!(
-            "{:<18} {:<18} {:<12} {}",
-            "DANGEROUS TOOL", "LOLBIN", "MITRE ID", "DESCRIPTION"
+            "{:<18} {:<18} {:<12} DESCRIPTION",
+            "DANGEROUS TOOL", "LOLBIN", "MITRE ID"
         );
         println!("{}", "-".repeat(90));
 
@@ -444,8 +444,8 @@ impl OpsecCommandHandler {
         };
 
         println!(
-            "{:<15} {:<6} {:<10} {}",
-            "ACTION", "RISK", "MONITORED", "EVASION TECHNIQUE"
+            "{:<15} {:<6} {:<10} EVASION TECHNIQUE",
+            "ACTION", "RISK", "MONITORED"
         );
         println!("{}", "-".repeat(90));
 

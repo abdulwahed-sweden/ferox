@@ -63,6 +63,12 @@ pub struct SessionsCleanupArgs {
 
 pub struct SessionCommandHandler;
 
+impl Default for SessionCommandHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SessionCommandHandler {
     pub fn new() -> Self {
         Self

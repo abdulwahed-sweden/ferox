@@ -50,7 +50,7 @@ impl DumpParser {
         let created_at = metadata
             .modified()
             .ok()
-            .map(|time| DateTime::<Utc>::from(time));
+            .map(DateTime::<Utc>::from);
 
         Ok(Self {
             path: path.to_path_buf(),

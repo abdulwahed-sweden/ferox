@@ -24,7 +24,7 @@ impl CliDashboard {
         println!("\n{}", "═".repeat(70).cyan());
         println!(
             "{}",
-            format!("🩺 Ferox Maintenance Health Report").bold().cyan()
+            "🩺 Ferox Maintenance Health Report".to_string().bold().cyan()
         );
         println!("{}", "═".repeat(70).cyan());
     }

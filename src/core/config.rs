@@ -14,6 +14,7 @@ use std::path::{Path, PathBuf};
 
 /// Global Ferox configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct FeroxConfig {
     pub global: GlobalConfig,
     pub modules: HashMap<String, ModuleConfig>,
@@ -70,17 +71,6 @@ impl FeroxConfig {
     }
 }
 
-impl Default for FeroxConfig {
-    fn default() -> Self {
-        Self {
-            global: GlobalConfig::default(),
-            modules: HashMap::new(),
-            security: SecurityPolicy::default(),
-            logging: LogConfig::default(),
-            network: NetworkConfig::default(),
-        }
-    }
-}
 
 /// Global configuration settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -346,10 +336,10 @@ mod tests {
         config.global.verbose = true;
         config.global.max_concurrent_operations = 200;
 
-        config.save_to_file(&config_path).unwrap();
+        config.save_to_file(config_path).unwrap();
 
-        let loaded = FeroxConfig::load_from_file(&config_path).unwrap();
-        assert_eq!(loaded.global.verbose, true);
+        let loaded = FeroxConfig::load_from_file(config_path).unwrap();
+        assert!(loaded.global.verbose);
         assert_eq!(loaded.global.max_concurrent_operations, 200);
     }
 

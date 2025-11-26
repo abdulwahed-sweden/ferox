@@ -77,6 +77,12 @@ pub struct MemoryMitreArgs {
 
 pub struct MemoryCommandHandler;
 
+impl Default for MemoryCommandHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryCommandHandler {
     pub fn new() -> Self {
         Self

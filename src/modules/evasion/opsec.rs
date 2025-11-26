@@ -99,22 +99,19 @@ impl StealthLevel {
 
 /// Network noise level configuration
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum NetworkNoise {
     /// Minimal packets (1-3)
     Whisper,
     /// Low packets (<10)
     Low,
     /// Moderate packets (<50)
+    #[default]
     Moderate,
     /// Normal traffic
     Normal,
 }
 
-impl Default for NetworkNoise {
-    fn default() -> Self {
-        Self::Moderate
-    }
-}
 
 impl NetworkNoise {
     pub fn max_packets(&self) -> usize {

@@ -68,7 +68,7 @@ impl CliThemeApplier {
         &self.icons().info_icon
     }
 
-    fn truecolor<'a>(&self, text: &'a str, color: RgbColor) -> colored::ColoredString {
+    fn truecolor(&self, text: &str, color: RgbColor) -> colored::ColoredString {
         text.truecolor(color.r, color.g, color.b)
     }
 }

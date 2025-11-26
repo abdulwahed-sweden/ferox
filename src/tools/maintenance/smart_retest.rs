@@ -98,7 +98,7 @@ impl SmartRetester {
     pub fn run_with_retries(
         &self,
         features: &[String],
-        on_retry: impl Fn(usize, usize) -> (),
+        on_retry: impl Fn(usize, usize),
     ) -> Result<TestResult, String> {
         let mut last_result = None;
 

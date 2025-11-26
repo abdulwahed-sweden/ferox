@@ -135,8 +135,6 @@ All health indicators within acceptable ranges
         let final_score = score.max(0).min(100);
 
         let output = format!(
-            "{}",
-            format!(
                 "
 🔢 PROJECT INTEGRITY SCORE
 ═══════════════════════════════════════════════
@@ -157,8 +155,7 @@ Status:  🎉 EXCELLENT
             ",
                 final_score.to_string().bold().green(),
                 final_score.to_string().bold().cyan()
-            )
-        );
+            ).to_string();
         Ok(output)
     }
 

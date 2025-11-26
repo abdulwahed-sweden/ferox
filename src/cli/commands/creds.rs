@@ -227,8 +227,8 @@ impl CredsCommandHandler {
         };
 
         println!(
-            "{:<25} {:<10} {:<20} {:<8} {}",
-            "NAME", "PLATFORM", "CATEGORY", "ADMIN", "MITRE ID"
+            "{:<25} {:<10} {:<20} {:<8} MITRE ID",
+            "NAME", "PLATFORM", "CATEGORY", "ADMIN"
         );
         println!("{}", "-".repeat(85));
 
@@ -296,8 +296,8 @@ impl CredsCommandHandler {
         }
 
         println!(
-            "{:<5} {:<15} {:<20} {:<15} {}",
-            "#", "TYPE", "SOURCE", "SENSITIVITY", "USERNAME"
+            "{:<5} {:<15} {:<20} {:<15} USERNAME",
+            "#", "TYPE", "SOURCE", "SENSITIVITY"
         );
         println!("{}", "-".repeat(70));
 

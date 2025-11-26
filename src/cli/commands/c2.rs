@@ -39,6 +39,12 @@ pub struct C2HealthArgs {
 
 pub struct C2CommandHandler;
 
+impl Default for C2CommandHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl C2CommandHandler {
     pub fn new() -> Self {
         Self
@@ -83,7 +89,7 @@ impl C2CommandHandler {
         let infos = self.module_infos();
         if let Some(name) = args.module {
             if let Some(info) = infos.iter().find(|m| m.name == name) {
-                Theme::section(&format!("{}", info.name));
+                Theme::section(&info.name.to_string());
                 self.print_info(info);
                 if args.verbose {
                     self.print_options(info);

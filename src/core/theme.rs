@@ -27,6 +27,12 @@ pub struct Typography {
     pub monospace_font: String,
 }
 
+impl Default for Typography {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Typography {
     pub fn new() -> Self {
         Self {
@@ -42,6 +48,12 @@ pub struct LayoutSettings {
     pub border_style: String,
     pub padding: u8,
     pub margin: u8,
+}
+
+impl Default for LayoutSettings {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl LayoutSettings {
@@ -79,6 +91,12 @@ pub struct MixedPredatorTheme {
     pub typography: Typography,
     pub layout: LayoutSettings,
     pub icons: IconSet,
+}
+
+impl Default for MixedPredatorTheme {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MixedPredatorTheme {

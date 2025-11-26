@@ -3,34 +3,28 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Default)]
 pub enum DumpType {
     Kernel,
     User,
     MiniDump,
     Full,
     Hybrid,
+    #[default]
     Unknown,
 }
 
-impl Default for DumpType {
-    fn default() -> Self {
-        DumpType::Unknown
-    }
-}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Default)]
 pub enum Architecture {
     X86,
     X64,
     Arm64,
+    #[default]
     Unknown,
 }
 
-impl Default for Architecture {
-    fn default() -> Self {
-        Architecture::Unknown
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct SystemInfo {
@@ -44,6 +38,7 @@ pub struct SystemInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct MemoryRegion {
     pub base_address: u64,
     pub size: u64,
@@ -52,17 +47,6 @@ pub struct MemoryRegion {
     pub is_executable: bool,
 }
 
-impl Default for MemoryRegion {
-    fn default() -> Self {
-        Self {
-            base_address: 0,
-            size: 0,
-            protection: None,
-            state: None,
-            is_executable: false,
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ThreadInfo {
@@ -166,18 +150,15 @@ pub struct MalwareFinding {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum Severity {
+    #[default]
     Low,
     Medium,
     High,
     Critical,
 }
 
-impl Default for Severity {
-    fn default() -> Self {
-        Severity::Low
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MitreTechnique {

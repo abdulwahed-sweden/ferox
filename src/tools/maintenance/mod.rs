@@ -215,7 +215,7 @@ impl MaintenanceEngine {
                 entries
                     .filter(|e| {
                         e.as_ref()
-                            .map(|f| f.path().extension().map_or(false, |ext| ext == "rs"))
+                            .map(|f| f.path().extension().is_some_and(|ext| ext == "rs"))
                             .unwrap_or(false)
                     })
                     .count()

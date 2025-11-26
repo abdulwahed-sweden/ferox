@@ -212,8 +212,8 @@ impl PersistCommandHandler {
         let methods = self.engine.methods_for_platform(&platform);
 
         println!(
-            "{:<30} {:<10} {:<12} {:<10} {}",
-            "NAME", "PLATFORM", "STEALTH", "ADMIN", "MITRE ID"
+            "{:<30} {:<10} {:<12} {:<10} MITRE ID",
+            "NAME", "PLATFORM", "STEALTH", "ADMIN"
         );
         println!("{}", "-".repeat(80));
 

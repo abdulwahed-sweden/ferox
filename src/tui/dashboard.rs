@@ -16,6 +16,12 @@ pub struct FeroxDashboard {
     focus: PanelFocus,
 }
 
+impl Default for FeroxDashboard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FeroxDashboard {
     pub fn new() -> Self {
         Self::with_mode(ThemeMode::Predator)

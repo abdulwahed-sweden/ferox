@@ -67,18 +67,15 @@ pub struct StageInfo {
 
 /// Target operating system
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Default)]
 pub enum TargetOS {
     Windows,
     Linux,
     MacOS,
+    #[default]
     Any,
 }
 
-impl Default for TargetOS {
-    fn default() -> Self {
-        Self::Any
-    }
-}
 
 impl std::fmt::Display for TargetOS {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -107,6 +104,7 @@ impl std::str::FromStr for TargetOS {
 
 /// C2 channel type for payload callbacks
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Default)]
 pub enum C2Channel {
     /// Microsoft Teams via Graph API
     Teams,
@@ -117,14 +115,10 @@ pub enum C2Channel {
     /// Standard HTTP beacon
     HttpBeacon,
     /// Direct TCP connection
+    #[default]
     DirectTcp,
 }
 
-impl Default for C2Channel {
-    fn default() -> Self {
-        Self::DirectTcp
-    }
-}
 
 /// Stager configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -889,7 +883,7 @@ mod tests {
         let result = engine.generate_reverse_tcp("192.168.1.100", 4444).unwrap();
 
         assert!(result.metadata.encrypted);
-        assert!(result.data.len() > 0);
+        assert!(!result.data.is_empty());
         assert!(!result.base64.is_empty());
         assert!(!result.hex.is_empty());
     }
@@ -900,7 +894,7 @@ mod tests {
         let result = engine.generate_bind_shell(4444).unwrap();
 
         assert!(result.metadata.encrypted);
-        assert!(result.data.len() > 0);
+        assert!(!result.data.is_empty());
     }
 
     #[test]

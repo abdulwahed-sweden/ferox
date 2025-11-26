@@ -108,11 +108,10 @@ fn generate_system_report(args: DoctorReportArgs, theme: &CliThemeApplier) -> Re
 
 fn write_report(report: &DoctorReport, path: &Path) -> Result<()> {
     let json = to_string_pretty(&report.to_json())?;
-    if let Some(parent) = path.parent() {
-        if !parent.as_os_str().is_empty() {
+    if let Some(parent) = path.parent()
+        && !parent.as_os_str().is_empty() {
             fs::create_dir_all(parent)?;
         }
-    }
     fs::write(path, json).with_context(|| format!("Unable to write report to {}", path.display()))
 }
 

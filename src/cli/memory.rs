@@ -96,7 +96,7 @@ impl MemoryCli {
                         "--output" => {
                             let path = iter
                                 .next()
-                                .map(|p| PathBuf::from(p))
+                                .map(PathBuf::from)
                                 .context("--output requires a path")?;
                             output = Some(path);
                         }
@@ -165,10 +165,10 @@ impl MemoryCli {
                 let mut output = None;
                 let mut iter = rest.iter();
                 while let Some(flag) = iter.next() {
-                    if (*flag).to_ascii_lowercase() == "--output" {
+                    if (*flag).eq_ignore_ascii_case("--output") {
                         let path = iter
                             .next()
-                            .map(|v| PathBuf::from(v))
+                            .map(PathBuf::from)
                             .context("--output requires a file path")?;
                         output = Some(path);
                     }

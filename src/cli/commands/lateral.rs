@@ -228,8 +228,8 @@ impl LateralCommandHandler {
             .collect();
 
         println!(
-            "{:<20} {:<10} {:<12} {:<12} {:<10} {}",
-            "NAME", "PLATFORM", "STEALTH", "MITRE ID", "ADMIN", "DESCRIPTION"
+            "{:<20} {:<10} {:<12} {:<12} {:<10} DESCRIPTION",
+            "NAME", "PLATFORM", "STEALTH", "MITRE ID", "ADMIN"
         );
         println!("{}", "-".repeat(100));
 
@@ -351,8 +351,8 @@ impl LateralCommandHandler {
 
         Theme::section("Discovered Targets");
         println!(
-            "{:<16} {:<20} {:<10} {:<30} {:<8} {}",
-            "IP ADDRESS", "HOSTNAME", "PLATFORM", "SERVICES", "DC", "CONFIDENCE"
+            "{:<16} {:<20} {:<10} {:<30} {:<8} CONFIDENCE",
+            "IP ADDRESS", "HOSTNAME", "PLATFORM", "SERVICES", "DC"
         );
         println!("{}", "-".repeat(100));
 
@@ -497,8 +497,8 @@ impl LateralCommandHandler {
         if args.method == "auto" {
             // Show which methods would be used for each target
             println!(
-                "{:<16} {:<20} {:<20} {:<12} {}",
-                "TARGET", "METHOD", "MITRE ID", "STATUS", "DETAILS"
+                "{:<16} {:<20} {:<20} {:<12} DETAILS",
+                "TARGET", "METHOD", "MITRE ID", "STATUS"
             );
             println!("{}", "-".repeat(90));
 
@@ -522,12 +522,11 @@ impl LateralCommandHandler {
                     );
                 } else {
                     println!(
-                        "{:<16} {:<20} {:<20} {:<12} {}",
+                        "{:<16} {:<20} {:<20} {:<12} No viable method found",
                         target.display_name(),
                         "-",
                         "-",
-                        "SKIPPED",
-                        "No viable method found"
+                        "SKIPPED"
                     );
                 }
             }
@@ -547,12 +546,11 @@ impl LateralCommandHandler {
                         );
                     } else {
                         println!(
-                            "{:<16} {:<20} {:<20} {:<12} {}",
+                            "{:<16} {:<20} {:<20} {:<12} Target not compatible with method",
                             target.display_name(),
                             method.name(),
                             "-",
-                            "INCOMPAT",
-                            "Target not compatible with method"
+                            "INCOMPAT"
                         );
                     }
                 }
@@ -627,8 +625,8 @@ for new_session in new_sessions {{
         Theme::section("Credential-Target Matrix");
 
         println!(
-            "{:<25} {:<15} {:<25} {:<10} {}",
-            "CREDENTIAL", "TYPE", "TARGETS", "PROB", "METHODS"
+            "{:<25} {:<15} {:<25} {:<10} METHODS",
+            "CREDENTIAL", "TYPE", "TARGETS", "PROB"
         );
         println!("{}", "-".repeat(90));
 

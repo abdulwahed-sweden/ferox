@@ -323,7 +323,7 @@ impl MaintenanceReport {
                     issue.severity, issue.component, issue.description, issue.suggestion
                 ));
             }
-            md.push_str("\n");
+            md.push('\n');
         }
 
         if self.auto_fixes_applied > 0 {

@@ -111,7 +111,7 @@ impl GitHubApiClient for HttpGitHubClient {
     async fn create_gist(&self, token: &str, req: &CreateGistRequest) -> Result<Gist> {
         let client = reqwest::Client::new();
         let resp = client
-            .post(&format!("{}/gists", GITHUB_API_BASE))
+            .post(format!("{}/gists", GITHUB_API_BASE))
             .header("Authorization", format!("Bearer {}", token))
             .header("User-Agent", "ferox-security-framework")
             .header("Accept", "application/vnd.github+json")
@@ -247,11 +247,10 @@ impl MockGitHubClient {
 
     /// Inject a command into the Gist (for testing)
     async fn inject_command(&self, gist_id: &str, filename: &str, content: &str) {
-        if let Some(gist) = self.gists.lock().await.get_mut(gist_id) {
-            if let Some(file) = gist.files.get_mut(filename) {
+        if let Some(gist) = self.gists.lock().await.get_mut(gist_id)
+            && let Some(file) = gist.files.get_mut(filename) {
                 file.content = content.to_string();
             }
-        }
         *self.last_command_file.lock().await = Some(content.to_string());
     }
 
