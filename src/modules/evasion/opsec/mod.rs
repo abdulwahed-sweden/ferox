@@ -11,12 +11,16 @@
 //! - **edr_signatures**: EDR product signatures database (T1518.001)
 //! - **edr_detector**: EDR detection engine with multiple scan depths
 //! - **edr_adaptor**: Auto-adaptation based on detected EDR
+//! - **memory_evasion**: Memory forensics evasion (T1055.012, T1027)
+//! - **thread_hider**: Thread hiding techniques
+//! - **pe_manipulator**: PE header manipulation
 //!
 //! ## MITRE ATT&CK Coverage
 //!
 //! - T1518.001: Security Software Discovery
 //! - T1562.001: Disable or Modify Tools (AMSI)
 //! - T1562.006: Indicator Blocking (ETW)
+//! - T1055.012: Process Hollowing
 //! - T1070: Indicator Removal
 //! - T1027: Obfuscation
 //! - T1497: Virtualization/Sandbox Evasion
@@ -30,6 +34,7 @@
 //!     AmsiBypass, AmsiBypassTechnique,
 //!     EtwPatcher, EtwProvider,
 //!     EdrDetector, EdrAdaptor, ScanDepth,
+//!     MemoryEvasion, ThreadHider, PeManipulator,
 //! };
 //!
 //! // Create OPSEC engine with ghost mode
@@ -58,6 +63,11 @@ pub mod windows_internals;
 pub mod edr_adaptor;
 pub mod edr_detector;
 pub mod edr_signatures;
+
+// Memory forensics evasion (Phase 3)
+pub mod memory_evasion;
+pub mod pe_manipulator;
+pub mod thread_hider;
 
 // Re-export core engine types
 pub use engine::{
@@ -88,6 +98,14 @@ pub use edr_detector::{
 
 // Re-export EDR adaptor types (Phase 2)
 pub use edr_adaptor::{AdaptedOpsecConfig, AdaptedStealthLevel, EdrAdaptor};
+
+// Re-export Memory evasion types (Phase 3)
+pub use memory_evasion::{
+    EncryptedHeap, MemoryEvasion, MemoryEvasionResult, MemoryEvasionStatus,
+    MemoryEvasionTechnique, MemoryRegion, MemoryRegionType,
+};
+pub use pe_manipulator::{PeManipResult, PeManipulator, PeOperation, PeSection};
+pub use thread_hider::{ThreadHideResult, ThreadHideTechnique, ThreadHider};
 
 // ============================================================================
 // Integrated OPSEC Operations
