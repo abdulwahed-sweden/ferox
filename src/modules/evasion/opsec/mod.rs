@@ -18,6 +18,9 @@
 //! - **sandbox_signatures**: Sandbox detection signatures (T1497)
 //! - **timing_checks**: Timing-based evasion detection (T1497.003)
 //! - **env_detector**: Environment detection engine (T1497)
+//! - **target_process**: Target process selection for injection (T1055)
+//! - **injection_techniques**: Process injection technique implementations (T1055.x)
+//! - **process_injection**: High-level injection orchestration (T1055)
 //!
 //! ## MITRE ATT&CK Coverage
 //!
@@ -29,6 +32,7 @@
 //! - T1027: Obfuscation
 //! - T1497: Virtualization/Sandbox Evasion
 //! - T1036: Masquerading (LOLBins)
+//! - T1055: Process Injection (multiple sub-techniques)
 //!
 //! ## Usage Example
 //!
@@ -80,6 +84,11 @@ pub mod sandbox_signatures;
 pub mod timing_checks;
 pub mod vm_signatures;
 
+// Process Injection (Phase 5)
+pub mod injection_techniques;
+pub mod process_injection;
+pub mod target_process;
+
 // Re-export core engine types
 pub use engine::{
     DefaultTrafficShaper, EdrDetectionResult, EdrDetector, EdrSignature, EdrType, LogEvasion,
@@ -125,6 +134,15 @@ pub use sandbox_signatures::{
 };
 pub use timing_checks::{TimingCheckResult, TimingChecker};
 pub use vm_signatures::{get_vm_signatures, VmSignature, VmType};
+
+// Re-export Process Injection types (Phase 5)
+pub use injection_techniques::{
+    InjectionMethods, InjectionResult, InjectionTechnique, Shellcode,
+};
+pub use process_injection::{InjectionConfig, ProcessInjector, TechniqueInfo};
+pub use target_process::{
+    InjectionTargets, IntegrityLevel, ProcessFinder, ProcessSelectionCriteria, TargetProcess,
+};
 
 // ============================================================================
 // Integrated OPSEC Operations
