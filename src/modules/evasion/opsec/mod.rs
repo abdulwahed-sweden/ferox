@@ -8,9 +8,13 @@
 //! - **amsi_bypass**: Windows AMSI bypass techniques (T1562.001)
 //! - **etw_patcher**: Windows ETW patching for telemetry evasion (T1562.006)
 //! - **windows_internals**: Low-level Windows API helpers
+//! - **edr_signatures**: EDR product signatures database (T1518.001)
+//! - **edr_detector**: EDR detection engine with multiple scan depths
+//! - **edr_adaptor**: Auto-adaptation based on detected EDR
 //!
 //! ## MITRE ATT&CK Coverage
 //!
+//! - T1518.001: Security Software Discovery
 //! - T1562.001: Disable or Modify Tools (AMSI)
 //! - T1562.006: Indicator Blocking (ETW)
 //! - T1070: Indicator Removal
@@ -25,6 +29,7 @@
 //!     OpsecEngine, OpsecConfig, StealthLevel,
 //!     AmsiBypass, AmsiBypassTechnique,
 //!     EtwPatcher, EtwProvider,
+//!     EdrDetector, EdrAdaptor, ScanDepth,
 //! };
 //!
 //! // Create OPSEC engine with ghost mode
@@ -44,10 +49,15 @@
 // Core OPSEC engine (existing code)
 pub mod engine;
 
-// Windows-specific evasion modules
+// Windows-specific evasion modules (Phase 1)
 pub mod amsi_bypass;
 pub mod etw_patcher;
 pub mod windows_internals;
+
+// EDR detection and adaptation (Phase 2)
+pub mod edr_adaptor;
+pub mod edr_detector;
+pub mod edr_signatures;
 
 // Re-export core engine types
 pub use engine::{
@@ -64,6 +74,20 @@ pub use etw_patcher::{EtwPatchResult, EtwPatchTechnique, EtwPatcher, EtwProvider
 
 // Re-export Windows internals types
 pub use windows_internals::{patches, PatchInfo, WinError, WinResult};
+
+// Re-export EDR signatures types (Phase 2)
+pub use edr_signatures::{
+    DetectionMethod as EdrDetectionMethod, EdrSignature as EdrProductSignature,
+    EdrType as EdrProductType,
+};
+
+// Re-export EDR detector types (Phase 2)
+pub use edr_detector::{
+    DetectedEdr, EdrDetectionResult as EdrScanResult, EdrDetector as EdrScanner, ScanDepth,
+};
+
+// Re-export EDR adaptor types (Phase 2)
+pub use edr_adaptor::{AdaptedOpsecConfig, AdaptedStealthLevel, EdrAdaptor};
 
 // ============================================================================
 // Integrated OPSEC Operations
