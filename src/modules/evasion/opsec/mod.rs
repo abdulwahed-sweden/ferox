@@ -21,6 +21,9 @@
 //! - **target_process**: Target process selection for injection (T1055)
 //! - **injection_techniques**: Process injection technique implementations (T1055.x)
 //! - **process_injection**: High-level injection orchestration (T1055)
+//! - **data_encoder**: Data encoding and chunking for exfiltration (T1048)
+//! - **exfil_channels**: Exfiltration channel implementations (T1048.x)
+//! - **exfil_engine**: High-level exfiltration orchestration (T1048)
 //!
 //! ## MITRE ATT&CK Coverage
 //!
@@ -33,6 +36,7 @@
 //! - T1497: Virtualization/Sandbox Evasion
 //! - T1036: Masquerading (LOLBins)
 //! - T1055: Process Injection (multiple sub-techniques)
+//! - T1048: Exfiltration Over Alternative Protocol
 //!
 //! ## Usage Example
 //!
@@ -89,6 +93,11 @@ pub mod injection_techniques;
 pub mod process_injection;
 pub mod target_process;
 
+// Covert Data Exfiltration (Phase 6)
+pub mod data_encoder;
+pub mod exfil_channels;
+pub mod exfil_engine;
+
 // Re-export core engine types
 pub use engine::{
     DefaultTrafficShaper, EdrDetectionResult, EdrDetector, EdrSignature, EdrType, LogEvasion,
@@ -143,6 +152,16 @@ pub use process_injection::{InjectionConfig, ProcessInjector, TechniqueInfo};
 pub use target_process::{
     InjectionTargets, IntegrityLevel, ProcessFinder, ProcessSelectionCriteria, TargetProcess,
 };
+
+// Re-export Data Exfiltration types (Phase 6)
+pub use data_encoder::{
+    CompressionMethod, DataChunk, DataEncoder, EncodingMethod, EncryptionMethod,
+};
+pub use exfil_channels::{
+    ChannelConfig, CloudExfil, CloudProvider, DnsExfil, ExfilChannel, ExfilResult, HttpsExfil,
+    IcmpExfil, WebhookExfil, WebhookPlatform,
+};
+pub use exfil_engine::{ChannelInfo, ExfilConfig, ExfilEngine, ExfilSession, ExfilStatus};
 
 // ============================================================================
 // Integrated OPSEC Operations
