@@ -133,7 +133,7 @@ export function EdrDetectorPanel() {
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="p-3 bg-dark-700/50 rounded-lg text-center">
-              <p className="text-2xl font-bold">{results.detectedEdrs.length}</p>
+              <p className="text-2xl font-bold">{results.detectedEdrs?.length ?? 0}</p>
               <p className="text-xs text-text-muted">Products Detected</p>
             </div>
             <div className="p-3 bg-dark-700/50 rounded-lg text-center">
@@ -159,7 +159,7 @@ export function EdrDetectorPanel() {
           </div>
 
           {/* Detection List */}
-          {results.detectedEdrs.length === 0 ? (
+          {(results.detectedEdrs?.length ?? 0) === 0 ? (
             <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
               <CheckCircle className="w-6 h-6 text-green-400" />
               <div>
@@ -171,7 +171,7 @@ export function EdrDetectorPanel() {
             </div>
           ) : (
             <div className="space-y-2">
-              {results.detectedEdrs.map((edr, i) => (
+              {(results.detectedEdrs ?? []).map((edr, i) => (
                 <div
                   key={i}
                   className="border border-dark-600 rounded-lg overflow-hidden"

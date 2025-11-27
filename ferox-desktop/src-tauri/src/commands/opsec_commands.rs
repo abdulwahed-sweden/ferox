@@ -11,6 +11,7 @@ use tauri::command;
 // ============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DetectedEdr {
     pub edr_type: String,
     pub confidence: f32,
@@ -19,6 +20,7 @@ pub struct DetectedEdr {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EdrDetectionResult {
     pub detected_edrs: Vec<DetectedEdr>,
     pub total_threat_level: u8,
@@ -27,6 +29,7 @@ pub struct EdrDetectionResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AmsiBypassResult {
     pub success: bool,
     pub technique: String,
@@ -35,6 +38,7 @@ pub struct AmsiBypassResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EtwPatchResult {
     pub success: bool,
     pub providers_patched: Vec<String>,
@@ -42,6 +46,7 @@ pub struct EtwPatchResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EnvironmentReport {
     pub detected_vm: Option<String>,
     pub detected_sandbox: Option<String>,
@@ -53,6 +58,7 @@ pub struct EnvironmentReport {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MemoryEvasionResult {
     pub success: bool,
     pub technique: String,
@@ -61,6 +67,7 @@ pub struct MemoryEvasionResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TargetProcess {
     pub pid: u32,
     pub name: String,
@@ -71,6 +78,7 @@ pub struct TargetProcess {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InjectionResult {
     pub success: bool,
     pub technique: String,
@@ -80,6 +88,7 @@ pub struct InjectionResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExfilChannelInfo {
     pub channel: String,
     pub stealth_rating: u8,
@@ -89,6 +98,7 @@ pub struct ExfilChannelInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExfilSession {
     pub session_id: String,
     pub channel: String,
@@ -101,6 +111,7 @@ pub struct ExfilSession {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct OpsecStatus {
     pub stealth_level: String,
     pub amsi_bypass: bool,
