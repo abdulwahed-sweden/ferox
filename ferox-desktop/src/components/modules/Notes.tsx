@@ -3,12 +3,21 @@
  * For demo/training purposes - stored in memory only
  */
 
-import { useState, useEffect } from 'react';
-import { StickyNote, Save, Trash2, Plus, Clock, Tag, Pin, RefreshCw } from 'lucide-react';
-import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
-import { simulateSessionNotes } from '../../lib/tauri';
-import type { SimulatedNote } from '../../types';
+import { useState, useEffect } from "react";
+import {
+  StickyNote,
+  Save,
+  Trash2,
+  Plus,
+  Clock,
+  Tag,
+  Pin,
+  RefreshCw,
+} from "lucide-react";
+import { clsx } from "clsx";
+import toast from "react-hot-toast";
+import { simulateSessionNotes } from "../../lib/tauri";
+import type { SimulatedNote } from "../../types";
 
 interface NotesProps {
   sessionId: string;
@@ -17,9 +26,9 @@ interface NotesProps {
 export function Notes({ sessionId }: NotesProps) {
   const [notes, setNotes] = useState<SimulatedNote[]>([]);
   const [selectedNote, setSelectedNote] = useState<SimulatedNote | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editContent, setEditContent] = useState('');
-  const [editTags, setEditTags] = useState('');
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editTags, setEditTags] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const loadNotes = async () => {
@@ -28,8 +37,8 @@ export function Notes({ sessionId }: NotesProps) {
       const data = await simulateSessionNotes(sessionId);
       setNotes(data);
     } catch (error) {
-      console.error('Failed to load notes:', error);
-      toast.error('Failed to load notes');
+      console.error("Failed to load notes:", error);
+      toast.error("Failed to load notes");
     } finally {
       setIsLoading(false);
     }
@@ -42,19 +51,19 @@ export function Notes({ sessionId }: NotesProps) {
   const handleNewNote = () => {
     const note: SimulatedNote = {
       id: `note-${Date.now()}`,
-      title: 'Untitled Note',
-      content: '',
+      title: "Untitled Note",
+      content: "",
       tags: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       pinned: false,
       color: null,
     };
-    setNotes(prev => [note, ...prev]);
+    setNotes((prev) => [note, ...prev]);
     setSelectedNote(note);
     setEditTitle(note.title);
     setEditContent(note.content);
-    setEditTags('');
+    setEditTags("");
   };
 
   const handleSelectNote = (note: SimulatedNote) => {
@@ -65,41 +74,48 @@ export function Notes({ sessionId }: NotesProps) {
     setSelectedNote(note);
     setEditTitle(note.title);
     setEditContent(note.content);
-    setEditTags(note.tags.join(', '));
+    setEditTags(note.tags.join(", "));
   };
 
   const handleSaveNote = () => {
     if (!selectedNote) return;
 
-    setNotes(prev => prev.map(n => {
-      if (n.id !== selectedNote.id) return n;
-      return {
-        ...n,
-        title: editTitle || 'Untitled Note',
-        content: editContent,
-        tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
-        updated_at: new Date().toISOString(),
-      };
-    }));
-    toast.success('Note saved');
+    setNotes((prev) =>
+      prev.map((n) => {
+        if (n.id !== selectedNote.id) return n;
+        return {
+          ...n,
+          title: editTitle || "Untitled Note",
+          content: editContent,
+          tags: editTags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          updated_at: new Date().toISOString(),
+        };
+      }),
+    );
+    toast.success("Note saved");
   };
 
   const handleDeleteNote = (id: string) => {
-    setNotes(prev => prev.filter(n => n.id !== id));
+    setNotes((prev) => prev.filter((n) => n.id !== id));
     if (selectedNote?.id === id) {
       setSelectedNote(null);
-      setEditTitle('');
-      setEditContent('');
-      setEditTags('');
+      setEditTitle("");
+      setEditContent("");
+      setEditTags("");
     }
-    toast.success('Note deleted');
+    toast.success("Note deleted");
   };
 
   const handleTogglePin = (id: string) => {
-    setNotes(prev => prev.map(n => {
-      if (n.id !== id) return n;
-      return { ...n, pinned: !n.pinned };
-    }));
+    setNotes((prev) =>
+      prev.map((n) => {
+        if (n.id !== id) return n;
+        return { ...n, pinned: !n.pinned };
+      }),
+    );
   };
 
   // Sort notes: pinned first, then by date
@@ -116,8 +132,15 @@ export function Notes({ sessionId }: NotesProps) {
           <div className="flex items-center gap-2">
             <StickyNote className="text-pink-400" size={20} />
             <h2 className="text-lg font-semibold text-text-primary">Notes</h2>
-            <span className="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded">SESSION</span>
-            {isLoading && <RefreshCw size={12} className="text-pink-400 animate-spin ml-2" />}
+            <span className="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded">
+              SESSION
+            </span>
+            {isLoading && (
+              <RefreshCw
+                size={12}
+                className="text-pink-400 animate-spin ml-2"
+              />
+            )}
           </div>
           <button
             onClick={handleNewNote}
@@ -127,7 +150,9 @@ export function Notes({ sessionId }: NotesProps) {
             New Note
           </button>
         </div>
-        <p className="text-xs text-text-muted mt-1">Per-session notes (memory only)</p>
+        <p className="text-xs text-text-muted mt-1">
+          Per-session notes (memory only)
+        </p>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
@@ -141,23 +166,26 @@ export function Notes({ sessionId }: NotesProps) {
             </div>
           ) : (
             <div className="divide-y divide-dark-600">
-              {sortedNotes.map(note => (
+              {sortedNotes.map((note) => (
                 <button
                   key={note.id}
                   onClick={() => handleSelectNote(note)}
                   className={clsx(
-                    'w-full p-3 text-left hover:bg-dark-700 transition-colors',
-                    selectedNote?.id === note.id && 'bg-dark-700 border-l-2 border-l-pink-400'
+                    "w-full p-3 text-left hover:bg-dark-700 transition-colors",
+                    selectedNote?.id === note.id &&
+                      "bg-dark-700 border-l-2 border-l-pink-400",
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-medium text-text-primary truncate flex-1">
                       {note.title}
                     </div>
-                    {note.pinned && <Pin size={12} className="text-pink-400 ml-1" />}
+                    {note.pinned && (
+                      <Pin size={12} className="text-pink-400 ml-1" />
+                    )}
                   </div>
                   <div className="text-xs text-text-muted mt-1 line-clamp-2">
-                    {note.content || 'Empty note...'}
+                    {note.content || "Empty note..."}
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <Clock size={10} className="text-text-muted" />
@@ -175,13 +203,18 @@ export function Notes({ sessionId }: NotesProps) {
                   </div>
                   {note.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {note.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-pink-500/10 text-pink-400 rounded">
+                      {note.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] px-1.5 py-0.5 bg-pink-500/10 text-pink-400 rounded"
+                        >
                           {tag}
                         </span>
                       ))}
                       {note.tags.length > 3 && (
-                        <span className="text-[10px] text-text-muted">+{note.tags.length - 3}</span>
+                        <span className="text-[10px] text-text-muted">
+                          +{note.tags.length - 3}
+                        </span>
                       )}
                     </div>
                   )}
@@ -200,19 +233,19 @@ export function Notes({ sessionId }: NotesProps) {
                 <input
                   type="text"
                   value={editTitle}
-                  onChange={e => setEditTitle(e.target.value)}
+                  onChange={(e) => setEditTitle(e.target.value)}
                   placeholder="Note title..."
                   className="flex-1 px-3 py-1.5 bg-dark-700 border border-dark-600 rounded text-sm text-text-primary font-medium focus:border-pink-400/50 focus:outline-none"
                 />
                 <button
                   onClick={() => handleTogglePin(selectedNote.id)}
                   className={clsx(
-                    'p-1.5 rounded transition-colors',
+                    "p-1.5 rounded transition-colors",
                     selectedNote.pinned
-                      ? 'bg-pink-500/20 text-pink-400'
-                      : 'bg-dark-700 text-text-secondary hover:text-text-primary'
+                      ? "bg-pink-500/20 text-pink-400"
+                      : "bg-dark-700 text-text-secondary hover:text-text-primary",
                   )}
-                  title={selectedNote.pinned ? 'Unpin' : 'Pin'}
+                  title={selectedNote.pinned ? "Unpin" : "Pin"}
                 >
                   <Pin size={14} />
                 </button>
@@ -238,7 +271,7 @@ export function Notes({ sessionId }: NotesProps) {
                   <input
                     type="text"
                     value={editTags}
-                    onChange={e => setEditTags(e.target.value)}
+                    onChange={(e) => setEditTags(e.target.value)}
                     placeholder="Tags (comma separated)..."
                     className="flex-1 bg-transparent text-xs text-text-primary placeholder:text-text-muted focus:outline-none"
                   />
@@ -249,7 +282,7 @@ export function Notes({ sessionId }: NotesProps) {
               <div className="flex-1 p-3">
                 <textarea
                   value={editContent}
-                  onChange={e => setEditContent(e.target.value)}
+                  onChange={(e) => setEditContent(e.target.value)}
                   placeholder="Write your notes here...
 
 Useful for:

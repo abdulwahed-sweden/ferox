@@ -1,8 +1,26 @@
-import { useState, useCallback } from 'react';
-import { useAppStore } from '../store';
-import { Terminal, FolderOpen, Activity, Network, X, Plus, Package, Radar, KeyRound, FileText, Clock, StickyNote, Crosshair, Globe, Grid3X3, ClipboardList, Eye } from 'lucide-react';
-import { clsx } from 'clsx';
-import type { TabType } from '../types';
+import { useState, useCallback } from "react";
+import { useAppStore } from "../store";
+import {
+  Terminal,
+  FolderOpen,
+  Activity,
+  Network,
+  X,
+  Plus,
+  Package,
+  Radar,
+  KeyRound,
+  FileText,
+  Clock,
+  StickyNote,
+  Crosshair,
+  Globe,
+  Grid3X3,
+  ClipboardList,
+  Eye,
+} from "lucide-react";
+import { clsx } from "clsx";
+import type { TabType } from "../types";
 
 const tabIcons: Record<TabType, typeof Terminal> = {
   terminal: Terminal,
@@ -23,8 +41,15 @@ const tabIcons: Record<TabType, typeof Terminal> = {
 };
 
 export function TabBar() {
-  const { tabs, activeTabId, setActiveTab, closeTab, selectedSessionId, addTab, reorderTabs } =
-    useAppStore();
+  const {
+    tabs,
+    activeTabId,
+    setActiveTab,
+    closeTab,
+    selectedSessionId,
+    addTab,
+    reorderTabs,
+  } = useAppStore();
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -33,21 +58,21 @@ export function TabBar() {
     if (selectedSessionId) {
       addTab({
         id: `tab-${Date.now()}`,
-        type: 'terminal',
+        type: "terminal",
         sessionId: selectedSessionId,
-        title: 'New Terminal',
-        icon: 'terminal',
+        title: "New Terminal",
+        icon: "terminal",
       });
     }
   };
 
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', index.toString());
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
     // Add some transparency to the dragged element
     if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '0.5';
+      e.currentTarget.style.opacity = "0.5";
     }
   }, []);
 
@@ -55,13 +80,13 @@ export function TabBar() {
     setDraggedIndex(null);
     setDragOverIndex(null);
     if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = '1';
+      e.currentTarget.style.opacity = "1";
     }
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer.dropEffect = "move";
     setDragOverIndex(index);
   }, []);
 
@@ -69,17 +94,20 @@ export function TabBar() {
     setDragOverIndex(null);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent, toIndex: number) => {
-    e.preventDefault();
-    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+  const handleDrop = useCallback(
+    (e: React.DragEvent, toIndex: number) => {
+      e.preventDefault();
+      const fromIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
 
-    if (fromIndex !== toIndex && !isNaN(fromIndex)) {
-      reorderTabs(fromIndex, toIndex);
-    }
+      if (fromIndex !== toIndex && !isNaN(fromIndex)) {
+        reorderTabs(fromIndex, toIndex);
+      }
 
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  }, [reorderTabs]);
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+    },
+    [reorderTabs],
+  );
 
   if (tabs.length === 0) {
     return (
@@ -109,12 +137,12 @@ export function TabBar() {
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, index)}
               className={clsx(
-                'group flex items-center gap-2 px-3 h-full border-r border-dark-600 cursor-pointer transition-all min-w-[120px] max-w-[200px]',
+                "group flex items-center gap-2 px-3 h-full border-r border-dark-600 cursor-pointer transition-all min-w-[120px] max-w-[200px]",
                 isActive
-                  ? 'bg-dark-700 text-text-primary border-b-2 border-b-ferox-green'
-                  : 'text-text-secondary hover:bg-dark-700 hover:text-text-primary',
-                isDragging && 'opacity-50',
-                isDragOver && 'border-l-2 border-l-ferox-green'
+                  ? "bg-dark-700 text-text-primary border-b-2 border-b-ferox-green"
+                  : "text-text-secondary hover:bg-dark-700 hover:text-text-primary",
+                isDragging && "opacity-50",
+                isDragOver && "border-l-2 border-l-ferox-green",
               )}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -122,9 +150,9 @@ export function TabBar() {
               <span className="text-sm truncate flex-1">{tab.title}</span>
               <button
                 className={clsx(
-                  'p-0.5 rounded hover:bg-dark-500 transition-colors',
-                  'opacity-0 group-hover:opacity-100',
-                  isActive && 'opacity-100'
+                  "p-0.5 rounded hover:bg-dark-500 transition-colors",
+                  "opacity-0 group-hover:opacity-100",
+                  isActive && "opacity-100",
                 )}
                 onClick={(e) => {
                   e.stopPropagation();

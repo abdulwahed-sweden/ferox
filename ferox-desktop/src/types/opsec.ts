@@ -1,22 +1,22 @@
 // ferox-desktop/src/types/opsec.ts
 // OPSEC Dashboard TypeScript Types
 
-export type StealthLevel = 'Normal' | 'Quiet' | 'Silent' | 'Ghost';
+export type StealthLevel = "Normal" | "Quiet" | "Silent" | "Ghost";
 
 export type EdrType =
-  | 'WindowsDefender'
-  | 'DefenderATP'
-  | 'CrowdStrike'
-  | 'SentinelOne'
-  | 'CarbonBlack'
-  | 'Cylance'
-  | 'Sophos'
-  | 'Kaspersky'
-  | 'ESET'
-  | 'McAfee'
-  | 'Bitdefender'
-  | 'Elastic'
-  | 'Unknown';
+  | "WindowsDefender"
+  | "DefenderATP"
+  | "CrowdStrike"
+  | "SentinelOne"
+  | "CarbonBlack"
+  | "Cylance"
+  | "Sophos"
+  | "Kaspersky"
+  | "ESET"
+  | "McAfee"
+  | "Bitdefender"
+  | "Elastic"
+  | "Unknown";
 
 export interface DetectedEdr {
   edrType: EdrType;
@@ -46,26 +46,26 @@ export interface EtwPatchResult {
 }
 
 export type VmType =
-  | 'VMware'
-  | 'VirtualBox'
-  | 'HyperV'
-  | 'QEMU'
-  | 'KVM'
-  | 'Xen'
-  | 'AmazonEC2'
-  | 'Azure'
-  | 'GoogleCloud'
-  | 'Docker';
+  | "VMware"
+  | "VirtualBox"
+  | "HyperV"
+  | "QEMU"
+  | "KVM"
+  | "Xen"
+  | "AmazonEC2"
+  | "Azure"
+  | "GoogleCloud"
+  | "Docker";
 
 export type SandboxType =
-  | 'CuckooSandbox'
-  | 'JoeSandbox'
-  | 'AnyRun'
-  | 'VirusTotal'
-  | 'HybridAnalysis'
-  | 'FireEye'
-  | 'CAPEv2'
-  | 'WindowsSandbox';
+  | "CuckooSandbox"
+  | "JoeSandbox"
+  | "AnyRun"
+  | "VirusTotal"
+  | "HybridAnalysis"
+  | "FireEye"
+  | "CAPEv2"
+  | "WindowsSandbox";
 
 export interface EnvironmentReport {
   detectedVm?: VmType;
@@ -78,10 +78,10 @@ export interface EnvironmentReport {
 }
 
 export type MemoryEvasionTechnique =
-  | 'HeapEncrypt'
-  | 'StackObfuscate'
-  | 'ModuleHide'
-  | 'PeHeader';
+  | "HeapEncrypt"
+  | "StackObfuscate"
+  | "ModuleHide"
+  | "PeHeader";
 
 export interface MemoryEvasionResult {
   success: boolean;
@@ -91,14 +91,14 @@ export interface MemoryEvasionResult {
 }
 
 export type InjectionTechnique =
-  | 'ClassicRemoteThread'
-  | 'NtCreateThreadEx'
-  | 'QueueUserApc'
-  | 'EarlyBird'
-  | 'ThreadHijack'
-  | 'ProcessHollowing'
-  | 'ModuleStomping'
-  | 'DirectSyscall';
+  | "ClassicRemoteThread"
+  | "NtCreateThreadEx"
+  | "QueueUserApc"
+  | "EarlyBird"
+  | "ThreadHijack"
+  | "ProcessHollowing"
+  | "ModuleStomping"
+  | "DirectSyscall";
 
 export interface TargetProcess {
   pid: number;
@@ -118,15 +118,15 @@ export interface InjectionResult {
 }
 
 export type ExfilChannel =
-  | 'Dns'
-  | 'HttpsPost'
-  | 'HttpsGet'
-  | 'Icmp'
-  | 'CloudStorage'
-  | 'Webhook'
-  | 'Steganography'
-  | 'Pastebin'
-  | 'WebSocket';
+  | "Dns"
+  | "HttpsPost"
+  | "HttpsGet"
+  | "Icmp"
+  | "CloudStorage"
+  | "Webhook"
+  | "Steganography"
+  | "Pastebin"
+  | "WebSocket";
 
 export interface ExfilChannelInfo {
   channel: ExfilChannel;
@@ -143,7 +143,7 @@ export interface ExfilSession {
   bytesSent: number;
   chunksTotal: number;
   chunksSent: number;
-  status: 'Pending' | 'InProgress' | 'Completed' | 'Failed' | 'Paused';
+  status: "Pending" | "InProgress" | "Completed" | "Failed" | "Paused";
   startedAt: string;
 }
 
@@ -161,16 +161,16 @@ export interface OpsecStatus {
 
 // Panel state types
 export interface EdrScanOptions {
-  depth: 'quick' | 'standard' | 'deep';
+  depth: "quick" | "standard" | "deep";
   safeMode: boolean;
 }
 
 export interface AmsiBypassOptions {
-  technique: 'PatchScanBuffer' | 'MemoryPatch' | 'ReflectiveUnhook' | 'Amsi2';
+  technique: "PatchScanBuffer" | "MemoryPatch" | "ReflectiveUnhook" | "Amsi2";
 }
 
 export interface EtwPatchOptions {
-  providers: ('PowerShell' | 'DotNet' | 'SecurityAuditing' | 'ThreatIntel')[];
+  providers: ("PowerShell" | "DotNet" | "SecurityAuditing" | "ThreatIntel")[];
 }
 
 export interface InjectionOptions {

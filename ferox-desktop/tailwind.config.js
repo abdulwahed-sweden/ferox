@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
+  darkMode: ['class', '[data-theme="dark"]'],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -47,6 +47,9 @@ export default {
           3: "hsl(var(--chart-3))",
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
+          6: "hsl(var(--chart-6))",
+          7: "hsl(var(--chart-7))",
+          8: "hsl(var(--chart-8))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -81,6 +84,118 @@ export default {
           primary: 'var(--text-primary)',
           secondary: 'var(--text-secondary)',
           muted: 'var(--text-muted)',
+        },
+
+        // ==========================================
+        // NEW FEROX THEME - Surface & Content System
+        // ==========================================
+
+        // Surface colors (backgrounds)
+        surface: {
+          base: 'var(--surface-base)',
+          DEFAULT: 'var(--surface-default)',
+          elevated: 'var(--surface-elevated)',
+          overlay: 'var(--surface-overlay)',
+          sidebar: 'var(--surface-sidebar)',
+          input: 'var(--surface-input)',
+          hover: 'var(--surface-hover)',
+          active: 'var(--surface-active)',
+        },
+
+        // Content colors (text)
+        content: {
+          primary: 'var(--content-primary)',
+          secondary: 'var(--content-secondary)',
+          tertiary: 'var(--content-tertiary)',
+          disabled: 'var(--content-disabled)',
+          inverse: 'var(--content-inverse)',
+          number: 'var(--content-number)',
+          'number-secondary': 'var(--content-number-secondary)',
+          data: 'var(--content-data)',
+          label: 'var(--content-label)',
+        },
+
+        // New border colors
+        'border-new': {
+          subtle: 'var(--border-subtle)',
+          DEFAULT: 'var(--border-default-new)',
+          strong: 'var(--border-strong-new)',
+          focus: 'var(--border-focus-new)',
+        },
+
+        // New primary colors
+        'primary-new': {
+          DEFAULT: 'var(--primary-new)',
+          hover: 'var(--primary-hover-new)',
+          active: 'var(--primary-active-new)',
+          soft: 'var(--primary-soft)',
+          muted: 'var(--primary-muted)',
+          text: 'var(--primary-text)',
+        },
+
+        // New success colors
+        'success-new': {
+          DEFAULT: 'var(--success-new)',
+          hover: 'var(--success-hover-new)',
+          soft: 'var(--success-soft)',
+          muted: 'var(--success-muted)',
+          text: 'var(--success-text)',
+          border: 'var(--success-border)',
+        },
+
+        // New warning colors
+        'warning-new': {
+          DEFAULT: 'var(--warning-new)',
+          hover: 'var(--warning-hover-new)',
+          soft: 'var(--warning-soft)',
+          muted: 'var(--warning-muted)',
+          text: 'var(--warning-text)',
+          border: 'var(--warning-border)',
+        },
+
+        // New danger colors
+        'danger-new': {
+          DEFAULT: 'var(--danger-new)',
+          hover: 'var(--danger-hover-new)',
+          soft: 'var(--danger-soft)',
+          muted: 'var(--danger-muted)',
+          text: 'var(--danger-text)',
+          border: 'var(--danger-border)',
+        },
+
+        // New info colors
+        'info-new': {
+          DEFAULT: 'var(--info-new)',
+          hover: 'var(--info-hover-new)',
+          soft: 'var(--info-soft)',
+          muted: 'var(--info-muted)',
+          text: 'var(--info-text)',
+          border: 'var(--info-border)',
+        },
+
+        // New purple colors
+        'purple-new': {
+          DEFAULT: 'var(--purple-new)',
+          hover: 'var(--purple-hover-new)',
+          soft: 'var(--purple-soft)',
+          muted: 'var(--purple-muted)',
+          text: 'var(--purple-text)',
+          border: 'var(--purple-border)',
+        },
+
+        // Data colors
+        data: {
+          positive: 'var(--data-positive)',
+          negative: 'var(--data-negative)',
+          neutral: 'var(--data-neutral)',
+          highlight: 'var(--data-highlight)',
+        },
+
+        // Toast colors
+        toast: {
+          bg: 'var(--toast-bg)',
+          border: 'var(--toast-border)',
+          text: 'var(--toast-text)',
         },
       },
       fontSize: {
@@ -117,11 +232,22 @@ export default {
         'theme-md': 'var(--shadow-md)',
         'theme-lg': 'var(--shadow-lg)',
         'theme-xl': 'var(--shadow-xl)',
+        'card': 'var(--shadow-card)',
+        // Glow shadows
+        'glow-primary': 'var(--shadow-glow-primary)',
+        'glow-success': 'var(--shadow-glow-success)',
+        'glow-danger': 'var(--shadow-glow-danger)',
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xs: 'var(--radius-xs)',
+        'radius-sm': 'var(--radius-sm)',
+        'radius-md': 'var(--radius-md)',
+        'radius-lg': 'var(--radius-lg)',
+        xl: 'var(--radius-xl)',
+        '2xl': 'var(--radius-2xl)',
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],

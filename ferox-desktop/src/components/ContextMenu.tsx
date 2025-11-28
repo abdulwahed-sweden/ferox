@@ -1,4 +1,4 @@
-import { useAppStore } from '../store';
+import { useAppStore } from "../store";
 import {
   Terminal,
   FolderOpen,
@@ -14,10 +14,10 @@ import {
   Zap,
   Lock,
   Globe,
-} from 'lucide-react';
-import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
-import { terminateSession } from '../lib/tauri';
+} from "lucide-react";
+import { clsx } from "clsx";
+import toast from "react-hot-toast";
+import { terminateSession } from "../lib/tauri";
 
 interface MenuItemProps {
   icon: typeof Terminal;
@@ -39,9 +39,9 @@ function MenuItem({
   return (
     <button
       className={clsx(
-        'context-menu-item w-full',
-        danger && 'text-danger hover:bg-danger/10',
-        disabled && 'opacity-50 cursor-not-allowed'
+        "context-menu-item w-full",
+        danger && "text-danger hover:bg-danger/10",
+        disabled && "opacity-50 cursor-not-allowed",
       )}
       onClick={onClick}
       disabled={disabled}
@@ -64,13 +64,8 @@ function MenuHeader({ label }: { label: string }) {
 }
 
 export function ContextMenu() {
-  const {
-    contextMenu,
-    hideContextMenu,
-    sessions,
-    addTab,
-    removeSession,
-  } = useAppStore();
+  const { contextMenu, hideContextMenu, sessions, addTab, removeSession } =
+    useAppStore();
 
   const session = sessions.find((s) => s.id === contextMenu.sessionId);
 
@@ -79,10 +74,10 @@ export function ContextMenu() {
   const handleOpenTerminal = () => {
     addTab({
       id: `tab-${Date.now()}`,
-      type: 'terminal',
+      type: "terminal",
       sessionId: session.id,
       title: session.hostname,
-      icon: 'terminal',
+      icon: "terminal",
     });
     hideContextMenu();
   };
@@ -90,10 +85,10 @@ export function ContextMenu() {
   const handleOpenFileBrowser = () => {
     addTab({
       id: `tab-${Date.now()}`,
-      type: 'filebrowser',
+      type: "filebrowser",
       sessionId: session.id,
       title: `Files - ${session.hostname}`,
-      icon: 'folder',
+      icon: "folder",
     });
     hideContextMenu();
   };
@@ -101,46 +96,46 @@ export function ContextMenu() {
   const handleOpenProcesses = () => {
     addTab({
       id: `tab-${Date.now()}`,
-      type: 'processes',
+      type: "processes",
       sessionId: session.id,
       title: `Processes - ${session.hostname}`,
-      icon: 'activity',
+      icon: "activity",
     });
     hideContextMenu();
   };
 
   const handlePrivEsc = () => {
-    toast.success('Running privilege escalation scan...');
+    toast.success("Running privilege escalation scan...");
     hideContextMenu();
   };
 
   const handleHarvestCreds = () => {
-    toast.success('Harvesting credentials...');
+    toast.success("Harvesting credentials...");
     hideContextMenu();
   };
 
   const handleNetworkDiscovery = () => {
-    toast.success('Running network discovery...');
+    toast.success("Running network discovery...");
     hideContextMenu();
   };
 
   const handleLateralMove = () => {
-    toast('Opening lateral movement wizard...');
+    toast("Opening lateral movement wizard...");
     hideContextMenu();
   };
 
   const handlePersistence = () => {
-    toast('Opening persistence options...');
+    toast("Opening persistence options...");
     hideContextMenu();
   };
 
   const handleUpload = () => {
-    toast('Opening file upload dialog...');
+    toast("Opening file upload dialog...");
     hideContextMenu();
   };
 
   const handleDownload = () => {
-    toast('Opening file download dialog...');
+    toast("Opening file download dialog...");
     hideContextMenu();
   };
 
@@ -148,7 +143,7 @@ export function ContextMenu() {
     try {
       await terminateSession(session.id);
       removeSession(session.id);
-      toast.success('Session terminated');
+      toast.success("Session terminated");
     } catch (error) {
       toast.error(`Failed to terminate session: ${error}`);
     }
@@ -156,12 +151,12 @@ export function ContextMenu() {
   };
 
   const handleAddNote = () => {
-    toast('Opening note editor...');
+    toast("Opening note editor...");
     hideContextMenu();
   };
 
   const handleAddTag = () => {
-    toast('Opening tag editor...');
+    toast("Opening tag editor...");
     hideContextMenu();
   };
 
@@ -179,39 +174,87 @@ export function ContextMenu() {
     >
       {/* Session info header */}
       <div className="px-3 py-2 border-b border-dark-600">
-        <p className="font-medium text-text-primary text-sm">{session.hostname}</p>
+        <p className="font-medium text-text-primary text-sm">
+          {session.hostname}
+        </p>
         <p className="text-xs text-text-muted">
           {session.username} @ {session.ip_address}
         </p>
       </div>
 
       <MenuHeader label="Explore" />
-      <MenuItem icon={Terminal} label="Terminal" shortcut="Enter" onClick={handleOpenTerminal} />
-      <MenuItem icon={FolderOpen} label="File Browser" onClick={handleOpenFileBrowser} />
-      <MenuItem icon={Activity} label="Processes" onClick={handleOpenProcesses} />
+      <MenuItem
+        icon={Terminal}
+        label="Terminal"
+        shortcut="Enter"
+        onClick={handleOpenTerminal}
+      />
+      <MenuItem
+        icon={FolderOpen}
+        label="File Browser"
+        onClick={handleOpenFileBrowser}
+      />
+      <MenuItem
+        icon={Activity}
+        label="Processes"
+        onClick={handleOpenProcesses}
+      />
 
       <MenuDivider />
       <MenuHeader label="Access" />
-      <MenuItem icon={Play} label="Execute Command" onClick={handleOpenTerminal} />
-      <MenuItem icon={Zap} label="Escalate Privileges" onClick={handlePrivEsc} />
-      <MenuItem icon={Key} label="Harvest Credentials" onClick={handleHarvestCreds} />
+      <MenuItem
+        icon={Play}
+        label="Execute Command"
+        onClick={handleOpenTerminal}
+      />
+      <MenuItem
+        icon={Zap}
+        label="Escalate Privileges"
+        onClick={handlePrivEsc}
+      />
+      <MenuItem
+        icon={Key}
+        label="Harvest Credentials"
+        onClick={handleHarvestCreds}
+      />
 
       <MenuDivider />
       <MenuHeader label="Pivot" />
-      <MenuItem icon={Network} label="Network Discovery" onClick={handleNetworkDiscovery} />
-      <MenuItem icon={Globe} label="Lateral Movement" onClick={handleLateralMove} />
-      <MenuItem icon={Lock} label="Install Persistence" onClick={handlePersistence} />
+      <MenuItem
+        icon={Network}
+        label="Network Discovery"
+        onClick={handleNetworkDiscovery}
+      />
+      <MenuItem
+        icon={Globe}
+        label="Lateral Movement"
+        onClick={handleLateralMove}
+      />
+      <MenuItem
+        icon={Lock}
+        label="Install Persistence"
+        onClick={handlePersistence}
+      />
 
       <MenuDivider />
       <MenuHeader label="Transfer" />
       <MenuItem icon={Upload} label="Upload File" onClick={handleUpload} />
-      <MenuItem icon={Download} label="Download File" onClick={handleDownload} />
+      <MenuItem
+        icon={Download}
+        label="Download File"
+        onClick={handleDownload}
+      />
 
       <MenuDivider />
       <MenuHeader label="Session" />
       <MenuItem icon={StickyNote} label="Add Note" onClick={handleAddNote} />
       <MenuItem icon={Tag} label="Add Tag" onClick={handleAddTag} />
-      <MenuItem icon={Trash2} label="Kill Session" danger onClick={handleKillSession} />
+      <MenuItem
+        icon={Trash2}
+        label="Kill Session"
+        danger
+        onClick={handleKillSession}
+      />
     </div>
   );
 }

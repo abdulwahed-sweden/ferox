@@ -1,37 +1,45 @@
 // ferox-desktop/src/components/modules/opsec/EdrDetectorPanel.tsx
 // EDR Detection Panel
 
-import { useState } from 'react';
-import { Search, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import { useOpsec } from '../../../hooks/useOpsec';
-import type { EdrDetectionResult, EdrScanOptions } from '../../../types/opsec';
+import { useState } from "react";
+import { Search, AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { useOpsec } from "../../../hooks/useOpsec";
+import type { EdrDetectionResult, EdrScanOptions } from "../../../types/opsec";
 
 const SCAN_DEPTHS = [
-  { id: 'quick', label: 'Quick Scan', description: 'Process names only (~1s)' },
-  { id: 'standard', label: 'Standard Scan', description: 'Process + services (~3s)' },
-  { id: 'deep', label: 'Deep Scan', description: 'Full system analysis (~10s)' },
+  { id: "quick", label: "Quick Scan", description: "Process names only (~1s)" },
+  {
+    id: "standard",
+    label: "Standard Scan",
+    description: "Process + services (~3s)",
+  },
+  {
+    id: "deep",
+    label: "Deep Scan",
+    description: "Full system analysis (~10s)",
+  },
 ] as const;
 
 const EDR_INFO: Record<string, { description: string; mitigation: string }> = {
   WindowsDefender: {
-    description: 'Microsoft built-in AV with cloud intelligence',
-    mitigation: 'AMSI bypass + ETW patch recommended',
+    description: "Microsoft built-in AV with cloud intelligence",
+    mitigation: "AMSI bypass + ETW patch recommended",
   },
   CrowdStrike: {
-    description: 'Cloud-native EDR with kernel-level monitoring',
-    mitigation: 'Direct syscalls + memory evasion required',
+    description: "Cloud-native EDR with kernel-level monitoring",
+    mitigation: "Direct syscalls + memory evasion required",
   },
   SentinelOne: {
-    description: 'AI-powered EDR with behavioral analysis',
-    mitigation: 'Ghost mode + delayed execution recommended',
+    description: "AI-powered EDR with behavioral analysis",
+    mitigation: "Ghost mode + delayed execution recommended",
   },
   CarbonBlack: {
-    description: 'VMware EDR with process monitoring',
-    mitigation: 'Process injection + LOLBins recommended',
+    description: "VMware EDR with process monitoring",
+    mitigation: "Process injection + LOLBins recommended",
   },
   Cylance: {
-    description: 'AI-based AV with static analysis',
-    mitigation: 'Code obfuscation + packing effective',
+    description: "AI-based AV with static analysis",
+    mitigation: "Code obfuscation + packing effective",
   },
 };
 
@@ -39,7 +47,7 @@ export function EdrDetectorPanel() {
   const { scanEdr, loading } = useOpsec();
   const [results, setResults] = useState<EdrDetectionResult | null>(null);
   const [scanOptions, setScanOptions] = useState<EdrScanOptions>({
-    depth: 'standard',
+    depth: "standard",
     safeMode: true,
   });
   const [expandedEdr, setExpandedEdr] = useState<string | null>(null);
@@ -49,7 +57,7 @@ export function EdrDetectorPanel() {
       const result = await scanEdr(scanOptions);
       setResults(result);
     } catch (e) {
-      console.error('EDR scan failed:', e);
+      console.error("EDR scan failed:", e);
     }
   };
 
@@ -73,8 +81,8 @@ export function EdrDetectorPanel() {
                 }
                 className={`flex-1 p-3 rounded-lg border transition-colors ${
                   scanOptions.depth === id
-                    ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400'
-                    : 'border-dark-600 hover:border-dark-500'
+                    ? "border-cyan-400 bg-cyan-400/10 text-cyan-400"
+                    : "border-dark-600 hover:border-dark-500"
                 }`}
               >
                 <p className="font-medium">{label}</p>
@@ -97,12 +105,12 @@ export function EdrDetectorPanel() {
               setScanOptions((prev) => ({ ...prev, safeMode: !prev.safeMode }))
             }
             className={`w-12 h-6 rounded-full transition-colors ${
-              scanOptions.safeMode ? 'bg-cyan-600' : 'bg-dark-600'
+              scanOptions.safeMode ? "bg-cyan-600" : "bg-dark-600"
             }`}
           >
             <div
               className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                scanOptions.safeMode ? 'translate-x-6' : 'translate-x-0.5'
+                scanOptions.safeMode ? "translate-x-6" : "translate-x-0.5"
               }`}
             />
           </button>
@@ -116,7 +124,7 @@ export function EdrDetectorPanel() {
             rounded-lg font-medium disabled:opacity-50 transition-colors"
         >
           <Search className="w-4 h-4" />
-          {loading ? 'Scanning...' : 'Scan for EDR/AV'}
+          {loading ? "Scanning..." : "Scan for EDR/AV"}
         </button>
       </div>
 
@@ -133,17 +141,19 @@ export function EdrDetectorPanel() {
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="p-3 bg-dark-700/50 rounded-lg text-center">
-              <p className="text-2xl font-bold">{results.detectedEdrs?.length ?? 0}</p>
+              <p className="text-2xl font-bold">
+                {results.detectedEdrs?.length ?? 0}
+              </p>
               <p className="text-xs text-text-muted">Products Detected</p>
             </div>
             <div className="p-3 bg-dark-700/50 rounded-lg text-center">
               <p
                 className={`text-2xl font-bold ${
                   results.totalThreatLevel > 7
-                    ? 'text-red-400'
+                    ? "text-danger-text"
                     : results.totalThreatLevel > 4
-                    ? 'text-yellow-400'
-                    : 'text-green-400'
+                      ? "text-warning-text"
+                      : "text-success-text"
                 }`}
               >
                 {results.totalThreatLevel}/10
@@ -160,10 +170,10 @@ export function EdrDetectorPanel() {
 
           {/* Detection List */}
           {(results.detectedEdrs?.length ?? 0) === 0 ? (
-            <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-400" />
+            <div className="flex items-center gap-3 p-4 bg-success-soft border border-green-500/30 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-success-text" />
               <div>
-                <p className="font-medium text-green-400">No EDR Detected</p>
+                <p className="font-medium text-success-text">No EDR Detected</p>
                 <p className="text-sm text-text-muted">
                   Environment appears clean for operation
                 </p>
@@ -178,7 +188,9 @@ export function EdrDetectorPanel() {
                 >
                   <button
                     onClick={() =>
-                      setExpandedEdr(expandedEdr === edr.edrType ? null : edr.edrType)
+                      setExpandedEdr(
+                        expandedEdr === edr.edrType ? null : edr.edrType,
+                      )
                     }
                     className="w-full flex items-center justify-between p-3 hover:bg-dark-700/50 transition-colors"
                   >
@@ -186,10 +198,10 @@ export function EdrDetectorPanel() {
                       <AlertTriangle
                         className={`w-5 h-5 ${
                           edr.threatLevel > 7
-                            ? 'text-red-400'
+                            ? "text-danger-text"
                             : edr.threatLevel > 4
-                            ? 'text-yellow-400'
-                            : 'text-green-400'
+                              ? "text-warning-text"
+                              : "text-success-text"
                         }`}
                       />
                       <div className="text-left">
@@ -203,10 +215,10 @@ export function EdrDetectorPanel() {
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           edr.threatLevel > 7
-                            ? 'bg-red-400/10 text-red-400'
+                            ? "bg-danger-soft text-danger-text"
                             : edr.threatLevel > 4
-                            ? 'bg-yellow-400/10 text-yellow-400'
-                            : 'bg-green-400/10 text-green-400'
+                              ? "bg-warning-soft text-warning-text"
+                              : "bg-success-soft text-success-text"
                         }`}
                       >
                         Threat: {edr.threatLevel}/10
@@ -223,13 +235,15 @@ export function EdrDetectorPanel() {
                             {EDR_INFO[edr.edrType].description}
                           </p>
                           <p className="text-sm">
-                            <span className="text-cyan-400">Mitigation:</span>{' '}
+                            <span className="text-cyan-400">Mitigation:</span>{" "}
                             {EDR_INFO[edr.edrType].mitigation}
                           </p>
                         </div>
                       )}
                       <div>
-                        <p className="text-xs text-text-muted mb-1">Evidence:</p>
+                        <p className="text-xs text-text-muted mb-1">
+                          Evidence:
+                        </p>
                         <ul className="text-xs text-text-secondary space-y-1">
                           {edr.evidence.map((e, j) => (
                             <li key={j} className="flex items-center gap-1">

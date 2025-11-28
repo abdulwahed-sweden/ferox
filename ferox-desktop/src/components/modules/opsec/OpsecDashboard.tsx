@@ -1,7 +1,7 @@
 // ferox-desktop/src/components/modules/opsec/OpsecDashboard.tsx
 // Main OPSEC Dashboard Component
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Shield,
   Eye,
@@ -13,42 +13,43 @@ import {
   XCircle,
   Monitor,
   RefreshCw,
-} from 'lucide-react';
-import { useOpsec } from '../../../hooks/useOpsec';
-import { EdrDetectorPanel } from './EdrDetectorPanel';
-import { AmsiEtwPanel } from './AmsiEtwPanel';
-import { MemoryEvasionPanel } from './MemoryEvasionPanel';
-import { EnvDetectorPanel } from './EnvDetectorPanel';
-import { InjectionPanel } from './InjectionPanel';
-import { ExfilPanel } from './ExfilPanel';
-import type { StealthLevel, OpsecStatus } from '../../../types/opsec';
+} from "lucide-react";
+import { useOpsec } from "../../../hooks/useOpsec";
+import { EdrDetectorPanel } from "./EdrDetectorPanel";
+import { AmsiEtwPanel } from "./AmsiEtwPanel";
+import { MemoryEvasionPanel } from "./MemoryEvasionPanel";
+import { EnvDetectorPanel } from "./EnvDetectorPanel";
+import { InjectionPanel } from "./InjectionPanel";
+import { ExfilPanel } from "./ExfilPanel";
+import type { StealthLevel, OpsecStatus } from "../../../types/opsec";
 
 const STEALTH_COLORS: Record<StealthLevel, string> = {
-  Normal: 'text-green-400 bg-green-400/10 border-green-400/30',
-  Quiet: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  Silent: 'text-orange-400 bg-orange-400/10 border-orange-400/30',
-  Ghost: 'text-red-400 bg-red-400/10 border-red-400/30',
+  Normal: "text-success-text bg-success-soft border-success-border",
+  Quiet: "text-warning-text bg-warning-soft border-warning-border",
+  Silent:
+    "text-[var(--warning-text)] bg-[var(--warning-soft)] border-[var(--warning-border)]",
+  Ghost: "text-danger-text bg-danger-soft border-danger-border",
 };
 
 const STEALTH_DESCRIPTIONS: Record<StealthLevel, string> = {
-  Normal: 'Standard operation - minimal evasion',
-  Quiet: 'Reduced noise - basic evasion enabled',
-  Silent: 'Low profile - advanced evasion active',
-  Ghost: 'Maximum stealth - all evasion enabled',
+  Normal: "Standard operation - minimal evasion",
+  Quiet: "Reduced noise - basic evasion enabled",
+  Silent: "Low profile - advanced evasion active",
+  Ghost: "Maximum stealth - all evasion enabled",
 };
 
 interface StatusIndicatorProps {
   label: string;
-  status: 'success' | 'warning' | 'error' | 'inactive';
+  status: "success" | "warning" | "error" | "inactive";
   count?: number;
 }
 
 function StatusIndicator({ label, status, count }: StatusIndicatorProps) {
   const colors = {
-    success: 'text-green-400',
-    warning: 'text-yellow-400',
-    error: 'text-red-400',
-    inactive: 'text-gray-500',
+    success: "text-success-text",
+    warning: "text-warning-text",
+    error: "text-danger-text",
+    inactive: "text-content-tertiary",
   };
 
   const icons = {
@@ -65,7 +66,9 @@ function StatusIndicator({ label, status, count }: StatusIndicatorProps) {
       <Icon className="w-4 h-4" />
       <span className="text-sm font-medium">{label}</span>
       {count !== undefined && count > 0 && (
-        <span className="px-1.5 py-0.5 text-xs bg-dark-700 rounded">{count}</span>
+        <span className="px-1.5 py-0.5 text-xs bg-dark-700 rounded">
+          {count}
+        </span>
       )}
     </div>
   );
@@ -91,7 +94,9 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               disabled={loading}
               className="p-1 hover:bg-dark-700 rounded transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              />
             </button>
           </div>
           <div className="space-y-3">
@@ -99,16 +104,22 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">Stealth Level</span>
               <span
                 className={`px-2 py-1 rounded text-sm font-medium ${
-                  status ? STEALTH_COLORS[status.stealthLevel] : 'text-gray-500'
+                  status
+                    ? STEALTH_COLORS[status.stealthLevel]
+                    : "text-content-tertiary"
                 }`}
               >
-                {status?.stealthLevel || 'Unknown'}
+                {status?.stealthLevel || "Unknown"}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-text-secondary">Safe to Execute</span>
-              <span className={status?.isSafe ? 'text-green-400' : 'text-red-400'}>
-                {status?.isSafe ? 'Yes' : 'No'}
+              <span
+                className={
+                  status?.isSafe ? "text-success-text" : "text-danger-text"
+                }
+              >
+                {status?.isSafe ? "Yes" : "No"}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -116,7 +127,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-muted text-sm">
                 {status?.lastScan
                   ? new Date(status.lastScan).toLocaleTimeString()
-                  : 'Never'}
+                  : "Never"}
               </span>
             </div>
           </div>
@@ -131,11 +142,11 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.amsiBypass
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? "text-success-text bg-success-soft"
+                    : "text-content-tertiary bg-dark-700"
                 }`}
               >
-                {status?.amsiBypass ? 'Active' : 'Inactive'}
+                {status?.amsiBypass ? "Active" : "Inactive"}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -143,11 +154,11 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.etwPatched
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? "text-success-text bg-success-soft"
+                    : "text-content-tertiary bg-dark-700"
                 }`}
               >
-                {status?.etwPatched ? 'Yes' : 'No'}
+                {status?.etwPatched ? "Yes" : "No"}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -155,11 +166,11 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.memoryProtected
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? "text-success-text bg-success-soft"
+                    : "text-content-tertiary bg-dark-700"
                 }`}
               >
-                {status?.memoryProtected ? 'Yes' : 'No'}
+                {status?.memoryProtected ? "Yes" : "No"}
               </span>
             </div>
           </div>
@@ -173,27 +184,31 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">VM Detected</span>
               <span
                 className={
-                  status?.vmDetected ? 'text-yellow-400' : 'text-green-400'
+                  status?.vmDetected ? "text-warning-text" : "text-success-text"
                 }
               >
-                {status?.vmDetected || 'None'}
+                {status?.vmDetected || "None"}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-text-secondary">Sandbox</span>
               <span
                 className={
-                  status?.sandboxDetected ? 'text-red-400' : 'text-green-400'
+                  status?.sandboxDetected
+                    ? "text-danger-text"
+                    : "text-success-text"
                 }
               >
-                {status?.sandboxDetected || 'None'}
+                {status?.sandboxDetected || "None"}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-text-secondary">EDR Products</span>
               <span
                 className={
-                  status?.edrDetected?.length ? 'text-yellow-400' : 'text-green-400'
+                  status?.edrDetected?.length
+                    ? "text-warning-text"
+                    : "text-success-text"
                 }
               >
                 {status?.edrDetected?.length || 0} detected
@@ -207,7 +222,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
       {status?.edrDetected && status.edrDetected.length > 0 && (
         <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-yellow-400" />
+            <AlertTriangle className="w-5 h-5 text-warning-text" />
             Detected Security Products
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -225,10 +240,10 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
                 <div
                   className={`px-2 py-1 rounded text-xs ${
                     edr.threatLevel > 7
-                      ? 'bg-red-400/10 text-red-400'
+                      ? "bg-danger-soft text-danger-text"
                       : edr.threatLevel > 4
-                      ? 'bg-yellow-400/10 text-yellow-400'
-                      : 'bg-green-400/10 text-green-400'
+                        ? "bg-warning-soft text-warning-text"
+                        : "bg-success-soft text-success-text"
                   }`}
                 >
                   Threat: {edr.threatLevel}/10
@@ -263,7 +278,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
 
 export function OpsecDashboard() {
   const { status, loading, error, getStatus, setStealthLevel } = useOpsec();
-  const [activePanel, setActivePanel] = useState<string>('overview');
+  const [activePanel, setActivePanel] = useState<string>("overview");
 
   useEffect(() => {
     getStatus().catch(() => {
@@ -272,13 +287,13 @@ export function OpsecDashboard() {
   }, [getStatus]);
 
   const panels = [
-    { id: 'overview', label: 'Overview', icon: Shield },
-    { id: 'edr', label: 'EDR Detection', icon: Eye },
-    { id: 'amsi-etw', label: 'AMSI/ETW', icon: Shield },
-    { id: 'memory', label: 'Memory Evasion', icon: Cpu },
-    { id: 'environment', label: 'VM/Sandbox', icon: Monitor },
-    { id: 'injection', label: 'Injection', icon: Syringe },
-    { id: 'exfil', label: 'Exfiltration', icon: Upload },
+    { id: "overview", label: "Overview", icon: Shield },
+    { id: "edr", label: "EDR Detection", icon: Eye },
+    { id: "amsi-etw", label: "AMSI/ETW", icon: Shield },
+    { id: "memory", label: "Memory Evasion", icon: Cpu },
+    { id: "environment", label: "VM/Sandbox", icon: Monitor },
+    { id: "injection", label: "Injection", icon: Syringe },
+    { id: "exfil", label: "Exfiltration", icon: Upload },
   ];
 
   return (
@@ -295,11 +310,11 @@ export function OpsecDashboard() {
           <span className="text-sm text-text-secondary">Stealth Level:</span>
           <div className="relative group">
             <select
-              value={status?.stealthLevel || 'Silent'}
+              value={status?.stealthLevel || "Silent"}
               onChange={(e) => setStealthLevel(e.target.value as StealthLevel)}
               className={`px-3 py-1.5 rounded-lg border bg-dark-700 cursor-pointer
                 appearance-none pr-8 font-medium
-                ${status ? STEALTH_COLORS[status.stealthLevel] : 'border-dark-600'}`}
+                ${status ? STEALTH_COLORS[status.stealthLevel] : "border-dark-600"}`}
             >
               <option value="Normal">Normal</option>
               <option value="Quiet">Quiet</option>
@@ -317,30 +332,30 @@ export function OpsecDashboard() {
       <div className="flex items-center gap-4 px-4 py-2 bg-dark-800/50 border-b border-dark-600">
         <StatusIndicator
           label="AMSI"
-          status={status?.amsiBypass ? 'success' : 'inactive'}
+          status={status?.amsiBypass ? "success" : "inactive"}
         />
         <StatusIndicator
           label="ETW"
-          status={status?.etwPatched ? 'success' : 'inactive'}
+          status={status?.etwPatched ? "success" : "inactive"}
         />
         <StatusIndicator
           label="EDR"
           status={
             status?.edrDetected?.length
               ? status.edrDetected.length > 2
-                ? 'error'
-                : 'warning'
-              : 'success'
+                ? "error"
+                : "warning"
+              : "success"
           }
           count={status?.edrDetected?.length}
         />
         <StatusIndicator
           label="Environment"
-          status={status?.isSafe ? 'success' : 'error'}
+          status={status?.isSafe ? "success" : "error"}
         />
         <StatusIndicator
           label="Memory"
-          status={status?.memoryProtected ? 'success' : 'inactive'}
+          status={status?.memoryProtected ? "success" : "inactive"}
         />
       </div>
 
@@ -354,8 +369,8 @@ export function OpsecDashboard() {
               transition-colors whitespace-nowrap
               ${
                 activePanel === id
-                  ? 'text-cyan-400 border-b-2 border-cyan-400 bg-dark-800/50'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-dark-800/30'
+                  ? "text-cyan-400 border-b-2 border-cyan-400 bg-dark-800/50"
+                  : "text-text-secondary hover:text-text-primary hover:bg-dark-800/30"
               }`}
           >
             <Icon className="w-4 h-4" />
@@ -368,31 +383,31 @@ export function OpsecDashboard() {
       <div className="flex-1 overflow-auto p-4">
         {loading && (
           <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-cyan-400 border-t-transparent" />
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-info border-t-transparent" />
           </div>
         )}
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500 rounded-lg p-4 mb-4">
-            <p className="text-red-400">{error}</p>
+          <div className="bg-danger-soft border border-danger-border rounded-lg p-4 mb-4">
+            <p className="text-danger-text">{error}</p>
           </div>
         )}
 
         {!loading && (
           <>
-            {activePanel === 'overview' && (
+            {activePanel === "overview" && (
               <OverviewPanel
                 status={status}
                 onRefresh={() => getStatus()}
                 loading={loading}
               />
             )}
-            {activePanel === 'edr' && <EdrDetectorPanel />}
-            {activePanel === 'amsi-etw' && <AmsiEtwPanel />}
-            {activePanel === 'memory' && <MemoryEvasionPanel />}
-            {activePanel === 'environment' && <EnvDetectorPanel />}
-            {activePanel === 'injection' && <InjectionPanel />}
-            {activePanel === 'exfil' && <ExfilPanel />}
+            {activePanel === "edr" && <EdrDetectorPanel />}
+            {activePanel === "amsi-etw" && <AmsiEtwPanel />}
+            {activePanel === "memory" && <MemoryEvasionPanel />}
+            {activePanel === "environment" && <EnvDetectorPanel />}
+            {activePanel === "injection" && <InjectionPanel />}
+            {activePanel === "exfil" && <ExfilPanel />}
           </>
         )}
       </div>

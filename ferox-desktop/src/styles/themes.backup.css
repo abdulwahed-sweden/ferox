@@ -1,0 +1,973 @@
+/* ==========================================
+   Ferox Desktop - Professional Theme System
+   "Arctic Professional" (Light) + "Midnight Operations" (Dark)
+   Optimized for security tools & extended use
+   ========================================== */
+
+@layer base {
+  :root {
+    /* ==========================================
+       LIGHT THEME - "Arctic Professional"
+       Clean, corporate, high readability
+       ========================================== */
+
+    /* Backgrounds - Cool, clean blue-gray */
+    --background: 210 20% 96%; /* Crisp light gray with cool undertone */
+    --foreground: 220 25% 12%; /* Soft dark (not pure black - easier on eyes) */
+
+    /* Cards & Panels - Pure white for clear hierarchy */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 220 25% 12%; /* Matching dark text */
+
+    /* Popovers & Dropdowns */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+
+    /* Primary Brand - Trustworthy corporate blue */
+    --primary: 215 85% 48%; /* Professional blue */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
+
+    /* Secondary Elements - Clean, not muddy */
+    --secondary: 210 15% 92%; /* Light, clean gray */
+    --secondary-foreground: 220 20% 18%; /* Readable dark */
+
+    /* Muted/Subtle - Balanced visibility */
+    --muted: 210 15% 92%;
+    --muted-foreground: 215 15% 38%; /* Sweet spot - visible but subtle */
+
+    /* Accent Color - Subtle blue tint */
+    --accent: 210 25% 90%;
+    --accent-foreground: 220 20% 18%;
+
+    /* Destructive/Error - Refined red */
+    --destructive: 0 72% 48%; /* Professional, not aggressive */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 214 20% 78%; /* Visible but not harsh */
+    --input: 214 20% 78%;
+    --ring: 215 85% 48%; /* Match primary */
+
+    /* Sidebar - Dark sidebar for contrast */
+    --sidebar-background: 220 20% 12%; /* Deep slate */
+    --sidebar-foreground: 210 15% 95%; /* Soft white */
+    --sidebar-primary: 210 15% 95%;
+    --sidebar-primary-foreground: 220 20% 12%;
+    --sidebar-accent: 220 18% 18%;
+    --sidebar-accent-foreground: 210 15% 95%;
+    --sidebar-border: 220 18% 18%;
+    --sidebar-ring: 210 15% 95%;
+
+    /* Chart Colors - Professional palette */
+    --chart-1: 215 85% 48%; /* Primary blue */
+    --chart-2: 162 60% 38%; /* Teal */
+    --chart-3: 25 85% 45%; /* Burnt orange */
+    --chart-4: 270 50% 50%; /* Purple */
+    --chart-5: 152 55% 38%; /* Green */
+
+    /* Ferox Brand - Sophisticated teal-green */
+    --ferox-green: 162 72% 32%; /* Deep, professional teal */
+    --ferox-green-hover: 162 72% 28%; /* Darker on hover */
+    --ferox-green-bright: 162 72% 42%; /* For emphasis */
+
+    /* Status Colors - Clear, professional */
+    --status-online: 152 60% 32%; /* Deep green - authority */
+    --status-offline: 0 72% 48%; /* Refined red */
+    --status-idle: 25 85% 42%; /* Burnt orange - professional */
+    --status-away: 270 50% 45%; /* Muted purple */
+
+    /* Icon Colors - High contrast for visibility */
+    --icon-primary: 220 25% 12%; /* Match foreground */
+    --icon-secondary: 215 15% 38%; /* Match muted-foreground */
+    --icon-tertiary: 215 12% 52%; /* Lighter */
+
+    /* Text Size Scale */
+    --text-xs: 0.8125rem; /* 13px */
+    --text-sm: 0.9375rem; /* 15px */
+    --text-base: 1.0625rem; /* 17px */
+    --text-lg: 1.1875rem; /* 19px */
+    --text-xl: 1.3125rem; /* 21px */
+    --text-2xl: 1.5625rem; /* 25px */
+
+    /* Line Height */
+    --leading-tight: 1.3;
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.75;
+
+    /* Border Radius */
+    --radius: 0.5rem;
+
+    /* ==========================================
+       Legacy Ferox Variable Mappings (Light)
+       ========================================== */
+
+    /* Backgrounds */
+    --bg-primary: hsl(var(--background));
+    --bg-secondary: hsl(var(--secondary));
+    --bg-panel: hsl(var(--card));
+    --bg-hover: hsl(210 18% 88%);
+    --bg-active: hsl(210 18% 84%);
+    --bg-input: hsl(var(--card));
+
+    /* Text Colors */
+    --text-primary: hsl(var(--foreground));
+    --text-secondary: hsl(var(--secondary-foreground));
+    --text-tertiary: hsl(var(--muted-foreground));
+    --text-muted: hsl(var(--muted-foreground));
+    --text-inverted: hsl(var(--primary-foreground));
+
+    /* Icon Colors (mapped) */
+    --icon-color: hsl(var(--icon-primary));
+    --icon-color-muted: hsl(var(--icon-secondary));
+    --icon-color-subtle: hsl(var(--icon-tertiary));
+
+    /* Borders */
+    --border-primary: hsl(var(--border));
+    --border-secondary: hsl(214 18% 85%);
+    --border-strong: hsl(214 20% 65%);
+    --border-focus: hsl(var(--primary));
+
+    /* Brand Colors */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(215 85% 42%);
+    --color-primary-light: hsl(215 85% 58%);
+
+    --color-accent: hsl(var(--accent));
+    --color-accent-hover: hsl(210 25% 85%);
+
+    /* Semantic Colors */
+    --color-success: hsl(var(--status-online));
+    --color-warning: hsl(var(--status-idle));
+    --color-error: hsl(var(--destructive));
+    --color-info: hsl(var(--primary));
+
+    /* Ferox Brand mapped */
+    --color-ferox-green: hsl(var(--ferox-green));
+    --color-ferox-green-hover: hsl(var(--ferox-green-hover));
+    --color-ferox-green-dim: hsl(var(--ferox-green-bright));
+
+    /* Shadows - Subtle for light theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+    /* Component colors */
+    --dark-900: hsl(var(--background));
+    --dark-800: hsl(var(--secondary));
+    --dark-700: hsl(210 18% 88%);
+    --dark-600: hsl(var(--border));
+    --dark-500: hsl(214 20% 65%);
+    --dark-400: hsl(var(--muted-foreground));
+    --dark-300: hsl(var(--secondary-foreground));
+  }
+
+  [data-theme="dark"] {
+    /* ==========================================
+       DARK THEME - "Midnight Operations"
+       Neutral dark, optimized for long sessions
+       ========================================== */
+
+    /* Backgrounds - Neutral dark, easy on eyes */
+    --background: 220 18% 10%; /* Near-black with subtle blue */
+    --foreground: 210 15% 95%; /* Soft white (not pure white) */
+
+    /* Cards & Panels - Clear layer separation */
+    --card: 220 15% 15%; /* Distinct from background */
+    --card-foreground: 210 15% 95%;
+
+    /* Popovers & Dropdowns */
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 15% 95%;
+
+    /* Primary Brand - Bright comfortable blue */
+    --primary: 215 80% 58%; /* Vibrant but not harsh */
+    --primary-foreground: 220 18% 10%; /* Dark text on blue */
+
+    /* Secondary Elements - Subtle elevation */
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 210 15% 92%;
+
+    /* Muted/Subtle */
+    --muted: 220 12% 18%;
+    --muted-foreground: 215 12% 62%; /* Good contrast ratio */
+
+    /* Accent Color */
+    --accent: 220 15% 20%;
+    --accent-foreground: 210 15% 92%;
+
+    /* Destructive/Error */
+    --destructive: 0 65% 52%;
+    --destructive-foreground: 210 15% 95%;
+
+    /* Borders & Inputs - Subtle but visible */
+    --border: 220 12% 22%;
+    --input: 220 12% 22%;
+    --ring: 215 80% 58%;
+
+    /* Sidebar - Slightly darker than background */
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 15% 95%;
+    --sidebar-primary: 210 15% 95%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 210 15% 95%;
+    --sidebar-border: 220 15% 15%;
+    --sidebar-ring: 210 15% 95%;
+
+    /* Chart Colors - Vibrant for dark backgrounds */
+    --chart-1: 215 80% 62%; /* Bright blue */
+    --chart-2: 160 65% 52%; /* Teal */
+    --chart-3: 35 85% 58%; /* Warm orange */
+    --chart-4: 280 55% 62%; /* Purple */
+    --chart-5: 152 60% 52%; /* Green */
+
+    /* Ferox Brand - Vibrant but not harsh */
+    --ferox-green: 160 70% 48%; /* Balanced brightness */
+    --ferox-green-hover: 160 70% 55%; /* Brighter on hover */
+    --ferox-green-bright: 160 70% 58%; /* For emphasis */
+
+    /* Status Colors - Softer for dark mode */
+    --status-online: 152 55% 48%; /* Soft green */
+    --status-offline: 0 65% 55%; /* Soft red */
+    --status-idle: 35 80% 55%; /* Warm amber */
+    --status-away: 270 55% 62%; /* Soft purple */
+
+    /* Icon Colors - Bright for dark theme */
+    --icon-primary: 210 15% 95%; /* Match foreground */
+    --icon-secondary: 215 12% 62%; /* Match muted-foreground */
+    --icon-tertiary: 215 10% 48%; /* Dimmer */
+
+    /* Text sizes - Same as light */
+    --text-xs: 0.8125rem;
+    --text-sm: 0.9375rem;
+    --text-base: 1.0625rem;
+    --text-lg: 1.1875rem;
+    --text-xl: 1.3125rem;
+    --text-2xl: 1.5625rem;
+
+    /* Line height - Same as light */
+    --leading-tight: 1.3;
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.75;
+
+    /* ==========================================
+       Legacy Ferox Variable Mappings (Dark)
+       ========================================== */
+
+    /* Backgrounds */
+    --bg-primary: hsl(var(--background));
+    --bg-secondary: hsl(var(--secondary));
+    --bg-panel: hsl(var(--card));
+    --bg-hover: hsl(220 14% 20%);
+    --bg-active: hsl(220 14% 24%);
+    --bg-input: hsl(var(--card));
+
+    /* Text Colors */
+    --text-primary: hsl(var(--foreground));
+    --text-secondary: hsl(var(--secondary-foreground));
+    --text-tertiary: hsl(var(--muted-foreground));
+    --text-muted: hsl(var(--muted-foreground));
+    --text-inverted: hsl(var(--primary-foreground));
+
+    /* Icon Colors (mapped) */
+    --icon-color: hsl(var(--icon-primary));
+    --icon-color-muted: hsl(var(--icon-secondary));
+    --icon-color-subtle: hsl(var(--icon-tertiary));
+
+    /* Borders */
+    --border-primary: hsl(220 12% 25%);
+    --border-secondary: hsl(var(--border));
+    --border-strong: hsl(220 12% 32%);
+    --border-focus: hsl(var(--ring));
+
+    /* Brand Colors */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(215 80% 65%);
+    --color-primary-light: hsl(215 80% 70%);
+
+    --color-accent: hsl(var(--accent));
+    --color-accent-hover: hsl(220 15% 25%);
+
+    /* Semantic Colors */
+    --color-success: hsl(var(--status-online));
+    --color-warning: hsl(var(--status-idle));
+    --color-error: hsl(var(--destructive));
+    --color-info: hsl(200 80% 55%);
+
+    /* Ferox Brand mapped */
+    --color-ferox-green: hsl(var(--ferox-green));
+    --color-ferox-green-hover: hsl(var(--ferox-green-hover));
+    --color-ferox-green-dim: hsl(var(--ferox-green-bright));
+
+    /* Shadows - Deeper for dark theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+
+    /* Component colors */
+    --dark-900: hsl(var(--background));
+    --dark-800: hsl(var(--secondary));
+    --dark-700: hsl(var(--card));
+    --dark-600: hsl(220 12% 25%);
+    --dark-500: hsl(220 12% 32%);
+    --dark-400: hsl(220 12% 40%);
+    --dark-300: hsl(var(--muted-foreground));
+  }
+}
+
+/* ==========================================
+   Base Typography
+   ========================================== */
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+    font-weight: 600;
+  }
+
+  p {
+    line-height: var(--leading-relaxed);
+    margin-bottom: 1rem;
+  }
+
+  small {
+    font-size: var(--text-xs);
+  }
+
+  *:not(.no-transition) {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .theme-transitioning * {
+    transition: none !important;
+  }
+}
+
+/* ==========================================
+   Icon Utilities
+   ========================================== */
+
+@layer utilities {
+  .icon-primary,
+  .icon-secondary,
+  .icon-tertiary {
+    stroke-width: 2;
+  }
+
+  [data-theme="dark"] .icon-primary,
+  [data-theme="dark"] .icon-secondary,
+  [data-theme="dark"] .icon-tertiary {
+    stroke-width: 1.75;
+  }
+
+  .icon-primary {
+    color: hsl(var(--icon-primary));
+  }
+
+  .icon-secondary {
+    color: hsl(var(--icon-secondary));
+  }
+
+  .icon-tertiary {
+    color: hsl(var(--icon-tertiary));
+  }
+
+  .icon-xs {
+    width: 0.9375rem;
+    height: 0.9375rem;
+  }
+  .icon-sm {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+  .icon-md {
+    width: 1.3125rem;
+    height: 1.3125rem;
+  }
+  .icon-lg {
+    width: 1.5625rem;
+    height: 1.5625rem;
+  }
+
+  .status-online {
+    background-color: hsl(var(--status-online));
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .status-offline {
+    background-color: hsl(var(--status-offline));
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .status-idle {
+    background-color: hsl(var(--status-idle));
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .status-away {
+    background-color: hsl(var(--status-away));
+    padding: 0.375rem 0.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .text-xs {
+    font-size: var(--text-xs);
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+  }
+  .text-base {
+    font-size: var(--text-base);
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+  }
+}
+
+/* ==========================================
+   Component Utilities
+   ========================================== */
+
+@layer components {
+  .btn-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: 1px solid hsl(var(--primary));
+    font-size: var(--text-base);
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+  }
+
+  .btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
+  }
+
+  .btn-secondary {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+    font-size: var(--text-base);
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+  }
+
+  .btn-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.8);
+  }
+
+  .card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
+    padding: 1.25rem;
+    border-radius: var(--radius);
+  }
+
+  .input {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid hsl(var(--input));
+    font-size: var(--text-base);
+    padding: 0.625rem 0.875rem;
+    line-height: var(--leading-normal);
+    border-radius: var(--radius);
+  }
+
+  .input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input:focus {
+    border-color: hsl(var(--ring));
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.15);
+  }
+
+  .label {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .sidebar {
+    background-color: hsl(var(--sidebar-background));
+    color: hsl(var(--sidebar-foreground));
+    border-right: 1px solid hsl(var(--sidebar-border));
+  }
+
+  .sidebar-item {
+    padding: 0.75rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+  }
+
+  .sidebar-item:hover {
+    background-color: hsl(var(--sidebar-accent));
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: calc(var(--radius) / 2);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  .badge-success {
+    background-color: hsl(var(--status-online) / 0.15);
+    color: hsl(var(--status-online));
+  }
+
+  .badge-warning {
+    background-color: hsl(var(--status-idle) / 0.15);
+    color: hsl(var(--status-idle));
+  }
+
+  .badge-danger {
+    background-color: hsl(var(--status-offline) / 0.15);
+    color: hsl(var(--status-offline));
+  }
+
+  .badge-info {
+    background-color: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+  }
+
+  .badge-gray {
+    background-color: var(--bg-hover);
+    color: var(--text-secondary);
+  }
+
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .status-active {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: var(--color-ferox-green);
+  }
+
+  .status-sleeping {
+    background-color: var(--color-warning);
+  }
+
+  .status-dead {
+    background-color: var(--color-error);
+  }
+
+  .priv-user {
+    color: var(--text-secondary);
+  }
+
+  .priv-admin {
+    color: var(--color-warning);
+  }
+
+  .priv-system {
+    color: var(--color-error);
+  }
+
+  .priv-root {
+    color: var(--color-error);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--text-secondary);
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-ferox-green);
+    color: var(--color-ferox-green);
+  }
+
+  .btn-danger {
+    background-color: var(--color-error);
+    color: white;
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  .context-menu {
+    position: absolute;
+    z-index: 50;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-xl);
+    padding: 0.25rem 0;
+    min-width: 200px;
+    animation: fade-in 0.15s ease-out;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-primary);
+  }
+
+  .context-menu-item {
+    padding: 0.625rem 0.875rem;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+    color: var(--text-secondary);
+  }
+
+  .context-menu-item:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .context-menu-divider {
+    margin: 0.25rem 0;
+    border-top: 1px solid var(--border-secondary);
+  }
+
+  .context-menu-header {
+    padding: 0.5rem 0.875rem;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+}
+
+/* ==========================================
+   Ferox-Specific Utilities
+   ========================================== */
+
+.ferox-green {
+  color: hsl(var(--ferox-green));
+}
+
+.ferox-green-bright {
+  color: hsl(var(--ferox-green-bright));
+}
+
+.bg-ferox-green {
+  background-color: hsl(var(--ferox-green));
+}
+
+.hover\:bg-ferox-green:hover {
+  background-color: hsl(var(--ferox-green-hover));
+}
+
+/* Terminal styles */
+.terminal {
+  background-color: hsl(var(--card));
+  color: var(--text-primary);
+  border: 1px solid hsl(var(--border));
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+.terminal-prompt {
+  color: hsl(var(--ferox-green));
+  font-weight: 600;
+}
+
+/* xterm.js styling */
+.xterm {
+  padding: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  width: 10px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 4px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: calc(var(--radius) / 2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Table styles */
+table {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+}
+
+th {
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+}
+
+td {
+  padding: 0.75rem 1rem;
+}
+
+/* Code blocks */
+code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.9375rem;
+  background-color: var(--bg-secondary);
+  padding: 0.25rem 0.5rem;
+  border-radius: calc(var(--radius) / 2);
+}
+
+pre code {
+  font-size: 0.875rem;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-ferox-green);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: hsl(var(--primary) / 0.25);
+}
+
+[data-theme="dark"] ::selection {
+  background: hsl(var(--ferox-green) / 0.3);
+}
+
+/* Icon styling */
+svg {
+  color: inherit;
+}
+
+svg:not([class*="text-"]):not([class*="icon-"]) {
+  color: var(--icon-color);
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 0%,
+    var(--bg-active) 50%,
+    var(--bg-hover) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Theme-aware utility classes */
+@layer utilities {
+  .bg-dark-900 {
+    background-color: var(--dark-900);
+  }
+  .bg-dark-800 {
+    background-color: var(--dark-800);
+  }
+  .bg-dark-700 {
+    background-color: var(--dark-700);
+  }
+  .bg-dark-600 {
+    background-color: var(--dark-600);
+  }
+  .bg-dark-500 {
+    background-color: var(--dark-500);
+  }
+
+  .border-dark-600 {
+    border-color: var(--border-primary);
+  }
+  .border-dark-500 {
+    border-color: var(--border-secondary);
+  }
+  .border-dark-400 {
+    border-color: var(--text-tertiary);
+  }
+
+  .text-text-primary {
+    color: var(--text-primary);
+  }
+  .text-text-secondary {
+    color: var(--text-secondary);
+  }
+  .text-text-muted {
+    color: var(--text-muted);
+  }
+
+  .text-ferox-green {
+    color: var(--color-ferox-green);
+  }
+  .bg-ferox-green {
+    background-color: var(--color-ferox-green);
+  }
+  .text-ferox-green-dark {
+    color: var(--color-ferox-green-dim);
+  }
+  .bg-ferox-green-dark {
+    background-color: var(--color-ferox-green-dim);
+  }
+
+  .text-danger {
+    color: var(--color-error);
+  }
+  .bg-danger {
+    background-color: var(--color-error);
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .text-info {
+    color: var(--color-info);
+  }
+  .bg-info {
+    background-color: var(--color-info);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+  .bg-success {
+    background-color: var(--color-success);
+  }
+
+  .icon-default {
+    color: var(--icon-color);
+  }
+  .icon-muted {
+    color: var(--icon-color-muted);
+  }
+
+  .border-strong {
+    border-color: var(--border-strong);
+  }
+}

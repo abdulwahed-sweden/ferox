@@ -1,8 +1,8 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useAppStore } from '../store';
-import { createTerminal } from '../lib/tauri';
-import { terminalToasts, errorToasts } from '../lib/toast';
-import type { Tab } from '../types';
+import { useEffect, useCallback, useRef } from "react";
+import { useAppStore } from "../store";
+import { createTerminal } from "../lib/tauri";
+import { terminalToasts, errorToasts } from "../lib/toast";
+import type { Tab } from "../types";
 
 /**
  * Keyboard shortcuts hook for global navigation
@@ -58,15 +58,15 @@ export function useKeyboardShortcuts() {
         id: response.terminal_id,
         sessionId: selectedSessionId,
         title: `${session.hostname} - Terminal`,
-        type: 'terminal',
-        icon: 'terminal',
+        type: "terminal",
+        icon: "terminal",
       };
 
       addTab(newTab);
       terminalToasts.created(session.hostname);
     } catch (error) {
-      console.error('Failed to create terminal:', error);
-      errorToasts.generic('Failed to create terminal');
+      console.error("Failed to create terminal:", error);
+      errorToasts.generic("Failed to create terminal");
     }
   }, [selectedSessionId, sessions, tabs, addTab]);
 
@@ -75,31 +75,31 @@ export function useKeyboardShortcuts() {
     (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       const isInputFocused =
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
         target.isContentEditable;
 
       // If typing in terminal or input, only handle Escape
-      if (isInputFocused && event.key !== 'Escape') {
+      if (isInputFocused && event.key !== "Escape") {
         return;
       }
 
       // Ctrl+Tab: Cycle tabs forward
-      if (event.ctrlKey && event.key === 'Tab' && !event.shiftKey) {
+      if (event.ctrlKey && event.key === "Tab" && !event.shiftKey) {
         event.preventDefault();
         cycleTabForward();
         return;
       }
 
       // Ctrl+Shift+Tab: Cycle tabs backward
-      if (event.ctrlKey && event.shiftKey && event.key === 'Tab') {
+      if (event.ctrlKey && event.shiftKey && event.key === "Tab") {
         event.preventDefault();
         cycleTabBackward();
         return;
       }
 
       // Ctrl+W: Close active tab
-      if (event.ctrlKey && event.key === 'w') {
+      if (event.ctrlKey && event.key === "w") {
         event.preventDefault();
         closeActiveTab();
         return;
@@ -107,9 +107,9 @@ export function useKeyboardShortcuts() {
 
       // Skip other shortcuts if input is focused
       if (isInputFocused) {
-        if (event.key === 'Escape') {
+        if (event.key === "Escape") {
           (target as HTMLInputElement).blur();
-          setSearchQuery('');
+          setSearchQuery("");
           setSearchInputFocused(false);
         }
         return;
@@ -117,25 +117,25 @@ export function useKeyboardShortcuts() {
 
       switch (event.key) {
         // j: Navigate down in session tree
-        case 'j':
+        case "j":
           event.preventDefault();
           selectNextSession();
           break;
 
         // k: Navigate up in session tree
-        case 'k':
+        case "k":
           event.preventDefault();
           selectPrevSession();
           break;
 
         // Enter: Open terminal for selected session
-        case 'Enter':
+        case "Enter":
           event.preventDefault();
           openTerminalForSelectedSession();
           break;
 
         // /: Focus search
-        case '/':
+        case "/":
           event.preventDefault();
           if (searchInputRef.current) {
             searchInputRef.current.focus();
@@ -144,8 +144,8 @@ export function useKeyboardShortcuts() {
           break;
 
         // Escape: Clear and unfocus
-        case 'Escape':
-          setSearchQuery('');
+        case "Escape":
+          setSearchQuery("");
           setSearchInputFocused(false);
           break;
       }
@@ -159,13 +159,13 @@ export function useKeyboardShortcuts() {
       openTerminalForSelectedSession,
       setSearchQuery,
       setSearchInputFocused,
-    ]
+    ],
   );
 
   // Register global keyboard listener
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
   // Return ref for search input

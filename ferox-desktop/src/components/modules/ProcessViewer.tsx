@@ -3,7 +3,7 @@
  * For demo/training purposes only - no real process access
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   Square,
   RefreshCw,
@@ -12,12 +12,12 @@ import {
   HardDrive,
   Activity,
   Shield,
-} from 'lucide-react';
-import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
-import { Spinner } from '../Loading';
-import { simulateProcessList } from '../../lib/tauri';
-import type { SimulatedProcess, ProcessListResult } from '../../types';
+} from "lucide-react";
+import { clsx } from "clsx";
+import toast from "react-hot-toast";
+import { Spinner } from "../Loading";
+import { simulateProcessList } from "../../lib/tauri";
+import type { SimulatedProcess, ProcessListResult } from "../../types";
 
 interface ProcessViewerProps {
   sessionId: string;
@@ -28,8 +28,8 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
   const [processes, setProcesses] = useState<SimulatedProcess[]>([]);
   const [selectedPid, setSelectedPid] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState<keyof SimulatedProcess>('cpu');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState<keyof SimulatedProcess>("cpu");
   const [sortDesc, setSortDesc] = useState(true);
 
   const loadProcesses = useCallback(async () => {
@@ -39,8 +39,8 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
       setResult(data);
       setProcesses(data.processes);
     } catch (error) {
-      console.error('Failed to load processes:', error);
-      toast.error('Failed to enumerate processes');
+      console.error("Failed to load processes:", error);
+      toast.error("Failed to enumerate processes");
     } finally {
       setLoading(false);
     }
@@ -56,20 +56,23 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
 
   const handleKillProcess = useCallback(() => {
     if (selectedPid) {
-      setProcesses(prev => prev.filter(p => p.pid !== selectedPid));
+      setProcesses((prev) => prev.filter((p) => p.pid !== selectedPid));
       toast.success(`Process ${selectedPid} terminated (simulated)`);
       setSelectedPid(null);
     }
   }, [selectedPid]);
 
-  const handleSort = useCallback((field: keyof SimulatedProcess) => {
-    if (sortField === field) {
-      setSortDesc(!sortDesc);
-    } else {
-      setSortField(field);
-      setSortDesc(true);
-    }
-  }, [sortField, sortDesc]);
+  const handleSort = useCallback(
+    (field: keyof SimulatedProcess) => {
+      if (sortField === field) {
+        setSortDesc(!sortDesc);
+      } else {
+        setSortField(field);
+        setSortDesc(true);
+      }
+    },
+    [sortField, sortDesc],
+  );
 
   const filteredProcesses = useMemo(() => {
     let result = processes;
@@ -82,7 +85,7 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
           p.name.toLowerCase().includes(query) ||
           p.user.toLowerCase().includes(query) ||
           p.command.toLowerCase().includes(query) ||
-          p.pid.toString().includes(query)
+          p.pid.toString().includes(query),
       );
     }
 
@@ -90,7 +93,7 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
     result = [...result].sort((a, b) => {
       const aVal = a[sortField];
       const bVal = b[sortField];
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
+      if (typeof aVal === "number" && typeof bVal === "number") {
         return sortDesc ? bVal - aVal : aVal - bVal;
       }
       return sortDesc
@@ -109,9 +112,13 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
       {/* Header */}
       <div className="p-3 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
-          <Activity className="text-green-400" size={18} />
-          <h2 className="text-sm font-semibold text-text-primary">Process Viewer</h2>
-          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <Activity className="text-success-text" size={18} />
+          <h2 className="text-sm font-semibold text-text-primary">
+            Process Viewer
+          </h2>
+          <span className="text-xs bg-success-soft text-success-text px-2 py-0.5 rounded">
+            SIMULATION
+          </span>
         </div>
       </div>
 
@@ -122,7 +129,7 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
           className="p-1.5 hover:bg-dark-600 rounded transition-colors"
           title="Refresh"
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
         </button>
         <button
           onClick={handleKillProcess}
@@ -136,7 +143,10 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
         <div className="flex-1" />
 
         <div className="relative">
-          <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Search
+            size={14}
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted"
+          />
           <input
             type="text"
             placeholder="Search processes..."
@@ -149,11 +159,21 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
         {/* Stats */}
         <div className="flex items-center gap-3 pl-3 border-l border-dark-600 text-xs text-text-muted">
           <div className="flex items-center gap-1">
-            <Cpu size={12} className={totalCpu > 50 ? 'text-red-400' : 'text-green-400'} />
+            <Cpu
+              size={12}
+              className={
+                totalCpu > 50 ? "text-danger-text" : "text-success-text"
+              }
+            />
             <span>{totalCpu.toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-1">
-            <HardDrive size={12} className={totalMemory > 50 ? 'text-red-400' : 'text-green-400'} />
+            <HardDrive
+              size={12}
+              className={
+                totalMemory > 50 ? "text-danger-text" : "text-success-text"
+              }
+            />
             <span>{totalMemory.toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-1">
@@ -175,33 +195,33 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
               <tr>
                 <th
                   className="text-left p-2 font-medium cursor-pointer hover:text-text-primary w-20"
-                  onClick={() => handleSort('pid')}
+                  onClick={() => handleSort("pid")}
                 >
-                  PID {sortField === 'pid' && (sortDesc ? '↓' : '↑')}
+                  PID {sortField === "pid" && (sortDesc ? "↓" : "↑")}
                 </th>
                 <th
                   className="text-left p-2 font-medium cursor-pointer hover:text-text-primary"
-                  onClick={() => handleSort('name')}
+                  onClick={() => handleSort("name")}
                 >
-                  Name {sortField === 'name' && (sortDesc ? '↓' : '↑')}
+                  Name {sortField === "name" && (sortDesc ? "↓" : "↑")}
                 </th>
                 <th
                   className="text-left p-2 font-medium cursor-pointer hover:text-text-primary w-24"
-                  onClick={() => handleSort('user')}
+                  onClick={() => handleSort("user")}
                 >
-                  User {sortField === 'user' && (sortDesc ? '↓' : '↑')}
+                  User {sortField === "user" && (sortDesc ? "↓" : "↑")}
                 </th>
                 <th
                   className="text-right p-2 font-medium cursor-pointer hover:text-text-primary w-20"
-                  onClick={() => handleSort('cpu')}
+                  onClick={() => handleSort("cpu")}
                 >
-                  CPU% {sortField === 'cpu' && (sortDesc ? '↓' : '↑')}
+                  CPU% {sortField === "cpu" && (sortDesc ? "↓" : "↑")}
                 </th>
                 <th
                   className="text-right p-2 font-medium cursor-pointer hover:text-text-primary w-20"
-                  onClick={() => handleSort('memory')}
+                  onClick={() => handleSort("memory")}
                 >
-                  MEM% {sortField === 'memory' && (sortDesc ? '↓' : '↑')}
+                  MEM% {sortField === "memory" && (sortDesc ? "↓" : "↑")}
                 </th>
                 <th className="text-left p-2 font-medium w-20">Threads</th>
                 <th className="text-left p-2 font-medium">Status</th>
@@ -212,9 +232,9 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                 <tr
                   key={proc.pid}
                   className={clsx(
-                    'cursor-pointer hover:bg-dark-700 transition-colors',
-                    selectedPid === proc.pid && 'bg-dark-600',
-                    proc.is_implant && 'bg-ferox-green/5'
+                    "cursor-pointer hover:bg-dark-700 transition-colors",
+                    selectedPid === proc.pid && "bg-dark-600",
+                    proc.is_implant && "bg-ferox-green/5",
                   )}
                   onClick={() => setSelectedPid(proc.pid)}
                 >
@@ -229,26 +249,45 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-text-muted truncate max-w-xs" title={proc.command}>
+                    <div
+                      className="text-xs text-text-muted truncate max-w-xs"
+                      title={proc.command}
+                    >
                       {proc.command}
                     </div>
                   </td>
                   <td className="p-2 text-text-muted">{proc.user}</td>
-                  <td className={clsx('p-2 text-right', proc.cpu > 2 && 'text-yellow-400', proc.cpu > 5 && 'text-red-400')}>
+                  <td
+                    className={clsx(
+                      "p-2 text-right",
+                      proc.cpu > 2 && "text-warning-text",
+                      proc.cpu > 5 && "text-danger-text",
+                    )}
+                  >
                     {proc.cpu.toFixed(1)}
                   </td>
-                  <td className={clsx('p-2 text-right', proc.memory > 5 && 'text-yellow-400', proc.memory > 10 && 'text-red-400')}>
+                  <td
+                    className={clsx(
+                      "p-2 text-right",
+                      proc.memory > 5 && "text-warning-text",
+                      proc.memory > 10 && "text-danger-text",
+                    )}
+                  >
                     {proc.memory.toFixed(1)}
                   </td>
                   <td className="p-2 text-text-muted">{proc.threads}</td>
                   <td className="p-2">
                     <span
                       className={clsx(
-                        'text-xs px-1.5 py-0.5 rounded',
-                        proc.status === 'running' && 'bg-ferox-green/20 text-ferox-green',
-                        proc.status === 'sleeping' && 'bg-blue-500/20 text-blue-400',
-                        proc.status === 'stopped' && 'bg-red-500/20 text-red-400',
-                        proc.status === 'zombie' && 'bg-purple-500/20 text-purple-400'
+                        "text-xs px-1.5 py-0.5 rounded",
+                        proc.status === "running" &&
+                          "bg-ferox-green/20 text-ferox-green",
+                        proc.status === "sleeping" &&
+                          "bg-info-soft text-info-text",
+                        proc.status === "stopped" &&
+                          "bg-danger-soft text-danger-text",
+                        proc.status === "zombie" &&
+                          "bg-purple-soft text-purple-text",
                       )}
                     >
                       {proc.status}
@@ -263,7 +302,8 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
 
       {/* Status bar */}
       <div className="px-3 py-1.5 bg-dark-800 border-t border-dark-600 text-xs text-text-muted">
-        {filteredProcesses.length} processes | Session: {sessionId.slice(0, 8)}...
+        {filteredProcesses.length} processes | Session: {sessionId.slice(0, 8)}
+        ...
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 interface UseThemeReturn {
   theme: Theme;
@@ -11,27 +11,27 @@ interface UseThemeReturn {
   isLight: boolean;
 }
 
-const THEME_STORAGE_KEY = 'ferox-theme';
+const THEME_STORAGE_KEY = "ferox-theme";
 
 /**
  * Get initial theme from localStorage or system preference
  */
 function getInitialTheme(): Theme {
   // Check localStorage first
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    if (stored === 'light' || stored === 'dark') {
+    if (stored === "light" || stored === "dark") {
       return stored;
     }
 
     // Check system preference
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
     }
   }
 
   // Default to dark for Ferox aesthetic
-  return 'dark';
+  return "dark";
 }
 
 /**
@@ -45,17 +45,17 @@ export function useTheme(): UseThemeReturn {
     const root = document.documentElement;
 
     // Add transitioning class to prevent flash
-    root.classList.add('theme-transitioning');
+    root.classList.add("theme-transitioning");
 
     // Set theme attribute
-    root.setAttribute('data-theme', theme);
+    root.setAttribute("data-theme", theme);
 
     // Store preference
     localStorage.setItem(THEME_STORAGE_KEY, theme);
 
     // Remove transitioning class after brief delay
     const timeout = setTimeout(() => {
-      root.classList.remove('theme-transitioning');
+      root.classList.remove("theme-transitioning");
     }, 50);
 
     return () => clearTimeout(timeout);
@@ -63,34 +63,34 @@ export function useTheme(): UseThemeReturn {
 
   // Listen for system preference changes
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {
       // Only auto-switch if user hasn't set a preference
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
       if (!stored) {
-        setTheme(e.matches ? 'dark' : 'light');
+        setTheme(e.matches ? "dark" : "light");
       }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
-  const setLightTheme = useCallback(() => setTheme('light'), []);
-  const setDarkTheme = useCallback(() => setTheme('dark'), []);
+  const setLightTheme = useCallback(() => setTheme("light"), []);
+  const setDarkTheme = useCallback(() => setTheme("dark"), []);
 
   return {
     theme,
     toggleTheme,
     setLightTheme,
     setDarkTheme,
-    isDark: theme === 'dark',
-    isLight: theme === 'light',
+    isDark: theme === "dark",
+    isLight: theme === "light",
   };
 }
 

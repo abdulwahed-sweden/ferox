@@ -1,7 +1,7 @@
 // ferox-desktop/src/components/modules/opsec/ExfilPanel.tsx
 // Exfiltration Panel
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Upload,
   Download,
@@ -12,14 +12,14 @@ import {
   Cloud,
   Globe,
   MessageSquare,
-} from 'lucide-react';
-import { useOpsec } from '../../../hooks/useOpsec';
+} from "lucide-react";
+import { useOpsec } from "../../../hooks/useOpsec";
 import type {
   ExfilChannel,
   ExfilChannelInfo,
   ExfilSession,
   ExfilOptions,
-} from '../../../types/opsec';
+} from "../../../types/opsec";
 
 const CHANNEL_ICONS: Record<ExfilChannel, React.ElementType> = {
   Dns: Globe,
@@ -34,19 +34,21 @@ const CHANNEL_ICONS: Record<ExfilChannel, React.ElementType> = {
 };
 
 export function ExfilPanel() {
-  const { listExfilChannels, startExfil, getExfilSessions, loading } = useOpsec();
+  const { listExfilChannels, startExfil, getExfilSessions, loading } =
+    useOpsec();
   const [channels, setChannels] = useState<ExfilChannelInfo[]>([]);
   const [sessions, setSessions] = useState<ExfilSession[]>([]);
-  const [selectedChannel, setSelectedChannel] = useState<ExfilChannel>('HttpsPost');
+  const [selectedChannel, setSelectedChannel] =
+    useState<ExfilChannel>("HttpsPost");
   const [options, setOptions] = useState<ExfilOptions>({
-    channel: 'HttpsPost',
-    endpoint: '',
+    channel: "HttpsPost",
+    endpoint: "",
     chunkSize: 1024,
     delayMs: 2000,
     jitterPercent: 30,
     encryption: true,
   });
-  const [dataToExfil, setDataToExfil] = useState('');
+  const [dataToExfil, setDataToExfil] = useState("");
 
   useEffect(() => {
     loadChannels();
@@ -58,7 +60,7 @@ export function ExfilPanel() {
       const result = await listExfilChannels();
       setChannels(result);
     } catch (e) {
-      console.error('Failed to load channels:', e);
+      console.error("Failed to load channels:", e);
     }
   };
 
@@ -67,7 +69,7 @@ export function ExfilPanel() {
       const result = await getExfilSessions();
       setSessions(result);
     } catch (e) {
-      console.error('Failed to load sessions:', e);
+      console.error("Failed to load sessions:", e);
     }
   };
 
@@ -75,15 +77,17 @@ export function ExfilPanel() {
     try {
       const session = await startExfil(
         { ...options, channel: selectedChannel },
-        dataToExfil
+        dataToExfil,
       );
       setSessions((prev) => [...prev, session]);
     } catch (e) {
-      console.error('Exfiltration failed:', e);
+      console.error("Exfiltration failed:", e);
     }
   };
 
-  const selectedChannelInfo = channels.find((c) => c.channel === selectedChannel);
+  const selectedChannelInfo = channels.find(
+    (c) => c.channel === selectedChannel,
+  );
 
   return (
     <div className="space-y-6">
@@ -102,8 +106,8 @@ export function ExfilPanel() {
                 }}
                 className={`p-3 rounded-lg border text-left transition-colors ${
                   selectedChannel === channel.channel
-                    ? 'border-cyan-400 bg-cyan-400/10'
-                    : 'border-dark-600 hover:border-dark-500'
+                    ? "border-cyan-400 bg-cyan-400/10"
+                    : "border-dark-600 hover:border-dark-500"
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -124,7 +128,7 @@ export function ExfilPanel() {
                   <span className="text-text-muted">Speed:</span>
                   <div className="flex-1 h-1 bg-dark-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-green-400 rounded-full"
+                      className="h-full bg-success-text rounded-full"
                       style={{ width: `${channel.bandwidthRating * 10}%` }}
                     />
                   </div>
@@ -144,7 +148,9 @@ export function ExfilPanel() {
             </div>
             <div className="flex items-center justify-between text-sm mt-1">
               <span className="text-text-muted">Max Chunk Size:</span>
-              <span>{(selectedChannelInfo.maxChunkSize / 1024).toFixed(0)} KB</span>
+              <span>
+                {(selectedChannelInfo.maxChunkSize / 1024).toFixed(0)} KB
+              </span>
             </div>
           </div>
         )}
@@ -163,11 +169,13 @@ export function ExfilPanel() {
             <input
               type="text"
               value={options.endpoint}
-              onChange={(e) => setOptions((prev) => ({ ...prev, endpoint: e.target.value }))}
+              onChange={(e) =>
+                setOptions((prev) => ({ ...prev, endpoint: e.target.value }))
+              }
               placeholder={
-                selectedChannel === 'Dns'
-                  ? 'exfil.example.com'
-                  : 'https://api.example.com/collect'
+                selectedChannel === "Dns"
+                  ? "exfil.example.com"
+                  : "https://api.example.com/collect"
               }
               className="w-full px-3 py-2 bg-dark-700 border border-dark-600 rounded-lg
                 focus:outline-none focus:border-cyan-400"
@@ -183,7 +191,10 @@ export function ExfilPanel() {
               type="range"
               value={options.chunkSize}
               onChange={(e) =>
-                setOptions((prev) => ({ ...prev, chunkSize: parseInt(e.target.value) }))
+                setOptions((prev) => ({
+                  ...prev,
+                  chunkSize: parseInt(e.target.value),
+                }))
               }
               min={64}
               max={selectedChannelInfo?.maxChunkSize || 4096}
@@ -201,7 +212,10 @@ export function ExfilPanel() {
               type="range"
               value={options.delayMs}
               onChange={(e) =>
-                setOptions((prev) => ({ ...prev, delayMs: parseInt(e.target.value) }))
+                setOptions((prev) => ({
+                  ...prev,
+                  delayMs: parseInt(e.target.value),
+                }))
               }
               min={100}
               max={30000}
@@ -219,7 +233,10 @@ export function ExfilPanel() {
               type="range"
               value={options.jitterPercent}
               onChange={(e) =>
-                setOptions((prev) => ({ ...prev, jitterPercent: parseInt(e.target.value) }))
+                setOptions((prev) => ({
+                  ...prev,
+                  jitterPercent: parseInt(e.target.value),
+                }))
               }
               min={0}
               max={50}
@@ -232,19 +249,24 @@ export function ExfilPanel() {
           <div className="flex items-center justify-between p-3 bg-dark-700/50 rounded-lg">
             <div>
               <p className="font-medium">Encryption</p>
-              <p className="text-xs text-text-muted">Encrypt data before transmission</p>
+              <p className="text-xs text-text-muted">
+                Encrypt data before transmission
+              </p>
             </div>
             <button
               onClick={() =>
-                setOptions((prev) => ({ ...prev, encryption: !prev.encryption }))
+                setOptions((prev) => ({
+                  ...prev,
+                  encryption: !prev.encryption,
+                }))
               }
               className={`w-12 h-6 rounded-full transition-colors ${
-                options.encryption ? 'bg-cyan-600' : 'bg-dark-600'
+                options.encryption ? "bg-cyan-600" : "bg-dark-600"
               }`}
             >
               <div
                 className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  options.encryption ? 'translate-x-6' : 'translate-x-0.5'
+                  options.encryption ? "translate-x-6" : "translate-x-0.5"
                 }`}
               />
             </button>
@@ -267,9 +289,9 @@ export function ExfilPanel() {
           <p className="text-xs text-text-muted">
             {dataToExfil.length > 0
               ? `${dataToExfil.length} characters (~${Math.ceil(
-                  dataToExfil.length / options.chunkSize
+                  dataToExfil.length / options.chunkSize,
                 )} chunks)`
-              : 'No data entered'}
+              : "No data entered"}
           </p>
           <button className="text-xs text-cyan-400 hover:underline">
             Select File...
@@ -285,7 +307,7 @@ export function ExfilPanel() {
           rounded-lg font-medium disabled:opacity-50 transition-colors"
       >
         <Upload className="w-4 h-4" />
-        {loading ? 'Starting...' : 'Start Exfiltration'}
+        {loading ? "Starting..." : "Start Exfiltration"}
       </button>
 
       {/* Active Sessions */}
@@ -309,18 +331,22 @@ export function ExfilPanel() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm">{session.sessionId.slice(0, 8)}</span>
-                    <span className="text-xs text-text-muted">{session.channel}</span>
+                    <span className="font-mono text-sm">
+                      {session.sessionId.slice(0, 8)}
+                    </span>
+                    <span className="text-xs text-text-muted">
+                      {session.channel}
+                    </span>
                   </div>
                   <span
                     className={`px-2 py-0.5 rounded text-xs ${
-                      session.status === 'Completed'
-                        ? 'bg-green-400/10 text-green-400'
-                        : session.status === 'Failed'
-                        ? 'bg-red-400/10 text-red-400'
-                        : session.status === 'InProgress'
-                        ? 'bg-cyan-400/10 text-cyan-400'
-                        : 'bg-yellow-400/10 text-yellow-400'
+                      session.status === "Completed"
+                        ? "bg-success-soft text-success-text"
+                        : session.status === "Failed"
+                          ? "bg-danger-soft text-danger-text"
+                          : session.status === "InProgress"
+                            ? "bg-info-soft text-info-text"
+                            : "bg-warning-soft text-warning-text"
                     }`}
                   >
                     {session.status}
@@ -334,7 +360,10 @@ export function ExfilPanel() {
                       {session.chunksSent}/{session.chunksTotal} chunks
                     </span>
                     <span>
-                      {((session.bytesSent / session.totalBytes) * 100).toFixed(0)}%
+                      {((session.bytesSent / session.totalBytes) * 100).toFixed(
+                        0,
+                      )}
+                      %
                     </span>
                   </div>
                   <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
@@ -349,9 +378,12 @@ export function ExfilPanel() {
 
                 <div className="flex items-center justify-between text-xs text-text-muted">
                   <span>
-                    {(session.bytesSent / 1024).toFixed(1)} / {(session.totalBytes / 1024).toFixed(1)} KB
+                    {(session.bytesSent / 1024).toFixed(1)} /{" "}
+                    {(session.totalBytes / 1024).toFixed(1)} KB
                   </span>
-                  <span>Started: {new Date(session.startedAt).toLocaleTimeString()}</span>
+                  <span>
+                    Started: {new Date(session.startedAt).toLocaleTimeString()}
+                  </span>
                 </div>
               </div>
             ))}

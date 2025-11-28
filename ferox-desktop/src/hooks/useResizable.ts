@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from "react";
 
 interface UseResizableOptions {
   initialSize: number;
   minSize?: number;
   maxSize?: number;
-  direction?: 'horizontal' | 'vertical';
+  direction?: "horizontal" | "vertical";
   onResize?: (size: number) => void;
 }
 
@@ -15,7 +15,7 @@ export function useResizable({
   initialSize,
   minSize = 150,
   maxSize = 500,
-  direction = 'horizontal',
+  direction = "horizontal",
   onResize,
 }: UseResizableOptions) {
   const [size, setSize] = useState(initialSize);
@@ -27,19 +27,22 @@ export function useResizable({
     (e: React.MouseEvent) => {
       e.preventDefault();
       setIsResizing(true);
-      startPosRef.current = direction === 'horizontal' ? e.clientX : e.clientY;
+      startPosRef.current = direction === "horizontal" ? e.clientX : e.clientY;
       startSizeRef.current = size;
     },
-    [direction, size]
+    [direction, size],
   );
 
   useEffect(() => {
     if (!isResizing) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const currentPos = direction === 'horizontal' ? e.clientX : e.clientY;
+      const currentPos = direction === "horizontal" ? e.clientX : e.clientY;
       const delta = currentPos - startPosRef.current;
-      const newSize = Math.min(maxSize, Math.max(minSize, startSizeRef.current + delta));
+      const newSize = Math.min(
+        maxSize,
+        Math.max(minSize, startSizeRef.current + delta),
+      );
 
       setSize(newSize);
       onResize?.(newSize);
@@ -49,18 +52,19 @@ export function useResizable({
       setIsResizing(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     // Add cursor style to body during resize
-    document.body.style.cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor =
+      direction === "horizontal" ? "col-resize" : "row-resize";
+    document.body.style.userSelect = "none";
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
   }, [isResizing, direction, minSize, maxSize, onResize]);
 

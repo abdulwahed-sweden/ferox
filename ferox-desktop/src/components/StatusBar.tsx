@@ -1,12 +1,12 @@
 // ferox-desktop/src/components/StatusBar.tsx
 // Enhanced StatusBar with animations
 
-import { useAppStore } from '../store';
-import { Wifi, WifiOff, Monitor, Clock, Activity } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ThemeToggle } from './ThemeToggle';
-import { PulseIndicator } from './ui/PulseIndicator';
+import { useAppStore } from "../store";
+import { Wifi, WifiOff, Monitor, Clock, Activity } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "./ThemeToggle";
+import { PulseIndicator } from "./ui/PulseIndicator";
 
 export function StatusBar() {
   const { sessions } = useAppStore();
@@ -14,7 +14,7 @@ export function StatusBar() {
   const [connected] = useState(true);
   const [cpuUsage] = useState(Math.floor(Math.random() * 30) + 10);
 
-  const activeCount = sessions.filter((s) => s.status === 'active').length;
+  const activeCount = sessions.filter((s) => s.status === "active").length;
   const totalCount = sessions.length;
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function StatusBar() {
       {/* Connection status with pulse */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={connected ? 'connected' : 'disconnected'}
+          key={connected ? "connected" : "disconnected"}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 10 }}
@@ -63,7 +63,7 @@ export function StatusBar() {
       <motion.div
         className="flex items-center gap-1.5"
         whileHover={{ scale: 1.02 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
       >
         <Monitor size={12} />
         <span>
@@ -74,8 +74,8 @@ export function StatusBar() {
             className="inline-block"
           >
             {activeCount}
-          </motion.span>{' '}
-          active /{' '}
+          </motion.span>{" "}
+          active /{" "}
           <motion.span
             key={totalCount}
             initial={{ opacity: 0, y: -5 }}
@@ -83,7 +83,7 @@ export function StatusBar() {
             className="inline-block"
           >
             {totalCount}
-          </motion.span>{' '}
+          </motion.span>{" "}
           total sessions
         </span>
       </motion.div>
@@ -98,14 +98,14 @@ export function StatusBar() {
             <motion.div
               className={`h-full rounded-full ${
                 cpuUsage > 70
-                  ? 'bg-red-400'
+                  ? "bg-danger-text"
                   : cpuUsage > 40
-                  ? 'bg-yellow-400'
-                  : 'bg-cyan-400'
+                    ? "bg-warning-text"
+                    : "bg-info-text"
               }`}
               initial={{ width: 0 }}
               animate={{ width: `${cpuUsage}%` }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             />
           </div>
           <span className="w-8">{cpuUsage}%</span>

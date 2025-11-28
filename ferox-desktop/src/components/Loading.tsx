@@ -1,27 +1,27 @@
-import { clsx } from 'clsx';
+import { clsx } from "clsx";
 
 /**
  * Spinner component for loading indicators
  */
 export function Spinner({
-  size = 'md',
+  size = "md",
   className,
 }: {
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   className?: string;
 }) {
   const sizeClasses = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-6 h-6 border-2',
-    lg: 'w-8 h-8 border-3',
+    sm: "w-4 h-4 border-2",
+    md: "w-6 h-6 border-2",
+    lg: "w-8 h-8 border-3",
   };
 
   return (
     <div
       className={clsx(
-        'animate-spin rounded-full border-ferox-green border-t-transparent',
+        "animate-spin rounded-full border-ferox-green border-t-transparent",
         sizeClasses[size],
-        className
+        className,
       )}
     />
   );
@@ -30,7 +30,11 @@ export function Spinner({
 /**
  * Full-page loading overlay
  */
-export function LoadingOverlay({ message = 'Loading...' }: { message?: string }) {
+export function LoadingOverlay({
+  message = "Loading...",
+}: {
+  message?: string;
+}) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-900/80 backdrop-blur-sm z-50">
       <Spinner size="lg" />
@@ -44,10 +48,10 @@ export function LoadingOverlay({ message = 'Loading...' }: { message?: string })
  */
 export function LoadingInline({
   message,
-  size = 'sm',
+  size = "sm",
 }: {
   message?: string;
-  size?: 'sm' | 'md';
+  size?: "sm" | "md";
 }) {
   return (
     <div className="flex items-center gap-2 text-text-muted">
@@ -61,8 +65,8 @@ export function LoadingInline({
  * Skeleton line for text placeholders
  */
 export function SkeletonLine({
-  width = '100%',
-  height = '1rem',
+  width = "100%",
+  height = "1rem",
   className,
 }: {
   width?: string | number;
@@ -71,7 +75,7 @@ export function SkeletonLine({
 }) {
   return (
     <div
-      className={clsx('skeleton rounded', className)}
+      className={clsx("skeleton rounded", className)}
       style={{ width, height }}
     />
   );
@@ -89,7 +93,7 @@ export function SkeletonCircle({
 }) {
   return (
     <div
-      className={clsx('skeleton rounded-full', className)}
+      className={clsx("skeleton rounded-full", className)}
       style={{ width: size, height: size }}
     />
   );
@@ -140,7 +144,8 @@ export function TerminalSkeleton() {
       </div>
       <div className="mt-4 flex items-center gap-2">
         <SkeletonLine width="80px" height="1rem" />
-        <div className="w-2 h-4 bg-ferox-green/50 animate-pulse" /> {/* Cursor */}
+        <div className="w-2 h-4 bg-ferox-green/50 animate-pulse" />{" "}
+        {/* Cursor */}
       </div>
     </div>
   );
@@ -191,9 +196,9 @@ export function ButtonLoading({
   return (
     <button
       className={clsx(
-        'relative inline-flex items-center justify-center transition-all',
-        loading && 'cursor-wait',
-        className
+        "relative inline-flex items-center justify-center transition-all",
+        loading && "cursor-wait",
+        className,
       )}
       disabled={disabled || loading}
       {...props}
@@ -203,7 +208,7 @@ export function ButtonLoading({
           <Spinner size="sm" />
         </span>
       )}
-      <span className={clsx(loading && 'invisible')}>{children}</span>
+      <span className={clsx(loading && "invisible")}>{children}</span>
     </button>
   );
 }

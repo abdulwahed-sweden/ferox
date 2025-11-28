@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import type { Session, SessionTreeNode, Tab } from '../types';
+import { create } from "zustand";
+import type { Session, SessionTreeNode, Tab } from "../types";
 
 interface AppState {
   // Sessions
@@ -45,10 +45,10 @@ interface AppState {
 
   // Session Filters
   sessionFilters: {
-    status: ('active' | 'sleeping' | 'dead')[];
+    status: ("active" | "sleeping" | "dead")[];
     os: string[];
   };
-  setStatusFilter: (statuses: ('active' | 'sleeping' | 'dead')[]) => void;
+  setStatusFilter: (statuses: ("active" | "sleeping" | "dead")[]) => void;
   setOsFilter: (os: string[]) => void;
   clearFilters: () => void;
 
@@ -94,7 +94,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateSession: (id, updates) =>
     set((state) => ({
       sessions: state.sessions.map((s) =>
-        s.id === id ? { ...s, ...updates } : s
+        s.id === id ? { ...s, ...updates } : s,
       ),
     })),
   removeSession: (id) =>
@@ -150,7 +150,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       return {
         tabs: newTabs,
         activeTabId: wasActive
-          ? newTabs[newTabs.length - 1]?.id ?? null
+          ? (newTabs[newTabs.length - 1]?.id ?? null)
           : state.activeTabId,
       };
     }),
@@ -164,9 +164,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Select previous tab, or next if at start, or null if no tabs left
     let newActiveId: string | null = null;
     if (newTabs.length > 0) {
-      newActiveId = currentIndex > 0
-        ? newTabs[currentIndex - 1]?.id ?? newTabs[0]?.id
-        : newTabs[0]?.id ?? null;
+      newActiveId =
+        currentIndex > 0
+          ? (newTabs[currentIndex - 1]?.id ?? newTabs[0]?.id)
+          : (newTabs[0]?.id ?? null);
     }
 
     set({ tabs: newTabs, activeTabId: newActiveId });
@@ -216,7 +217,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   // UI State
   sidebarWidth: 280,
   setSidebarWidth: (sidebarWidth) => set({ sidebarWidth }),
-  searchQuery: '',
+  searchQuery: "",
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   searchInputFocused: false,
   setSearchInputFocused: (searchInputFocused) => set({ searchInputFocused }),

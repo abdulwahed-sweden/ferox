@@ -1,7 +1,7 @@
 // ferox-desktop/src/components/modules/opsec/InjectionPanel.tsx
 // Process Injection Panel
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Syringe,
   Search,
@@ -9,13 +9,13 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
-} from 'lucide-react';
-import { useOpsec } from '../../../hooks/useOpsec';
+} from "lucide-react";
+import { useOpsec } from "../../../hooks/useOpsec";
 import type {
   InjectionTechnique,
   InjectionResult,
   TargetProcess,
-} from '../../../types/opsec';
+} from "../../../types/opsec";
 
 const INJECTION_TECHNIQUES: {
   id: InjectionTechnique;
@@ -23,99 +23,115 @@ const INJECTION_TECHNIQUES: {
   description: string;
   mitre: string;
   stealth: number;
-  complexity: 'low' | 'medium' | 'high';
+  complexity: "low" | "medium" | "high";
 }[] = [
   {
-    id: 'ClassicRemoteThread',
-    name: 'Classic Remote Thread',
-    description: 'CreateRemoteThread injection - widely detected',
-    mitre: 'T1055.002',
+    id: "ClassicRemoteThread",
+    name: "Classic Remote Thread",
+    description: "CreateRemoteThread injection - widely detected",
+    mitre: "T1055.002",
     stealth: 3,
-    complexity: 'low',
+    complexity: "low",
   },
   {
-    id: 'NtCreateThreadEx',
-    name: 'NtCreateThreadEx',
-    description: 'Direct syscall for thread creation - less monitored',
-    mitre: 'T1055.002',
+    id: "NtCreateThreadEx",
+    name: "NtCreateThreadEx",
+    description: "Direct syscall for thread creation - less monitored",
+    mitre: "T1055.002",
     stealth: 6,
-    complexity: 'medium',
+    complexity: "medium",
   },
   {
-    id: 'QueueUserApc',
-    name: 'APC Queue Injection',
-    description: 'Queue APC to alertable thread - stealthy',
-    mitre: 'T1055.004',
+    id: "QueueUserApc",
+    name: "APC Queue Injection",
+    description: "Queue APC to alertable thread - stealthy",
+    mitre: "T1055.004",
     stealth: 7,
-    complexity: 'medium',
+    complexity: "medium",
   },
   {
-    id: 'EarlyBird',
-    name: 'Early Bird',
-    description: 'APC injection to suspended process - very stealthy',
-    mitre: 'T1055.004',
+    id: "EarlyBird",
+    name: "Early Bird",
+    description: "APC injection to suspended process - very stealthy",
+    mitre: "T1055.004",
     stealth: 8,
-    complexity: 'high',
+    complexity: "high",
   },
   {
-    id: 'ThreadHijack',
-    name: 'Thread Hijack',
-    description: 'Hijack existing thread context - no new threads',
-    mitre: 'T1055.003',
+    id: "ThreadHijack",
+    name: "Thread Hijack",
+    description: "Hijack existing thread context - no new threads",
+    mitre: "T1055.003",
     stealth: 8,
-    complexity: 'high',
+    complexity: "high",
   },
   {
-    id: 'ProcessHollowing',
-    name: 'Process Hollowing',
-    description: 'Replace process memory - appears legitimate',
-    mitre: 'T1055.012',
+    id: "ProcessHollowing",
+    name: "Process Hollowing",
+    description: "Replace process memory - appears legitimate",
+    mitre: "T1055.012",
     stealth: 9,
-    complexity: 'high',
+    complexity: "high",
   },
   {
-    id: 'ModuleStomping',
-    name: 'Module Stomping',
-    description: 'Overwrite legitimate DLL in memory',
-    mitre: 'T1055.001',
+    id: "ModuleStomping",
+    name: "Module Stomping",
+    description: "Overwrite legitimate DLL in memory",
+    mitre: "T1055.001",
     stealth: 9,
-    complexity: 'high',
+    complexity: "high",
   },
   {
-    id: 'DirectSyscall',
-    name: 'Direct Syscall',
-    description: 'Bypass userland hooks with direct syscalls',
-    mitre: 'T1055',
+    id: "DirectSyscall",
+    name: "Direct Syscall",
+    description: "Bypass userland hooks with direct syscalls",
+    mitre: "T1055",
     stealth: 10,
-    complexity: 'high',
+    complexity: "high",
   },
 ];
 
 const TARGET_CRITERIA = [
-  { id: 'SystemProcess', label: 'System Process', description: 'svchost.exe, RuntimeBroker.exe' },
-  { id: 'BrowserProcess', label: 'Browser', description: 'chrome.exe, firefox.exe, msedge.exe' },
-  { id: 'SignedMicrosoft', label: 'Signed Microsoft', description: 'Any Microsoft-signed binary' },
-  { id: 'ByName', label: 'Custom', description: 'Specify process name' },
+  {
+    id: "SystemProcess",
+    label: "System Process",
+    description: "svchost.exe, RuntimeBroker.exe",
+  },
+  {
+    id: "BrowserProcess",
+    label: "Browser",
+    description: "chrome.exe, firefox.exe, msedge.exe",
+  },
+  {
+    id: "SignedMicrosoft",
+    label: "Signed Microsoft",
+    description: "Any Microsoft-signed binary",
+  },
+  { id: "ByName", label: "Custom", description: "Specify process name" },
 ];
 
 export function InjectionPanel() {
   const { findTargets, inject, loading } = useOpsec();
-  const [selectedTechnique, setSelectedTechnique] = useState<InjectionTechnique>('QueueUserApc');
-  const [targetCriteria, setTargetCriteria] = useState('SystemProcess');
-  const [customTarget, setCustomTarget] = useState('');
+  const [selectedTechnique, setSelectedTechnique] =
+    useState<InjectionTechnique>("QueueUserApc");
+  const [targetCriteria, setTargetCriteria] = useState("SystemProcess");
+  const [customTarget, setCustomTarget] = useState("");
   const [targets, setTargets] = useState<TargetProcess[]>([]);
-  const [selectedTarget, setSelectedTarget] = useState<TargetProcess | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState<TargetProcess | null>(
+    null,
+  );
   const [result, setResult] = useState<InjectionResult | null>(null);
-  const [shellcode, setShellcode] = useState('');
+  const [shellcode, setShellcode] = useState("");
 
   const handleFindTargets = async () => {
     try {
-      const criteria = targetCriteria === 'ByName' ? customTarget : targetCriteria;
+      const criteria =
+        targetCriteria === "ByName" ? customTarget : targetCriteria;
       const found = await findTargets(criteria);
       setTargets(found);
       setSelectedTarget(null);
     } catch (e) {
-      console.error('Failed to find targets:', e);
+      console.error("Failed to find targets:", e);
     }
   };
 
@@ -129,7 +145,7 @@ export function InjectionPanel() {
       });
       setResult(injResult);
     } catch (e) {
-      console.error('Injection failed:', e);
+      console.error("Injection failed:", e);
     }
   };
 
@@ -148,8 +164,8 @@ export function InjectionPanel() {
               onClick={() => setSelectedTechnique(tech.id)}
               className={`p-3 rounded-lg border text-left transition-colors ${
                 selectedTechnique === tech.id
-                  ? 'border-cyan-400 bg-cyan-400/10'
-                  : 'border-dark-600 hover:border-dark-500'
+                  ? "border-cyan-400 bg-cyan-400/10"
+                  : "border-dark-600 hover:border-dark-500"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
@@ -172,11 +188,11 @@ export function InjectionPanel() {
                 </div>
                 <span
                   className={`px-2 py-0.5 rounded text-xs ${
-                    tech.complexity === 'low'
-                      ? 'bg-green-400/10 text-green-400'
-                      : tech.complexity === 'medium'
-                      ? 'bg-yellow-400/10 text-yellow-400'
-                      : 'bg-red-400/10 text-red-400'
+                    tech.complexity === "low"
+                      ? "bg-success-soft text-success-text"
+                      : tech.complexity === "medium"
+                        ? "bg-warning-soft text-warning-text"
+                        : "bg-danger-soft text-danger-text"
                   }`}
                 >
                   {tech.complexity}
@@ -199,8 +215,8 @@ export function InjectionPanel() {
               onClick={() => setTargetCriteria(criteria.id)}
               className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                 targetCriteria === criteria.id
-                  ? 'bg-cyan-600 text-white'
-                  : 'bg-dark-700 hover:bg-dark-600'
+                  ? "bg-cyan-600 text-white"
+                  : "bg-dark-700 hover:bg-dark-600"
               }`}
             >
               {criteria.label}
@@ -209,7 +225,7 @@ export function InjectionPanel() {
         </div>
 
         {/* Custom Target Input */}
-        {targetCriteria === 'ByName' && (
+        {targetCriteria === "ByName" && (
           <input
             type="text"
             value={customTarget}
@@ -228,7 +244,7 @@ export function InjectionPanel() {
             rounded-lg font-medium transition-colors border border-dark-600 mb-4"
         >
           <Search className="w-4 h-4" />
-          {loading ? 'Searching...' : 'Find Targets'}
+          {loading ? "Searching..." : "Find Targets"}
         </button>
 
         {/* Target List */}
@@ -240,27 +256,29 @@ export function InjectionPanel() {
                 onClick={() => setSelectedTarget(target)}
                 className={`w-full p-3 rounded-lg border text-left transition-colors ${
                   selectedTarget?.pid === target.pid
-                    ? 'border-cyan-400 bg-cyan-400/10'
-                    : 'border-dark-600 hover:border-dark-500'
+                    ? "border-cyan-400 bg-cyan-400/10"
+                    : "border-dark-600 hover:border-dark-500"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-text-muted" />
                     <span className="font-medium">{target.name}</span>
-                    <span className="text-xs text-text-muted">PID: {target.pid}</span>
+                    <span className="text-xs text-text-muted">
+                      PID: {target.pid}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-text-muted">
-                      {target.is64bit ? 'x64' : 'x86'}
+                      {target.is64bit ? "x64" : "x86"}
                     </span>
                     <span
                       className={`px-2 py-0.5 rounded text-xs ${
                         target.suitability > 7
-                          ? 'bg-green-400/10 text-green-400'
+                          ? "bg-success-soft text-success-text"
                           : target.suitability > 4
-                          ? 'bg-yellow-400/10 text-yellow-400'
-                          : 'bg-red-400/10 text-red-400'
+                            ? "bg-warning-soft text-warning-text"
+                            : "bg-danger-soft text-danger-text"
                       }`}
                     >
                       Score: {target.suitability}/10
@@ -268,7 +286,9 @@ export function InjectionPanel() {
                   </div>
                 </div>
                 {target.path && (
-                  <p className="text-xs text-text-muted mt-1 truncate">{target.path}</p>
+                  <p className="text-xs text-text-muted mt-1 truncate">
+                    {target.path}
+                  </p>
                 )}
               </button>
             ))}
@@ -289,8 +309,8 @@ export function InjectionPanel() {
         />
         <p className="text-xs text-text-muted mt-2">
           {shellcode.length > 0
-            ? `${Math.floor(shellcode.replace(/\\x/g, '').length / 2)} bytes`
-            : 'Enter shellcode in hex format'}
+            ? `${Math.floor(shellcode.replace(/\\x/g, "").length / 2)} bytes`
+            : "Enter shellcode in hex format"}
         </p>
       </div>
 
@@ -302,7 +322,7 @@ export function InjectionPanel() {
           rounded-lg font-medium disabled:opacity-50 transition-colors"
       >
         <Syringe className="w-4 h-4" />
-        {loading ? 'Injecting...' : 'Execute Injection'}
+        {loading ? "Injecting..." : "Execute Injection"}
       </button>
 
       {/* Result */}
@@ -310,36 +330,39 @@ export function InjectionPanel() {
         <div
           className={`rounded-lg p-4 border ${
             result.success
-              ? 'bg-green-400/10 border-green-400/30'
-              : 'bg-red-400/10 border-red-400/30'
+              ? "bg-success-soft border-green-400/30"
+              : "bg-danger-soft border-red-400/30"
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
             {result.success ? (
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <CheckCircle className="w-5 h-5 text-success-text" />
             ) : (
-              <XCircle className="w-5 h-5 text-red-400" />
+              <XCircle className="w-5 h-5 text-danger-text" />
             )}
             <span className="font-medium">
-              {result.success ? 'Injection Successful' : 'Injection Failed'}
+              {result.success ? "Injection Successful" : "Injection Failed"}
             </span>
           </div>
           <p className="text-sm text-text-secondary">{result.message}</p>
           {result.threadId && (
-            <p className="text-xs text-text-muted mt-1">Thread ID: {result.threadId}</p>
+            <p className="text-xs text-text-muted mt-1">
+              Thread ID: {result.threadId}
+            </p>
           )}
         </div>
       )}
 
       {/* Warning */}
-      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
+      <div className="bg-warning-soft border border-yellow-400/30 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-warning-text mt-0.5" />
           <div>
-            <p className="font-medium text-yellow-400">Security Notice</p>
+            <p className="font-medium text-warning-text">Security Notice</p>
             <p className="text-sm text-text-secondary mt-1">
-              Process injection is a monitored technique. Use appropriate stealth
-              level and avoid injecting into protected processes like lsass.exe.
+              Process injection is a monitored technique. Use appropriate
+              stealth level and avoid injecting into protected processes like
+              lsass.exe.
             </p>
           </div>
         </div>

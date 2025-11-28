@@ -1,23 +1,41 @@
-import { useEffect, lazy, Suspense } from 'react';
-import { Toaster } from 'react-hot-toast';
-import { useAppStore } from './store';
-import { getSessions, getSessionTree } from './lib/tauri';
-import { SessionTree } from './components/SessionTree';
-import { SessionFilters } from './components/SessionFilters';
-import { TabBar } from './components/TabBar';
-import { ContextMenu } from './components/ContextMenu';
-import { StatusBar } from './components/StatusBar';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { Spinner } from './components/Loading';
-import { useTauriEvents } from './hooks/useTauriEvents';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { useResizable } from './hooks/useResizable';
-import { Shield, Search, X, Package, Radar, KeyRound, FileText, Clock, StickyNote, ChevronDown, Crosshair, Globe, Grid3X3, ClipboardList, Eye } from 'lucide-react';
-import { useState, useRef } from 'react';
-import { clsx } from 'clsx';
+import { useEffect, lazy, Suspense } from "react";
+import { Toaster } from "react-hot-toast";
+import { useAppStore } from "./store";
+import { getSessions, getSessionTree } from "./lib/tauri";
+import { SessionTree } from "./components/SessionTree";
+import { SessionFilters } from "./components/SessionFilters";
+import { TabBar } from "./components/TabBar";
+import { ContextMenu } from "./components/ContextMenu";
+import { StatusBar } from "./components/StatusBar";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { Spinner } from "./components/Loading";
+import { useTauriEvents } from "./hooks/useTauriEvents";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useResizable } from "./hooks/useResizable";
+import {
+  Shield,
+  Search,
+  X,
+  Package,
+  Radar,
+  KeyRound,
+  FileText,
+  Clock,
+  StickyNote,
+  ChevronDown,
+  Crosshair,
+  Globe,
+  Grid3X3,
+  ClipboardList,
+  Eye,
+} from "lucide-react";
+import { useState, useRef } from "react";
+import { clsx } from "clsx";
 
 // Lazy load heavy components for better initial load time
-const TabContent = lazy(() => import('./components/TabContent').then(m => ({ default: m.TabContent })));
+const TabContent = lazy(() =>
+  import("./components/TabContent").then((m) => ({ default: m.TabContent })),
+);
 
 function App() {
   const {
@@ -40,8 +58,23 @@ function App() {
   const toolsRef = useRef<HTMLDivElement>(null);
 
   // Generic tab opener
-  const openToolTab = (type: 'payloads' | 'scanner' | 'credentials' | 'eventlog' | 'scheduler' | 'notes' | 'postexploitation' | 'networkmap' | 'mitre' | 'reports' | 'opsec', title: string, icon: string) => {
-    const existing = tabs.find(t => t.type === type);
+  const openToolTab = (
+    type:
+      | "payloads"
+      | "scanner"
+      | "credentials"
+      | "eventlog"
+      | "scheduler"
+      | "notes"
+      | "postexploitation"
+      | "networkmap"
+      | "mitre"
+      | "reports"
+      | "opsec",
+    title: string,
+    icon: string,
+  ) => {
+    const existing = tabs.find((t) => t.type === type);
     if (existing) {
       useAppStore.getState().setActiveTab(existing.id);
       setToolsOpen(false);
@@ -51,16 +84,19 @@ function App() {
     addTab({
       id: `${type}-${Date.now()}`,
       type,
-      sessionId: '',
+      sessionId: "",
       title,
       icon,
     });
     setToolsOpen(false);
   };
 
-
   // Resizable sidebar
-  const { size: sidebarWidth, isResizing, handleMouseDown } = useResizable({
+  const {
+    size: sidebarWidth,
+    isResizing,
+    handleMouseDown,
+  } = useResizable({
     initialSize: 280,
     minSize: 200,
     maxSize: 450,
@@ -92,9 +128,11 @@ function App() {
         setSessionTree(tree);
         setSessionsError(null);
       } catch (error) {
-        console.error('Failed to load sessions:', error);
+        console.error("Failed to load sessions:", error);
         if (mounted) {
-          setSessionsError(error instanceof Error ? error.message : 'Failed to load sessions');
+          setSessionsError(
+            error instanceof Error ? error.message : "Failed to load sessions",
+          );
         }
       } finally {
         if (mounted && isInitial) {
@@ -120,13 +158,17 @@ function App() {
         hideContextMenu();
       }
       // Close tools dropdown when clicking outside
-      if (toolsOpen && toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
+      if (
+        toolsOpen &&
+        toolsRef.current &&
+        !toolsRef.current.contains(e.target as Node)
+      ) {
         setToolsOpen(false);
       }
     };
 
-    window.addEventListener('click', handleClick);
-    return () => window.removeEventListener('click', handleClick);
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
   }, [contextMenu.visible, hideContextMenu, toolsOpen]);
 
   return (
@@ -150,26 +192,42 @@ function App() {
               className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
             >
               Tools
-              <ChevronDown size={12} className={clsx('transition-transform', toolsOpen && 'rotate-180')} />
+              <ChevronDown
+                size={12}
+                className={clsx(
+                  "transition-transform",
+                  toolsOpen && "rotate-180",
+                )}
+              />
             </button>
             {toolsOpen && (
               <div className="absolute top-full left-0 mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-xl py-1 min-w-48 z-50">
                 <button
-                  onClick={() => openToolTab('payloads', 'Payload Builder', 'package')}
+                  onClick={() =>
+                    openToolTab("payloads", "Payload Builder", "package")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Package size={14} className="text-purple-400" />
                   Payload Builder
                 </button>
                 <button
-                  onClick={() => openToolTab('scanner', 'Network Scanner', 'radar')}
+                  onClick={() =>
+                    openToolTab("scanner", "Network Scanner", "radar")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Radar size={14} className="text-blue-400" />
                   Network Scanner
                 </button>
                 <button
-                  onClick={() => openToolTab('credentials', 'Credentials Viewer', 'key-round')}
+                  onClick={() =>
+                    openToolTab(
+                      "credentials",
+                      "Credentials Viewer",
+                      "key-round",
+                    )
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <KeyRound size={14} className="text-yellow-400" />
@@ -177,21 +235,25 @@ function App() {
                 </button>
                 <div className="h-px bg-dark-600 my-1" />
                 <button
-                  onClick={() => openToolTab('eventlog', 'Event Log', 'file-text')}
+                  onClick={() =>
+                    openToolTab("eventlog", "Event Log", "file-text")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <FileText size={14} className="text-cyan-400" />
                   Event Log
                 </button>
                 <button
-                  onClick={() => openToolTab('scheduler', 'Task Scheduler', 'clock')}
+                  onClick={() =>
+                    openToolTab("scheduler", "Task Scheduler", "clock")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Clock size={14} className="text-orange-400" />
                   Task Scheduler
                 </button>
                 <button
-                  onClick={() => openToolTab('notes', 'Notes', 'sticky-note')}
+                  onClick={() => openToolTab("notes", "Notes", "sticky-note")}
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <StickyNote size={14} className="text-pink-400" />
@@ -199,7 +261,13 @@ function App() {
                 </button>
                 <div className="h-px bg-dark-600 my-1" />
                 <button
-                  onClick={() => openToolTab('postexploitation', 'Post-Exploitation', 'crosshair')}
+                  onClick={() =>
+                    openToolTab(
+                      "postexploitation",
+                      "Post-Exploitation",
+                      "crosshair",
+                    )
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Crosshair size={14} className="text-red-400" />
@@ -207,21 +275,25 @@ function App() {
                 </button>
                 <div className="h-px bg-dark-600 my-1" />
                 <button
-                  onClick={() => openToolTab('networkmap', 'Network Map', 'globe')}
+                  onClick={() =>
+                    openToolTab("networkmap", "Network Map", "globe")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Globe size={14} className="text-cyan-400" />
                   Network Map
                 </button>
                 <button
-                  onClick={() => openToolTab('mitre', 'MITRE ATT&CK', 'grid')}
+                  onClick={() => openToolTab("mitre", "MITRE ATT&CK", "grid")}
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Grid3X3 size={14} className="text-purple-400" />
                   MITRE ATT&CK
                 </button>
                 <button
-                  onClick={() => openToolTab('reports', 'Reports', 'clipboard-list')}
+                  onClick={() =>
+                    openToolTab("reports", "Reports", "clipboard-list")
+                  }
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <ClipboardList size={14} className="text-emerald-400" />
@@ -229,7 +301,7 @@ function App() {
                 </button>
                 <div className="h-px bg-dark-600 my-1" />
                 <button
-                  onClick={() => openToolTab('opsec', 'OPSEC Dashboard', 'eye')}
+                  onClick={() => openToolTab("opsec", "OPSEC Dashboard", "eye")}
                   className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
                 >
                   <Eye size={14} className="text-cyan-400" />
@@ -250,17 +322,22 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <div className={clsx('flex-1 flex min-h-0', isResizing && 'select-none')}>
+      <div className={clsx("flex-1 flex min-h-0", isResizing && "select-none")}>
         {/* Sidebar - Session Tree */}
         <aside
           className="bg-dark-800 flex flex-col relative"
           style={{ width: sidebarWidth }}
         >
           <div className="p-3 border-b border-dark-600">
-            <h2 className="text-sm font-semibold text-text-primary mb-2">Sessions</h2>
+            <h2 className="text-sm font-semibold text-text-primary mb-2">
+              Sessions
+            </h2>
             {/* Search Input */}
             <div className="relative">
-              <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Search
+                size={14}
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted"
+              />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -271,7 +348,7 @@ function App() {
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => setSearchQuery("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
                 >
                   <X size={14} />
@@ -290,9 +367,9 @@ function App() {
           <div
             onMouseDown={handleMouseDown}
             className={clsx(
-              'absolute right-0 top-0 bottom-0 w-1 cursor-col-resize',
-              'hover:bg-ferox-green/30 transition-colors',
-              isResizing && 'bg-ferox-green/50'
+              "absolute right-0 top-0 bottom-0 w-1 cursor-col-resize",
+              "hover:bg-ferox-green/30 transition-colors",
+              isResizing && "bg-ferox-green/50",
             )}
           />
         </aside>
@@ -340,20 +417,20 @@ function App() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#151d30',
-            color: '#fff',
-            border: '1px solid #243049',
+            background: "var(--toast-bg)",
+            color: "var(--toast-text)",
+            border: "1px solid var(--toast-border)",
           },
           success: {
             iconTheme: {
-              primary: '#00ff88',
-              secondary: '#151d30',
+              primary: "var(--toast-success-primary)",
+              secondary: "var(--toast-success-secondary)",
             },
           },
           error: {
             iconTheme: {
-              primary: '#ff3366',
-              secondary: '#151d30',
+              primary: "var(--toast-error-primary)",
+              secondary: "var(--toast-error-secondary)",
             },
           },
         }}
