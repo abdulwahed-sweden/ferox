@@ -137,7 +137,7 @@ function InfoRow({
       </div>
       <span
         className="text-xs font-medium"
-        style={{ color: valueColor || '#e5e7eb' }}
+        style={{ color: valueColor || 'var(--content-secondary)' }}
       >
         {value}
       </span>

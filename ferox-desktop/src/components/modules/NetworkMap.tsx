@@ -103,7 +103,7 @@ export function NetworkMap({ sessionId: _sessionId }: NetworkMapProps) {
       <div
         ref={containerRef}
         className="flex-1 relative overflow-hidden network-grid network-vignette"
-        style={{ backgroundColor: '#0a0f1a' }}
+        style={{ backgroundColor: 'var(--surface-base)' }}
       >
         {/* Scan line effect */}
         <div className="network-scanline" />

@@ -96,7 +96,7 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
         cy="-16"
         r="5"
         fill={statusColor}
-        stroke="#0d1117"
+        stroke="var(--surface-base)"
         strokeWidth="2"
         style={{
           filter: node.status !== 'offline' ? `drop-shadow(0 0 4px ${statusColor})` : 'none'
@@ -118,7 +118,7 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
         y="52"
         textAnchor="middle"
         className="text-[8px] fill-current"
-        style={{ fill: '#6b7280' }}
+        style={{ fill: 'var(--content-tertiary)' }}
       >
         {node.ip}
       </text>
