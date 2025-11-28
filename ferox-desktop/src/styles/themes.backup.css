@@ -12,45 +12,45 @@
        ========================================== */
 
     /* Backgrounds - Cool, clean blue-gray */
-    --background: 210 20% 96%;           /* Crisp light gray with cool undertone */
-    --foreground: 220 25% 12%;           /* Soft dark (not pure black - easier on eyes) */
+    --background: 210 20% 96%; /* Crisp light gray with cool undertone */
+    --foreground: 220 25% 12%; /* Soft dark (not pure black - easier on eyes) */
 
     /* Cards & Panels - Pure white for clear hierarchy */
-    --card: 0 0% 100%;                   /* Pure white */
-    --card-foreground: 220 25% 12%;      /* Matching dark text */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 220 25% 12%; /* Matching dark text */
 
     /* Popovers & Dropdowns */
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
 
     /* Primary Brand - Trustworthy corporate blue */
-    --primary: 215 85% 48%;              /* Professional blue */
-    --primary-foreground: 0 0% 100%;     /* White text on blue */
+    --primary: 215 85% 48%; /* Professional blue */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
 
     /* Secondary Elements - Clean, not muddy */
-    --secondary: 210 15% 92%;            /* Light, clean gray */
+    --secondary: 210 15% 92%; /* Light, clean gray */
     --secondary-foreground: 220 20% 18%; /* Readable dark */
 
     /* Muted/Subtle - Balanced visibility */
     --muted: 210 15% 92%;
-    --muted-foreground: 215 15% 38%;     /* Sweet spot - visible but subtle */
+    --muted-foreground: 215 15% 38%; /* Sweet spot - visible but subtle */
 
     /* Accent Color - Subtle blue tint */
     --accent: 210 25% 90%;
     --accent-foreground: 220 20% 18%;
 
     /* Destructive/Error - Refined red */
-    --destructive: 0 72% 48%;            /* Professional, not aggressive */
+    --destructive: 0 72% 48%; /* Professional, not aggressive */
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 214 20% 78%;               /* Visible but not harsh */
+    --border: 214 20% 78%; /* Visible but not harsh */
     --input: 214 20% 78%;
-    --ring: 215 85% 48%;                 /* Match primary */
+    --ring: 215 85% 48%; /* Match primary */
 
     /* Sidebar - Dark sidebar for contrast */
-    --sidebar-background: 220 20% 12%;   /* Deep slate */
-    --sidebar-foreground: 210 15% 95%;   /* Soft white */
+    --sidebar-background: 220 20% 12%; /* Deep slate */
+    --sidebar-foreground: 210 15% 95%; /* Soft white */
     --sidebar-primary: 210 15% 95%;
     --sidebar-primary-foreground: 220 20% 12%;
     --sidebar-accent: 220 18% 18%;
@@ -59,35 +59,35 @@
     --sidebar-ring: 210 15% 95%;
 
     /* Chart Colors - Professional palette */
-    --chart-1: 215 85% 48%;              /* Primary blue */
-    --chart-2: 162 60% 38%;              /* Teal */
-    --chart-3: 25 85% 45%;               /* Burnt orange */
-    --chart-4: 270 50% 50%;              /* Purple */
-    --chart-5: 152 55% 38%;              /* Green */
+    --chart-1: 215 85% 48%; /* Primary blue */
+    --chart-2: 162 60% 38%; /* Teal */
+    --chart-3: 25 85% 45%; /* Burnt orange */
+    --chart-4: 270 50% 50%; /* Purple */
+    --chart-5: 152 55% 38%; /* Green */
 
     /* Ferox Brand - Sophisticated teal-green */
-    --ferox-green: 162 72% 32%;          /* Deep, professional teal */
-    --ferox-green-hover: 162 72% 28%;    /* Darker on hover */
-    --ferox-green-bright: 162 72% 42%;   /* For emphasis */
+    --ferox-green: 162 72% 32%; /* Deep, professional teal */
+    --ferox-green-hover: 162 72% 28%; /* Darker on hover */
+    --ferox-green-bright: 162 72% 42%; /* For emphasis */
 
     /* Status Colors - Clear, professional */
-    --status-online: 152 60% 32%;        /* Deep green - authority */
-    --status-offline: 0 72% 48%;         /* Refined red */
-    --status-idle: 25 85% 42%;           /* Burnt orange - professional */
-    --status-away: 270 50% 45%;          /* Muted purple */
+    --status-online: 152 60% 32%; /* Deep green - authority */
+    --status-offline: 0 72% 48%; /* Refined red */
+    --status-idle: 25 85% 42%; /* Burnt orange - professional */
+    --status-away: 270 50% 45%; /* Muted purple */
 
     /* Icon Colors - High contrast for visibility */
-    --icon-primary: 220 25% 12%;         /* Match foreground */
-    --icon-secondary: 215 15% 38%;       /* Match muted-foreground */
-    --icon-tertiary: 215 12% 52%;        /* Lighter */
+    --icon-primary: 220 25% 12%; /* Match foreground */
+    --icon-secondary: 215 15% 38%; /* Match muted-foreground */
+    --icon-tertiary: 215 12% 52%; /* Lighter */
 
     /* Text Size Scale */
-    --text-xs: 0.8125rem;     /* 13px */
-    --text-sm: 0.9375rem;     /* 15px */
-    --text-base: 1.0625rem;   /* 17px */
-    --text-lg: 1.1875rem;     /* 19px */
-    --text-xl: 1.3125rem;     /* 21px */
-    --text-2xl: 1.5625rem;    /* 25px */
+    --text-xs: 0.8125rem; /* 13px */
+    --text-sm: 0.9375rem; /* 15px */
+    --text-base: 1.0625rem; /* 17px */
+    --text-lg: 1.1875rem; /* 19px */
+    --text-xl: 1.3125rem; /* 21px */
+    --text-2xl: 1.5625rem; /* 25px */
 
     /* Line Height */
     --leading-tight: 1.3;
@@ -148,9 +148,12 @@
 
     /* Shadows - Subtle for light theme */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 
     /* Component colors */
     --dark-900: hsl(var(--background));
@@ -162,18 +165,18 @@
     --dark-300: hsl(var(--secondary-foreground));
   }
 
-  [data-theme='dark'] {
+  [data-theme="dark"] {
     /* ==========================================
        DARK THEME - "Midnight Operations"
        Neutral dark, optimized for long sessions
        ========================================== */
 
     /* Backgrounds - Neutral dark, easy on eyes */
-    --background: 220 18% 10%;           /* Near-black with subtle blue */
-    --foreground: 210 15% 95%;           /* Soft white (not pure white) */
+    --background: 220 18% 10%; /* Near-black with subtle blue */
+    --foreground: 210 15% 95%; /* Soft white (not pure white) */
 
     /* Cards & Panels - Clear layer separation */
-    --card: 220 15% 15%;                 /* Distinct from background */
+    --card: 220 15% 15%; /* Distinct from background */
     --card-foreground: 210 15% 95%;
 
     /* Popovers & Dropdowns */
@@ -181,8 +184,8 @@
     --popover-foreground: 210 15% 95%;
 
     /* Primary Brand - Bright comfortable blue */
-    --primary: 215 80% 58%;              /* Vibrant but not harsh */
-    --primary-foreground: 220 18% 10%;   /* Dark text on blue */
+    --primary: 215 80% 58%; /* Vibrant but not harsh */
+    --primary-foreground: 220 18% 10%; /* Dark text on blue */
 
     /* Secondary Elements - Subtle elevation */
     --secondary: 220 15% 18%;
@@ -190,7 +193,7 @@
 
     /* Muted/Subtle */
     --muted: 220 12% 18%;
-    --muted-foreground: 215 12% 62%;     /* Good contrast ratio */
+    --muted-foreground: 215 12% 62%; /* Good contrast ratio */
 
     /* Accent Color */
     --accent: 220 15% 20%;
@@ -216,27 +219,27 @@
     --sidebar-ring: 210 15% 95%;
 
     /* Chart Colors - Vibrant for dark backgrounds */
-    --chart-1: 215 80% 62%;              /* Bright blue */
-    --chart-2: 160 65% 52%;              /* Teal */
-    --chart-3: 35 85% 58%;               /* Warm orange */
-    --chart-4: 280 55% 62%;              /* Purple */
-    --chart-5: 152 60% 52%;              /* Green */
+    --chart-1: 215 80% 62%; /* Bright blue */
+    --chart-2: 160 65% 52%; /* Teal */
+    --chart-3: 35 85% 58%; /* Warm orange */
+    --chart-4: 280 55% 62%; /* Purple */
+    --chart-5: 152 60% 52%; /* Green */
 
     /* Ferox Brand - Vibrant but not harsh */
-    --ferox-green: 160 70% 48%;          /* Balanced brightness */
-    --ferox-green-hover: 160 70% 55%;    /* Brighter on hover */
-    --ferox-green-bright: 160 70% 58%;   /* For emphasis */
+    --ferox-green: 160 70% 48%; /* Balanced brightness */
+    --ferox-green-hover: 160 70% 55%; /* Brighter on hover */
+    --ferox-green-bright: 160 70% 58%; /* For emphasis */
 
     /* Status Colors - Softer for dark mode */
-    --status-online: 152 55% 48%;        /* Soft green */
-    --status-offline: 0 65% 55%;         /* Soft red */
-    --status-idle: 35 80% 55%;           /* Warm amber */
-    --status-away: 270 55% 62%;          /* Soft purple */
+    --status-online: 152 55% 48%; /* Soft green */
+    --status-offline: 0 65% 55%; /* Soft red */
+    --status-idle: 35 80% 55%; /* Warm amber */
+    --status-away: 270 55% 62%; /* Soft purple */
 
     /* Icon Colors - Bright for dark theme */
-    --icon-primary: 210 15% 95%;         /* Match foreground */
-    --icon-secondary: 215 12% 62%;       /* Match muted-foreground */
-    --icon-tertiary: 215 10% 48%;        /* Dimmer */
+    --icon-primary: 210 15% 95%; /* Match foreground */
+    --icon-secondary: 215 12% 62%; /* Match muted-foreground */
+    --icon-tertiary: 215 10% 48%; /* Dimmer */
 
     /* Text sizes - Same as light */
     --text-xs: 0.8125rem;
@@ -302,9 +305,12 @@
 
     /* Shadows - Deeper for dark theme */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 
     /* Component colors */
     --dark-900: hsl(var(--background));
@@ -331,7 +337,9 @@
     color: var(--text-primary);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
   }
 
   h1 {
@@ -362,10 +370,11 @@
   }
 
   *:not(.no-transition) {
-    transition: background-color 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .theme-transitioning * {
@@ -384,9 +393,9 @@
     stroke-width: 2;
   }
 
-  [data-theme='dark'] .icon-primary,
-  [data-theme='dark'] .icon-secondary,
-  [data-theme='dark'] .icon-tertiary {
+  [data-theme="dark"] .icon-primary,
+  [data-theme="dark"] .icon-secondary,
+  [data-theme="dark"] .icon-tertiary {
     stroke-width: 1.75;
   }
 
@@ -402,10 +411,22 @@
     color: hsl(var(--icon-tertiary));
   }
 
-  .icon-xs { width: 0.9375rem; height: 0.9375rem; }
-  .icon-sm { width: 1.125rem; height: 1.125rem; }
-  .icon-md { width: 1.3125rem; height: 1.3125rem; }
-  .icon-lg { width: 1.5625rem; height: 1.5625rem; }
+  .icon-xs {
+    width: 0.9375rem;
+    height: 0.9375rem;
+  }
+  .icon-sm {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+  .icon-md {
+    width: 1.3125rem;
+    height: 1.3125rem;
+  }
+  .icon-lg {
+    width: 1.5625rem;
+    height: 1.5625rem;
+  }
 
   .status-online {
     background-color: hsl(var(--status-online));
@@ -431,12 +452,24 @@
     font-size: var(--text-sm);
   }
 
-  .text-xs { font-size: var(--text-xs); }
-  .text-sm { font-size: var(--text-sm); }
-  .text-base { font-size: var(--text-base); }
-  .text-lg { font-size: var(--text-lg); }
-  .text-xl { font-size: var(--text-xl); }
-  .text-2xl { font-size: var(--text-2xl); }
+  .text-xs {
+    font-size: var(--text-xs);
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+  }
+  .text-base {
+    font-size: var(--text-base);
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+  }
 }
 
 /* ==========================================
@@ -654,7 +687,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
     color: var(--text-secondary);
   }
 
@@ -703,7 +738,7 @@
   background-color: hsl(var(--card));
   color: var(--text-primary);
   border: 1px solid hsl(var(--border));
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
   font-size: 0.9375rem;
   line-height: 1.6;
   padding: 1rem;
@@ -768,7 +803,7 @@ td {
 
 /* Code blocks */
 code {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.9375rem;
   background-color: var(--bg-secondary);
   padding: 0.25rem 0.5rem;
@@ -790,7 +825,7 @@ pre code {
   background: hsl(var(--primary) / 0.25);
 }
 
-[data-theme='dark'] ::selection {
+[data-theme="dark"] ::selection {
   background: hsl(var(--ferox-green) / 0.3);
 }
 
@@ -840,7 +875,8 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

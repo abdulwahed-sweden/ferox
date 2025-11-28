@@ -2,18 +2,11 @@
  * NetworkNode - Animated node component with cyber-neon styling
  */
 
-import { motion } from 'framer-motion';
-import {
-  Skull,
-  Server,
-  Monitor,
-  Router,
-  Database,
-  Shield,
-} from 'lucide-react';
-import type { NetworkNode as NodeType } from '../../data/mockNetwork';
-import { typeColors, statusColors } from '../../data/mockNetwork';
-import { nodeVariants, pulseVariants } from './animations';
+import { motion } from "framer-motion";
+import { Skull, Server, Monitor, Router, Database, Shield } from "lucide-react";
+import type { NetworkNode as NodeType } from "../../data/mockNetwork";
+import { typeColors, statusColors } from "../../data/mockNetwork";
+import { nodeVariants, pulseVariants } from "./animations";
 
 interface NetworkNodeProps {
   node: NodeType;
@@ -32,7 +25,13 @@ const iconMap: Record<string, typeof Monitor> = {
   compromised: Shield,
 };
 
-export function NetworkNode({ node, selected, onClick, containerWidth, containerHeight }: NetworkNodeProps) {
+export function NetworkNode({
+  node,
+  selected,
+  onClick,
+  containerWidth,
+  containerHeight,
+}: NetworkNodeProps) {
   const Icon = iconMap[node.type] || Monitor;
   const color = typeColors[node.type];
   const statusColor = statusColors[node.status];
@@ -52,7 +51,9 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
       whileTap={{ scale: 0.95 }}
     >
       {/* Pulse ring for active/scanning/exploited nodes */}
-      {(node.status === 'active' || node.status === 'scanning' || node.status === 'exploited') && (
+      {(node.status === "active" ||
+        node.status === "scanning" ||
+        node.status === "exploited") && (
         <motion.circle
           r="28"
           fill="none"
@@ -71,16 +72,23 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
         stroke={color}
         strokeWidth={selected ? 3 : 1.5}
         style={{
-          filter: node.status !== 'offline' ? `drop-shadow(0 0 8px ${color})` : 'none'
+          filter:
+            node.status !== "offline"
+              ? `drop-shadow(0 0 8px ${color})`
+              : "none",
         }}
-        animate={node.status !== 'offline' ? {
-          filter: [
-            `drop-shadow(0 0 4px ${color})`,
-            `drop-shadow(0 0 12px ${color})`,
-            `drop-shadow(0 0 4px ${color})`
-          ]
-        } : {}}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        animate={
+          node.status !== "offline"
+            ? {
+                filter: [
+                  `drop-shadow(0 0 4px ${color})`,
+                  `drop-shadow(0 0 12px ${color})`,
+                  `drop-shadow(0 0 4px ${color})`,
+                ],
+              }
+            : {}
+        }
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Icon */}
@@ -99,7 +107,10 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
         stroke="var(--surface-base)"
         strokeWidth="2"
         style={{
-          filter: node.status !== 'offline' ? `drop-shadow(0 0 4px ${statusColor})` : 'none'
+          filter:
+            node.status !== "offline"
+              ? `drop-shadow(0 0 4px ${statusColor})`
+              : "none",
         }}
       />
 
@@ -118,7 +129,7 @@ export function NetworkNode({ node, selected, onClick, containerWidth, container
         y="52"
         textAnchor="middle"
         className="text-[8px] fill-current"
-        style={{ fill: 'var(--content-tertiary)' }}
+        style={{ fill: "var(--content-tertiary)" }}
       >
         {node.ip}
       </text>

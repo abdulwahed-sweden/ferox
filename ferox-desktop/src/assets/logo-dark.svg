@@ -1,0 +1,44 @@
+<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Primary gradient for light backgrounds -->
+    <linearGradient id="darkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <!-- Subtle shadow -->
+    <filter id="darkShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Fox Icon -->
+  <g transform="translate(5, 5)">
+    <!-- Fox head - geometric style -->
+    <path d="M25 5 L40 25 L35 45 L25 40 L15 45 L10 25 Z"
+          fill="url(#darkGradient)" filter="url(#darkShadow)"/>
+    <!-- Left ear -->
+    <path d="M10 25 L5 8 L18 18 Z" fill="url(#darkGradient)"/>
+    <!-- Right ear -->
+    <path d="M40 25 L45 8 L32 18 Z" fill="url(#darkGradient)"/>
+    <!-- Eyes -->
+    <circle cx="18" cy="25" r="3" fill="#FFFFFF"/>
+    <circle cx="32" cy="25" r="3" fill="#FFFFFF"/>
+    <circle cx="19" cy="24" r="1" fill="#059669"/>
+    <circle cx="33" cy="24" r="1" fill="#059669"/>
+    <!-- Nose -->
+    <path d="M25 32 L22 36 L28 36 Z" fill="#FFFFFF"/>
+    <!-- Circuit lines -->
+    <path d="M5 42 L15 42 L18 38" stroke="#2563EB" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M45 42 L35 42 L32 38" stroke="#059669" stroke-width="1" fill="none" opacity="0.6"/>
+  </g>
+
+  <!-- Text: FEROX (dark version for light backgrounds) -->
+  <g transform="translate(60, 15)">
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="700" fill="#111827">
+      FEROX
+    </text>
+    <text x="2" y="45" font-family="Inter, system-ui, sans-serif" font-size="8" font-weight="400" fill="#6B7280" letter-spacing="2">
+      PENETRATION TESTING
+    </text>
+  </g>
+</svg>

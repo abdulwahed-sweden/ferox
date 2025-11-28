@@ -1,24 +1,38 @@
-import { useAppStore } from '../store';
-import { Filter, X } from 'lucide-react';
-import { clsx } from 'clsx';
+import { useAppStore } from "../store";
+import { Filter, X } from "lucide-react";
+import { clsx } from "clsx";
 
 const STATUS_OPTIONS = [
-  { value: 'active', label: 'Active', color: 'bg-ferox-green/20 text-ferox-green border-ferox-green/50' },
-  { value: 'sleeping', label: 'Sleep', color: 'bg-warning/20 text-warning border-warning/50' },
-  { value: 'dead', label: 'Dead', color: 'bg-danger/20 text-danger border-danger/50' },
+  {
+    value: "active",
+    label: "Active",
+    color: "bg-ferox-green/20 text-ferox-green border-ferox-green/50",
+  },
+  {
+    value: "sleeping",
+    label: "Sleep",
+    color: "bg-warning/20 text-warning border-warning/50",
+  },
+  {
+    value: "dead",
+    label: "Dead",
+    color: "bg-danger/20 text-danger border-danger/50",
+  },
 ] as const;
 
 const OS_OPTIONS = [
-  { value: 'windows', label: 'Windows' },
-  { value: 'linux', label: 'Linux' },
-  { value: 'macos', label: 'macOS' },
+  { value: "windows", label: "Windows" },
+  { value: "linux", label: "Linux" },
+  { value: "macos", label: "macOS" },
 ] as const;
 
 export function SessionFilters() {
-  const { sessionFilters, setStatusFilter, setOsFilter, clearFilters } = useAppStore();
-  const hasFilters = sessionFilters.status.length > 0 || sessionFilters.os.length > 0;
+  const { sessionFilters, setStatusFilter, setOsFilter, clearFilters } =
+    useAppStore();
+  const hasFilters =
+    sessionFilters.status.length > 0 || sessionFilters.os.length > 0;
 
-  const toggleStatus = (status: 'active' | 'sleeping' | 'dead') => {
+  const toggleStatus = (status: "active" | "sleeping" | "dead") => {
     const current = sessionFilters.status;
     if (current.includes(status)) {
       setStatusFilter(current.filter((s) => s !== status));
@@ -63,10 +77,10 @@ export function SessionFilters() {
               key={opt.value}
               onClick={() => toggleStatus(opt.value)}
               className={clsx(
-                'px-2 py-0.5 text-xs rounded border transition-colors',
+                "px-2 py-0.5 text-xs rounded border transition-colors",
                 isActive
                   ? opt.color
-                  : 'bg-dark-700 text-text-muted border-dark-600 hover:border-dark-500'
+                  : "bg-dark-700 text-text-muted border-dark-600 hover:border-dark-500",
               )}
             >
               {opt.label}
@@ -84,10 +98,10 @@ export function SessionFilters() {
               key={opt.value}
               onClick={() => toggleOs(opt.value)}
               className={clsx(
-                'px-2 py-0.5 text-xs rounded border transition-colors',
+                "px-2 py-0.5 text-xs rounded border transition-colors",
                 isActive
-                  ? 'bg-info/20 text-info border-info/50'
-                  : 'bg-dark-700 text-text-muted border-dark-600 hover:border-dark-500'
+                  ? "bg-info/20 text-info border-info/50"
+                  : "bg-dark-700 text-text-muted border-dark-600 hover:border-dark-500",
               )}
             >
               {opt.label}

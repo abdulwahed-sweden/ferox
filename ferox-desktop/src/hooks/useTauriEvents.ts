@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import { useAppStore } from '../store';
-import toast from 'react-hot-toast';
-import { sessionToasts, moduleToasts, errorToasts } from '../lib/toast';
-import type { Session } from '../types';
+import { useEffect } from "react";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { useAppStore } from "../store";
+import toast from "react-hot-toast";
+import { sessionToasts, moduleToasts, errorToasts } from "../lib/toast";
+import type { Session } from "../types";
 
 // Event types from the Tauri backend
 interface SessionCreatedEvent {
@@ -34,7 +34,7 @@ interface SessionPrivilegeChangedEvent {
 
 interface OpsecAlertEvent {
   session_id: string;
-  level: 'info' | 'warning' | 'critical';
+  level: "info" | "warning" | "critical";
   message: string;
   recommendation: string;
 }
@@ -71,58 +71,69 @@ export function useTauriEvents() {
     const unlisteners: UnlistenFn[] = [];
 
     // Listen for new sessions
-    listen<SessionCreatedEvent>('session:created', (event) => {
+    listen<SessionCreatedEvent>("session:created", (event) => {
       const { session } = event.payload;
       addSession(session);
       sessionToasts.created(session.hostname, session.ip_address);
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for session updates
-    listen<SessionUpdatedEvent>('session:updated', (event) => {
+    listen<SessionUpdatedEvent>("session:updated", (event) => {
       updateSession(event.payload.session_id, event.payload.updates);
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for session died
-    listen<SessionDiedEvent>('session:died', (event) => {
-      updateSession(event.payload.session_id, { status: 'dead' });
+    listen<SessionDiedEvent>("session:died", (event) => {
+      updateSession(event.payload.session_id, { status: "dead" });
       sessionToasts.died(event.payload.hostname);
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for session closures
-    listen<SessionClosedEvent>('session:closed', (event) => {
+    listen<SessionClosedEvent>("session:closed", (event) => {
       const session = sessions.find((s) => s.id === event.payload.session_id);
       removeSession(event.payload.session_id);
-      sessionToasts.terminated(event.payload.hostname || session?.hostname || 'Unknown');
+      sessionToasts.terminated(
+        event.payload.hostname || session?.hostname || "Unknown",
+      );
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for privilege changes
-    listen<SessionPrivilegeChangedEvent>('session:privilege_changed', (event) => {
-      // Cast to PrivilegeLevel - backend ensures valid values
-      updateSession(event.payload.session_id, {
-        privileges: event.payload.new_privilege as Session['privileges']
-      });
-      sessionToasts.privilegeEscalated(event.payload.hostname, event.payload.new_privilege);
-    }).then((unlisten) => unlisteners.push(unlisten));
+    listen<SessionPrivilegeChangedEvent>(
+      "session:privilege_changed",
+      (event) => {
+        // Cast to PrivilegeLevel - backend ensures valid values
+        updateSession(event.payload.session_id, {
+          privileges: event.payload.new_privilege as Session["privileges"],
+        });
+        sessionToasts.privilegeEscalated(
+          event.payload.hostname,
+          event.payload.new_privilege,
+        );
+      },
+    ).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for OPSEC alerts
-    listen<OpsecAlertEvent>('opsec:alert', (event) => {
+    listen<OpsecAlertEvent>("opsec:alert", (event) => {
       const { level, message, recommendation } = event.payload;
-      if (level === 'critical') {
-        toast.error(`OPSEC Alert: ${message}\n${recommendation}`, { duration: 8000, icon: '🚨' });
-      } else if (level === 'warning') {
-        toast(message, { icon: '⚠️', duration: 5000 });
+      if (level === "critical") {
+        toast.error(`OPSEC Alert: ${message}\n${recommendation}`, {
+          duration: 8000,
+          icon: "🚨",
+        });
+      } else if (level === "warning") {
+        toast(message, { icon: "⚠️", duration: 5000 });
       } else {
-        toast(message, { icon: 'ℹ️', duration: 3000 });
+        toast(message, { icon: "ℹ️", duration: 3000 });
       }
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for credentials found
-    listen<CredentialsFoundEvent>('credentials:found', (event) => {
+    listen<CredentialsFoundEvent>("credentials:found", (event) => {
       moduleToasts.credentialHarvest(event.payload.count);
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for command output
-    listen<CommandOutputEvent>('command:output', (event) => {
+    listen<CommandOutputEvent>("command:output", (event) => {
       // Commands are handled inline, but we can show errors
       if (!event.payload.success) {
         errorToasts.generic(`Command failed on session`);
@@ -130,22 +141,22 @@ export function useTauriEvents() {
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for lateral movement
-    listen<LateralMoveEvent>('lateral:complete', (event) => {
+    listen<LateralMoveEvent>("lateral:complete", (event) => {
       if (event.payload.success) {
         toast.success(`Established session on ${event.payload.target_host}`, {
           duration: 4000,
-          icon: '🚀',
+          icon: "🚀",
         });
       } else {
         toast.error(`Lateral movement to ${event.payload.target_host} failed`, {
           duration: 5000,
-          icon: '❌',
+          icon: "❌",
         });
       }
     }).then((unlisten) => unlisteners.push(unlisten));
 
     // Listen for discovery complete
-    listen<DiscoveryCompleteEvent>('discovery:complete', (event) => {
+    listen<DiscoveryCompleteEvent>("discovery:complete", (event) => {
       moduleToasts.discoveryComplete(event.payload.hosts_found);
     }).then((unlisten) => unlisteners.push(unlisten));
 

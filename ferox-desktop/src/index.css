@@ -1,5 +1,5 @@
-@import './styles/themes.css';
-@import './styles/glow.css';
+@import "./styles/themes.css";
+@import "./styles/glow.css";
 
 @tailwind base;
 @tailwind components;
@@ -361,9 +361,9 @@ body {
     stroke-width: 1.5;
   }
 
-  [data-theme='dark'] .icon-primary,
-  [data-theme='dark'] .icon-secondary,
-  [data-theme='dark'] .icon-tertiary {
+  [data-theme="dark"] .icon-primary,
+  [data-theme="dark"] .icon-secondary,
+  [data-theme="dark"] .icon-tertiary {
     stroke-width: 1.25;
   }
 

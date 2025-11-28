@@ -3,7 +3,7 @@
  * For demo/training purposes only
  */
 
-import { Grid3X3, Target } from 'lucide-react';
+import { Grid3X3, Target } from "lucide-react";
 
 interface MitreAttackProps {
   sessionId?: string;
@@ -11,20 +11,20 @@ interface MitreAttackProps {
 
 // MITRE ATT&CK Tactics (14 columns)
 const tactics = [
-  'Reconnaissance',
-  'Resource Dev',
-  'Initial Access',
-  'Execution',
-  'Persistence',
-  'Priv Escalation',
-  'Defense Evasion',
-  'Credential Access',
-  'Discovery',
-  'Lateral Movement',
-  'Collection',
-  'C2',
-  'Exfiltration',
-  'Impact',
+  "Reconnaissance",
+  "Resource Dev",
+  "Initial Access",
+  "Execution",
+  "Persistence",
+  "Priv Escalation",
+  "Defense Evasion",
+  "Credential Access",
+  "Discovery",
+  "Lateral Movement",
+  "Collection",
+  "C2",
+  "Exfiltration",
+  "Impact",
 ];
 
 export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
@@ -36,7 +36,9 @@ export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
     planned: 28,
   };
 
-  const coveragePercent = Math.round((mockStats.covered / mockStats.totalTechniques) * 100);
+  const coveragePercent = Math.round(
+    (mockStats.covered / mockStats.totalTechniques) * 100,
+  );
 
   return (
     <div className="h-full flex flex-col bg-dark-900">
@@ -45,12 +47,18 @@ export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Grid3X3 className="text-purple-text" size={22} />
-            <h2 className="text-lg font-semibold text-text-primary">MITRE ATT&CK Matrix</h2>
-            <span className="text-xs bg-purple-soft text-purple-text px-2 py-0.5 rounded">PLACEHOLDER</span>
+            <h2 className="text-lg font-semibold text-text-primary">
+              MITRE ATT&CK Matrix
+            </h2>
+            <span className="text-xs bg-purple-soft text-purple-text px-2 py-0.5 rounded">
+              PLACEHOLDER
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-muted">Coverage:</span>
-            <span className="text-sm font-bold text-purple-text">{coveragePercent}%</span>
+            <span className="text-sm font-bold text-purple-text">
+              {coveragePercent}%
+            </span>
           </div>
         </div>
         <p className="text-xs text-text-muted mt-2">
@@ -61,19 +69,27 @@ export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
       {/* Stats Summary */}
       <div className="p-4 border-b border-dark-600 grid grid-cols-4 gap-3">
         <div className="bg-dark-700/50 border border-dark-600 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-text-primary">{mockStats.totalTechniques}</div>
+          <div className="text-2xl font-bold text-text-primary">
+            {mockStats.totalTechniques}
+          </div>
           <div className="text-xs text-text-muted">Total Techniques</div>
         </div>
         <div className="bg-success-soft border border-success-soft rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-success-text">{mockStats.covered}</div>
+          <div className="text-2xl font-bold text-success-text">
+            {mockStats.covered}
+          </div>
           <div className="text-xs text-text-muted">Covered</div>
         </div>
         <div className="bg-warning-soft border border-warning-soft rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-warning-text">{mockStats.inProgress}</div>
+          <div className="text-2xl font-bold text-warning-text">
+            {mockStats.inProgress}
+          </div>
           <div className="text-xs text-text-muted">In Progress</div>
         </div>
         <div className="bg-info-soft border border-info-soft rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-info-text">{mockStats.planned}</div>
+          <div className="text-2xl font-bold text-info-text">
+            {mockStats.planned}
+          </div>
           <div className="text-xs text-text-muted">Planned</div>
         </div>
       </div>
@@ -98,22 +114,24 @@ export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
           <div className="grid grid-cols-14 gap-1">
             {tactics.map((_, colIdx) => (
               <div key={colIdx} className="space-y-1">
-                {[...Array(Math.floor(Math.random() * 8) + 3)].map((_, rowIdx) => {
-                  const status = Math.random();
-                  let bgColor = 'bg-dark-700';
-                  if (status > 0.8) bgColor = 'bg-success-soft';
-                  else if (status > 0.6) bgColor = 'bg-warning-soft';
-                  else if (status > 0.4) bgColor = 'bg-dark-600';
+                {[...Array(Math.floor(Math.random() * 8) + 3)].map(
+                  (_, rowIdx) => {
+                    const status = Math.random();
+                    let bgColor = "bg-dark-700";
+                    if (status > 0.8) bgColor = "bg-success-soft";
+                    else if (status > 0.6) bgColor = "bg-warning-soft";
+                    else if (status > 0.4) bgColor = "bg-dark-600";
 
-                  return (
-                    <div
-                      key={rowIdx}
-                      className={`${bgColor} h-6 rounded text-[9px] text-text-muted flex items-center justify-center`}
-                    >
-                      T{1000 + colIdx * 100 + rowIdx}
-                    </div>
-                  );
-                })}
+                    return (
+                      <div
+                        key={rowIdx}
+                        className={`${bgColor} h-6 rounded text-[9px] text-text-muted flex items-center justify-center`}
+                      >
+                        T{1000 + colIdx * 100 + rowIdx}
+                      </div>
+                    );
+                  },
+                )}
               </div>
             ))}
           </div>
@@ -143,7 +161,8 @@ export function MitreAttack({ sessionId: _sessionId }: MitreAttackProps) {
         <div className="mt-8 text-center">
           <Target size={32} className="mx-auto mb-3 text-purple-text/30" />
           <p className="text-sm text-text-muted">
-            Full interactive MITRE ATT&CK matrix with technique details and execution tracking coming soon
+            Full interactive MITRE ATT&CK matrix with technique details and
+            execution tracking coming soon
           </p>
         </div>
       </div>

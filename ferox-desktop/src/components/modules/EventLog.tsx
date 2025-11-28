@@ -3,14 +3,32 @@
  * For demo/training purposes only
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, Pause, Play, Trash2, Download, RefreshCw } from 'lucide-react';
-import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
-import { simulateEventLog } from '../../lib/tauri';
-import type { SimulatedLogEntry } from '../../types';
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  FileText,
+  Pause,
+  Play,
+  Trash2,
+  Download,
+  RefreshCw,
+} from "lucide-react";
+import { clsx } from "clsx";
+import toast from "react-hot-toast";
+import { simulateEventLog } from "../../lib/tauri";
+import type { SimulatedLogEntry } from "../../types";
 
-const MODULES = ['Scanner', 'Payload', 'Session', 'C2', 'PrivEsc', 'Creds', 'Lateral', 'Persist', 'System', 'Network'];
+const MODULES = [
+  "Scanner",
+  "Payload",
+  "Session",
+  "C2",
+  "PrivEsc",
+  "Creds",
+  "Lateral",
+  "Persist",
+  "System",
+  "Network",
+];
 
 interface EventLogProps {
   sessionId: string;
@@ -24,27 +42,30 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
 
-  const loadLogs = useCallback(async (append = false) => {
-    if (isPaused && append) return;
+  const loadLogs = useCallback(
+    async (append = false) => {
+      if (isPaused && append) return;
 
-    setIsLoading(true);
-    try {
-      const newLogs = await simulateEventLog(append ? 5 : 50);
+      setIsLoading(true);
+      try {
+        const newLogs = await simulateEventLog(append ? 5 : 50);
 
-      if (append) {
-        setLogs(prev => {
-          const combined = [...newLogs.slice(0, 5), ...prev];
-          return combined.slice(0, 200); // Keep max 200 logs
-        });
-      } else {
-        setLogs(newLogs);
+        if (append) {
+          setLogs((prev) => {
+            const combined = [...newLogs.slice(0, 5), ...prev];
+            return combined.slice(0, 200); // Keep max 200 logs
+          });
+        } else {
+          setLogs(newLogs);
+        }
+      } catch (error) {
+        console.error("Failed to load logs:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to load logs:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isPaused]);
+    },
+    [isPaused],
+  );
 
   // Initial load
   useEffect(() => {
@@ -55,9 +76,12 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
   useEffect(() => {
     if (isPaused) return;
 
-    const interval = setInterval(() => {
-      loadLogs(true);
-    }, 2000 + Math.random() * 2000);
+    const interval = setInterval(
+      () => {
+        loadLogs(true);
+      },
+      2000 + Math.random() * 2000,
+    );
 
     return () => clearInterval(interval);
   }, [isPaused, loadLogs]);
@@ -65,11 +89,11 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
   // Auto-scroll
   useEffect(() => {
     if (!isPaused) {
-      logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      logEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [logs, isPaused]);
 
-  const filteredLogs = logs.filter(log => {
+  const filteredLogs = logs.filter((log) => {
     const matchesModule = !filter || log.module === filter;
     const matchesLevel = !levelFilter || log.level === levelFilter;
     return matchesModule && matchesLevel;
@@ -77,43 +101,58 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'info': return 'text-info-text';
-      case 'warn': return 'text-warning-text';
-      case 'error': return 'text-danger-text';
-      case 'success': return 'text-success-text';
-      case 'debug': return 'text-purple-text';
-      default: return 'text-text-muted';
+      case "info":
+        return "text-info-text";
+      case "warn":
+        return "text-warning-text";
+      case "error":
+        return "text-danger-text";
+      case "success":
+        return "text-success-text";
+      case "debug":
+        return "text-purple-text";
+      default:
+        return "text-text-muted";
     }
   };
 
   const getLevelBg = (level: string) => {
     switch (level) {
-      case 'info': return 'bg-info-soft';
-      case 'warn': return 'bg-warning-soft';
-      case 'error': return 'bg-danger-soft';
-      case 'success': return 'bg-success-soft';
-      case 'debug': return 'bg-purple-soft';
-      default: return 'bg-dark-700';
+      case "info":
+        return "bg-info-soft";
+      case "warn":
+        return "bg-warning-soft";
+      case "error":
+        return "bg-danger-soft";
+      case "success":
+        return "bg-success-soft";
+      case "debug":
+        return "bg-purple-soft";
+      default:
+        return "bg-dark-700";
     }
   };
 
   const clearLogs = () => {
     setLogs([]);
-    toast.success('Logs cleared');
+    toast.success("Logs cleared");
   };
 
   const exportLogs = () => {
     const content = filteredLogs
-      .map(log => `[${new Date(log.timestamp).toISOString()}] [${log.level.toUpperCase()}] [${log.module}] ${log.message}`)
-      .join('\n');
-    const blob = new Blob([content], { type: 'text/plain' });
+      .map(
+        (log) =>
+          `[${new Date(log.timestamp).toISOString()}] [${log.level.toUpperCase()}] [${log.module}] ${log.message}`,
+      )
+      .join("\n");
+    const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `ferox-logs-${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Logs exported');
+    toast.success("Logs exported");
   };
 
   return (
@@ -123,9 +162,15 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
         <div className="flex items-center gap-2">
           <FileText className="text-info-text" size={20} />
           <h2 className="text-lg font-semibold text-text-primary">Event Log</h2>
-          <span className="text-xs bg-info-soft text-info-text px-2 py-0.5 rounded">SIMULATION</span>
-          <span className="text-xs text-text-muted ml-2">{logs.length} entries</span>
-          {isLoading && <RefreshCw size={12} className="text-info-text animate-spin ml-2" />}
+          <span className="text-xs bg-info-soft text-info-text px-2 py-0.5 rounded">
+            SIMULATION
+          </span>
+          <span className="text-xs text-text-muted ml-2">
+            {logs.length} entries
+          </span>
+          {isLoading && (
+            <RefreshCw size={12} className="text-info-text animate-spin ml-2" />
+          )}
         </div>
       </div>
 
@@ -134,32 +179,34 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
         <button
           onClick={() => setIsPaused(!isPaused)}
           className={clsx(
-            'px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 transition-colors',
+            "px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 transition-colors",
             isPaused
-              ? 'bg-success-soft text-success-text hover:bg-success-soft'
-              : 'bg-warning-soft text-warning-text hover:bg-warning-soft'
+              ? "bg-success-soft text-success-text hover:bg-success-soft"
+              : "bg-warning-soft text-warning-text hover:bg-warning-soft",
           )}
         >
           {isPaused ? <Play size={12} /> : <Pause size={12} />}
-          {isPaused ? 'Resume' : 'Pause'}
+          {isPaused ? "Resume" : "Pause"}
         </button>
 
         <div className="h-4 w-px bg-dark-600" />
 
         <select
-          value={filter || ''}
-          onChange={e => setFilter(e.target.value || null)}
+          value={filter || ""}
+          onChange={(e) => setFilter(e.target.value || null)}
           className="px-2 py-1.5 bg-dark-700 border border-dark-600 rounded text-xs text-text-primary focus:outline-none"
         >
           <option value="">All Modules</option>
-          {MODULES.map(m => (
-            <option key={m} value={m}>{m}</option>
+          {MODULES.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
 
         <select
-          value={levelFilter || ''}
-          onChange={e => setLevelFilter(e.target.value || null)}
+          value={levelFilter || ""}
+          onChange={(e) => setLevelFilter(e.target.value || null)}
           className="px-2 py-1.5 bg-dark-700 border border-dark-600 rounded text-xs text-text-primary focus:outline-none"
         >
           <option value="">All Levels</option>
@@ -201,18 +248,31 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
           </div>
         ) : (
           <div className="divide-y divide-dark-700/50">
-            {filteredLogs.map(log => (
-              <div key={log.id} className={clsx('px-4 py-2 hover:bg-dark-800/50', getLevelBg(log.level))}>
+            {filteredLogs.map((log) => (
+              <div
+                key={log.id}
+                className={clsx(
+                  "px-4 py-2 hover:bg-dark-800/50",
+                  getLevelBg(log.level),
+                )}
+              >
                 <span className="text-text-muted">
                   {new Date(log.timestamp).toLocaleTimeString()}
                 </span>
-                <span className={clsx('mx-2 px-1.5 py-0.5 rounded text-[10px] uppercase', getLevelColor(log.level))}>
+                <span
+                  className={clsx(
+                    "mx-2 px-1.5 py-0.5 rounded text-[10px] uppercase",
+                    getLevelColor(log.level),
+                  )}
+                >
                   {log.level}
                 </span>
                 <span className="text-purple-text">[{log.module}]</span>
                 <span className="text-text-primary ml-2">{log.message}</span>
                 {log.session_id && (
-                  <span className="text-text-muted ml-2">({log.session_id})</span>
+                  <span className="text-text-muted ml-2">
+                    ({log.session_id})
+                  </span>
                 )}
               </div>
             ))}

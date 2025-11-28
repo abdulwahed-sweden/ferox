@@ -1,10 +1,10 @@
 // ferox-desktop/src/components/ui/Tooltip.tsx
 // Animated tooltip component with Framer Motion
 
-import { useState, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
+type TooltipPosition = "top" | "bottom" | "left" | "right";
 
 interface TooltipProps {
   content: ReactNode;
@@ -15,19 +15,19 @@ interface TooltipProps {
 }
 
 const positionStyles: Record<TooltipPosition, string> = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
+  bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
+  left: "right-full top-1/2 -translate-y-1/2 mr-2",
+  right: "left-full top-1/2 -translate-y-1/2 ml-2",
 };
 
 const arrowStyles: Record<TooltipPosition, string> = {
-  top: 'top-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent',
+  top: "top-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent",
   bottom:
-    'bottom-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent',
-  left: 'left-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent',
+    "bottom-full left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent",
+  left: "left-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent",
   right:
-    'right-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent',
+    "right-full top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent",
 };
 
 const animationVariants = {
@@ -56,9 +56,9 @@ const animationVariants = {
 export function Tooltip({
   content,
   children,
-  position = 'top',
+  position = "top",
   delay = 200,
-  className = '',
+  className = "",
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -92,7 +92,7 @@ export function Tooltip({
             initial={variants.initial}
             animate={variants.animate}
             exit={variants.exit}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
           >
             <div className="px-2 py-1 text-xs font-medium text-white bg-dark-900 rounded shadow-lg border border-dark-600 whitespace-nowrap">
               {content}
@@ -114,7 +114,7 @@ interface InfoTooltipProps {
   position?: TooltipPosition;
 }
 
-export function InfoTooltip({ content, position = 'top' }: InfoTooltipProps) {
+export function InfoTooltip({ content, position = "top" }: InfoTooltipProps) {
   return (
     <Tooltip content={content} position={position}>
       <span className="inline-flex items-center justify-center w-4 h-4 text-xs text-text-muted hover:text-text-secondary cursor-help rounded-full border border-dark-600">
@@ -126,19 +126,23 @@ export function InfoTooltip({ content, position = 'top' }: InfoTooltipProps) {
 
 // Badge tooltip for status indicators
 interface StatusTooltipProps {
-  status: 'success' | 'warning' | 'error' | 'info';
+  status: "success" | "warning" | "error" | "info";
   message: string;
   children: ReactNode;
 }
 
 const statusColors = {
-  success: 'border-green-400/50',
-  warning: 'border-yellow-400/50',
-  error: 'border-red-400/50',
-  info: 'border-cyan-400/50',
+  success: "border-green-400/50",
+  warning: "border-yellow-400/50",
+  error: "border-red-400/50",
+  info: "border-cyan-400/50",
 };
 
-export function StatusTooltip({ status, message, children }: StatusTooltipProps) {
+export function StatusTooltip({
+  status,
+  message,
+  children,
+}: StatusTooltipProps) {
   return (
     <Tooltip
       content={

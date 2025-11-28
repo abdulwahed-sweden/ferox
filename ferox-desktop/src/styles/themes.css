@@ -13,45 +13,45 @@
        ========================================== */
 
     /* Backgrounds - Cool, clean blue-gray */
-    --background: 210 20% 96%;           /* Crisp light gray with cool undertone */
-    --foreground: 220 25% 12%;           /* Soft dark (not pure black - easier on eyes) */
+    --background: 210 20% 96%; /* Crisp light gray with cool undertone */
+    --foreground: 220 25% 12%; /* Soft dark (not pure black - easier on eyes) */
 
     /* Cards & Panels - Pure white for clear hierarchy */
-    --card: 0 0% 100%;                   /* Pure white */
-    --card-foreground: 220 25% 12%;      /* Matching dark text */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 220 25% 12%; /* Matching dark text */
 
     /* Popovers & Dropdowns */
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
 
     /* Primary Brand - Trustworthy corporate blue */
-    --primary: 215 85% 48%;              /* Professional blue */
-    --primary-foreground: 0 0% 100%;     /* White text on blue */
+    --primary: 215 85% 48%; /* Professional blue */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
 
     /* Secondary Elements - Clean, not muddy */
-    --secondary: 210 15% 92%;            /* Light, clean gray */
+    --secondary: 210 15% 92%; /* Light, clean gray */
     --secondary-foreground: 220 20% 18%; /* Readable dark */
 
     /* Muted/Subtle - Balanced visibility */
     --muted: 210 15% 92%;
-    --muted-foreground: 215 15% 38%;     /* Sweet spot - visible but subtle */
+    --muted-foreground: 215 15% 38%; /* Sweet spot - visible but subtle */
 
     /* Accent Color - Subtle blue tint */
     --accent: 210 25% 90%;
     --accent-foreground: 220 20% 18%;
 
     /* Destructive/Error - Refined red */
-    --destructive: 0 72% 48%;            /* Professional, not aggressive */
+    --destructive: 0 72% 48%; /* Professional, not aggressive */
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 214 20% 78%;               /* Visible but not harsh */
+    --border: 214 20% 78%; /* Visible but not harsh */
     --input: 214 20% 78%;
-    --ring: 215 85% 48%;                 /* Match primary */
+    --ring: 215 85% 48%; /* Match primary */
 
     /* Sidebar - Dark sidebar for contrast */
-    --sidebar-background: 220 20% 12%;   /* Deep slate */
-    --sidebar-foreground: 210 15% 95%;   /* Soft white */
+    --sidebar-background: 220 20% 12%; /* Deep slate */
+    --sidebar-foreground: 210 15% 95%; /* Soft white */
     --sidebar-primary: 210 15% 95%;
     --sidebar-primary-foreground: 220 20% 12%;
     --sidebar-accent: 220 18% 18%;
@@ -60,30 +60,30 @@
     --sidebar-ring: 210 15% 95%;
 
     /* Chart Colors - Professional palette */
-    --chart-1: 215 85% 48%;              /* Primary blue */
-    --chart-2: 162 60% 38%;              /* Teal */
-    --chart-3: 25 85% 45%;               /* Burnt orange */
-    --chart-4: 270 50% 50%;              /* Purple */
-    --chart-5: 152 55% 38%;              /* Green */
-    --chart-6: 0 72% 48%;                /* Red */
-    --chart-7: 330 65% 45%;              /* Pink */
-    --chart-8: 85 55% 40%;               /* Lime */
+    --chart-1: 215 85% 48%; /* Primary blue */
+    --chart-2: 162 60% 38%; /* Teal */
+    --chart-3: 25 85% 45%; /* Burnt orange */
+    --chart-4: 270 50% 50%; /* Purple */
+    --chart-5: 152 55% 38%; /* Green */
+    --chart-6: 0 72% 48%; /* Red */
+    --chart-7: 330 65% 45%; /* Pink */
+    --chart-8: 85 55% 40%; /* Lime */
 
     /* Ferox Brand - Sophisticated teal-green */
-    --ferox-green: 162 72% 32%;          /* Deep, professional teal */
-    --ferox-green-hover: 162 72% 28%;    /* Darker on hover */
-    --ferox-green-bright: 162 72% 42%;   /* For emphasis */
+    --ferox-green: 162 72% 32%; /* Deep, professional teal */
+    --ferox-green-hover: 162 72% 28%; /* Darker on hover */
+    --ferox-green-bright: 162 72% 42%; /* For emphasis */
 
     /* Status Colors - Clear, professional */
-    --status-online: 152 60% 32%;        /* Deep green - authority */
-    --status-offline: 0 72% 48%;         /* Refined red */
-    --status-idle: 25 85% 42%;           /* Burnt orange - professional */
-    --status-away: 270 50% 45%;          /* Muted purple */
+    --status-online: 152 60% 32%; /* Deep green - authority */
+    --status-offline: 0 72% 48%; /* Refined red */
+    --status-idle: 25 85% 42%; /* Burnt orange - professional */
+    --status-away: 270 50% 45%; /* Muted purple */
 
     /* Icon Colors - High contrast for visibility */
-    --icon-primary: 220 25% 12%;         /* Match foreground */
-    --icon-secondary: 215 15% 38%;       /* Match muted-foreground */
-    --icon-tertiary: 215 12% 52%;        /* Lighter */
+    --icon-primary: 220 25% 12%; /* Match foreground */
+    --icon-secondary: 215 15% 38%; /* Match muted-foreground */
+    --icon-tertiary: 215 12% 52%; /* Lighter */
 
     /* ==========================================
        NEW FEROX THEME - Surface & Content System
@@ -91,45 +91,45 @@
        ========================================== */
 
     /* Surface Colors - Backgrounds */
-    --surface-base: #F4F5F7;
-    --surface-default: #FFFFFF;
-    --surface-elevated: #F9FAFB;
-    --surface-overlay: #FFFFFF;
-    --surface-sidebar: #EBEDF0;
-    --surface-input: #FFFFFF;
-    --surface-hover: #F0F1F3;
-    --surface-active: #E5E7EB;
+    --surface-base: #f4f5f7;
+    --surface-default: #ffffff;
+    --surface-elevated: #f9fafb;
+    --surface-overlay: #ffffff;
+    --surface-sidebar: #ebedf0;
+    --surface-input: #ffffff;
+    --surface-hover: #f0f1f3;
+    --surface-active: #e5e7eb;
 
     /* Theme-Guide Aliases - Background */
-    --bg-base: #F4F5F7;
-    --bg-surface: #FFFFFF;
-    --bg-elevated: #F9FAFB;
-    --bg-overlay: #FFFFFF;
+    --bg-base: #f4f5f7;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f9fafb;
+    --bg-overlay: #ffffff;
 
     /* Content Colors - Text */
     --content-primary: #111827;
-    --content-secondary: #4B5563;
-    --content-tertiary: #6B7280;
-    --content-disabled: #9CA3AF;
-    --content-inverse: #FFFFFF;
+    --content-secondary: #4b5563;
+    --content-tertiary: #6b7280;
+    --content-disabled: #9ca3af;
+    --content-inverse: #ffffff;
     --content-number: #030712;
-    --content-number-secondary: #1F2937;
+    --content-number-secondary: #1f2937;
     --content-data: #374151;
-    --content-label: #6B7280;
+    --content-label: #6b7280;
 
     /* Border Colors - New semantic */
-    --border-subtle: #E5E7EB;
-    --border-default-new: #D1D5DB;
-    --border-strong-new: #9CA3AF;
-    --border-focus-new: #2563EB;
+    --border-subtle: #e5e7eb;
+    --border-default-new: #d1d5db;
+    --border-strong-new: #9ca3af;
+    --border-focus-new: #2563eb;
 
     /* Primary Colors - Blue */
-    --primary-new: #2563EB;
-    --primary-hover-new: #1D4ED8;
-    --primary-active-new: #1E40AF;
+    --primary-new: #2563eb;
+    --primary-hover-new: #1d4ed8;
+    --primary-active-new: #1e40af;
     --primary-soft: rgba(37, 99, 235, 0.1);
     --primary-muted: rgba(37, 99, 235, 0.15);
-    --primary-text: #1D4ED8;
+    --primary-text: #1d4ed8;
 
     /* Success Colors - Green */
     --success-new: #059669;
@@ -142,48 +142,48 @@
     --success: #059669;
 
     /* Warning Colors - Orange */
-    --warning-new: #D97706;
-    --warning-hover-new: #B45309;
+    --warning-new: #d97706;
+    --warning-hover-new: #b45309;
     --warning-soft: rgba(217, 119, 6, 0.15);
     --warning-muted: rgba(217, 119, 6, 0.15);
-    --warning-text: #B45309;
+    --warning-text: #b45309;
     --warning-border: rgba(217, 119, 6, 0.25);
     /* Theme-Guide Alias */
-    --warning: #D97706;
+    --warning: #d97706;
 
     /* Danger Colors - Red */
-    --danger-new: #DC2626;
-    --danger-hover-new: #B91C1C;
+    --danger-new: #dc2626;
+    --danger-hover-new: #b91c1c;
     --danger-soft: rgba(220, 38, 38, 0.15);
     --danger-muted: rgba(220, 38, 38, 0.15);
-    --danger-text: #B91C1C;
+    --danger-text: #b91c1c;
     --danger-border: rgba(220, 38, 38, 0.25);
     /* Theme-Guide Alias */
-    --error: #DC2626;
+    --error: #dc2626;
 
     /* Info Colors - Cyan */
-    --info-new: #0891B2;
-    --info-hover-new: #0E7490;
+    --info-new: #0891b2;
+    --info-hover-new: #0e7490;
     --info-soft: rgba(8, 145, 178, 0.15);
     --info-muted: rgba(8, 145, 178, 0.15);
-    --info-text: #0E7490;
+    --info-text: #0e7490;
     --info-border: rgba(8, 145, 178, 0.25);
     /* Theme-Guide Alias */
-    --info: #0891B2;
+    --info: #0891b2;
 
     /* Purple Colors */
-    --purple-new: #7C3AED;
-    --purple-hover-new: #6D28D9;
+    --purple-new: #7c3aed;
+    --purple-hover-new: #6d28d9;
     --purple-soft: rgba(124, 58, 237, 0.1);
     --purple-muted: rgba(124, 58, 237, 0.15);
-    --purple-text: #6D28D9;
+    --purple-text: #6d28d9;
     --purple-border: rgba(124, 58, 237, 0.25);
 
     /* Data Colors */
     --data-positive: #059669;
-    --data-negative: #DC2626;
-    --data-neutral: #6B7280;
-    --data-highlight: #D97706;
+    --data-negative: #dc2626;
+    --data-neutral: #6b7280;
+    --data-highlight: #d97706;
 
     /* Glow Shadows */
     --shadow-glow-primary: 0 0 20px rgba(37, 99, 235, 0.15);
@@ -191,21 +191,21 @@
     --shadow-glow-danger: 0 0 20px rgba(220, 38, 38, 0.15);
 
     /* Toast Colors */
-    --toast-bg: #FFFFFF;
-    --toast-border: #E5E7EB;
+    --toast-bg: #ffffff;
+    --toast-border: #e5e7eb;
     --toast-text: #111827;
     --toast-success-primary: #059669;
-    --toast-success-secondary: #FFFFFF;
-    --toast-error-primary: #DC2626;
-    --toast-error-secondary: #FFFFFF;
+    --toast-success-secondary: #ffffff;
+    --toast-error-primary: #dc2626;
+    --toast-error-secondary: #ffffff;
 
     /* Text Size Scale */
-    --text-xs: 0.8125rem;     /* 13px */
-    --text-sm: 0.9375rem;     /* 15px */
-    --text-base: 1.0625rem;   /* 17px */
-    --text-lg: 1.1875rem;     /* 19px */
-    --text-xl: 1.3125rem;     /* 21px */
-    --text-2xl: 1.5625rem;    /* 25px */
+    --text-xs: 0.8125rem; /* 13px */
+    --text-sm: 0.9375rem; /* 15px */
+    --text-base: 1.0625rem; /* 17px */
+    --text-lg: 1.1875rem; /* 19px */
+    --text-xl: 1.3125rem; /* 21px */
+    --text-2xl: 1.5625rem; /* 25px */
 
     /* Line Height */
     --leading-tight: 1.3;
@@ -272,9 +272,12 @@
 
     /* Shadows - Subtle for light theme */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06);
 
     /* Component colors */
@@ -287,18 +290,18 @@
     --dark-300: hsl(var(--secondary-foreground));
   }
 
-  [data-theme='dark'] {
+  [data-theme="dark"] {
     /* ==========================================
        DARK THEME - "Midnight Operations"
        Neutral dark, optimized for long sessions
        ========================================== */
 
     /* Backgrounds - Neutral dark, easy on eyes */
-    --background: 220 18% 10%;           /* Near-black with subtle blue */
-    --foreground: 210 15% 95%;           /* Soft white (not pure white) */
+    --background: 220 18% 10%; /* Near-black with subtle blue */
+    --foreground: 210 15% 95%; /* Soft white (not pure white) */
 
     /* Cards & Panels - Clear layer separation */
-    --card: 220 15% 15%;                 /* Distinct from background */
+    --card: 220 15% 15%; /* Distinct from background */
     --card-foreground: 210 15% 95%;
 
     /* Popovers & Dropdowns */
@@ -306,8 +309,8 @@
     --popover-foreground: 210 15% 95%;
 
     /* Primary Brand - Bright comfortable blue */
-    --primary: 215 80% 58%;              /* Vibrant but not harsh */
-    --primary-foreground: 220 18% 10%;   /* Dark text on blue */
+    --primary: 215 80% 58%; /* Vibrant but not harsh */
+    --primary-foreground: 220 18% 10%; /* Dark text on blue */
 
     /* Secondary Elements - Subtle elevation */
     --secondary: 220 15% 18%;
@@ -315,7 +318,7 @@
 
     /* Muted/Subtle */
     --muted: 220 12% 18%;
-    --muted-foreground: 215 12% 62%;     /* Good contrast ratio */
+    --muted-foreground: 215 12% 62%; /* Good contrast ratio */
 
     /* Accent Color */
     --accent: 220 15% 20%;
@@ -341,129 +344,129 @@
     --sidebar-ring: 210 15% 95%;
 
     /* Chart Colors - Vibrant for dark backgrounds */
-    --chart-1: 215 80% 62%;              /* Bright blue */
-    --chart-2: 160 65% 52%;              /* Teal */
-    --chart-3: 35 85% 58%;               /* Warm orange */
-    --chart-4: 280 55% 62%;              /* Purple */
-    --chart-5: 152 60% 52%;              /* Green */
-    --chart-6: 0 65% 55%;                /* Red */
-    --chart-7: 330 70% 55%;              /* Pink */
-    --chart-8: 85 60% 50%;               /* Lime */
+    --chart-1: 215 80% 62%; /* Bright blue */
+    --chart-2: 160 65% 52%; /* Teal */
+    --chart-3: 35 85% 58%; /* Warm orange */
+    --chart-4: 280 55% 62%; /* Purple */
+    --chart-5: 152 60% 52%; /* Green */
+    --chart-6: 0 65% 55%; /* Red */
+    --chart-7: 330 70% 55%; /* Pink */
+    --chart-8: 85 60% 50%; /* Lime */
 
     /* Ferox Brand - Vibrant but not harsh */
-    --ferox-green: 160 70% 48%;          /* Balanced brightness */
-    --ferox-green-hover: 160 70% 55%;    /* Brighter on hover */
-    --ferox-green-bright: 160 70% 58%;   /* For emphasis */
+    --ferox-green: 160 70% 48%; /* Balanced brightness */
+    --ferox-green-hover: 160 70% 55%; /* Brighter on hover */
+    --ferox-green-bright: 160 70% 58%; /* For emphasis */
 
     /* Status Colors - Softer for dark mode */
-    --status-online: 152 55% 48%;        /* Soft green */
-    --status-offline: 0 65% 55%;         /* Soft red */
-    --status-idle: 35 80% 55%;           /* Warm amber */
-    --status-away: 270 55% 62%;          /* Soft purple */
+    --status-online: 152 55% 48%; /* Soft green */
+    --status-offline: 0 65% 55%; /* Soft red */
+    --status-idle: 35 80% 55%; /* Warm amber */
+    --status-away: 270 55% 62%; /* Soft purple */
 
     /* Icon Colors - Bright for dark theme */
-    --icon-primary: 210 15% 95%;         /* Match foreground */
-    --icon-secondary: 215 12% 62%;       /* Match muted-foreground */
-    --icon-tertiary: 215 10% 48%;        /* Dimmer */
+    --icon-primary: 210 15% 95%; /* Match foreground */
+    --icon-secondary: 215 12% 62%; /* Match muted-foreground */
+    --icon-tertiary: 215 10% 48%; /* Dimmer */
 
     /* ==========================================
        NEW FEROX THEME - Surface & Content System (Dark)
        ========================================== */
 
     /* Surface Colors - Backgrounds */
-    --surface-base: #12161F;
-    --surface-default: #1A1F2B;
-    --surface-elevated: #242A38;
-    --surface-overlay: #2D3444;
-    --surface-sidebar: #161A24;
-    --surface-input: #1A1F2B;
-    --surface-hover: #2A3142;
-    --surface-active: #323A4D;
+    --surface-base: #12161f;
+    --surface-default: #1a1f2b;
+    --surface-elevated: #242a38;
+    --surface-overlay: #2d3444;
+    --surface-sidebar: #161a24;
+    --surface-input: #1a1f2b;
+    --surface-hover: #2a3142;
+    --surface-active: #323a4d;
 
     /* Theme-Guide Aliases - Background */
-    --bg-base: #12161F;
-    --bg-surface: #1A1F2B;
-    --bg-elevated: #242A38;
-    --bg-overlay: #2D3444;
+    --bg-base: #12161f;
+    --bg-surface: #1a1f2b;
+    --bg-elevated: #242a38;
+    --bg-overlay: #2d3444;
 
     /* Content Colors - Text */
-    --content-primary: #F0F2F5;
-    --content-secondary: #A0A8B8;
-    --content-tertiary: #6B7280;
-    --content-disabled: #4B5563;
-    --content-inverse: #12161F;
-    --content-number: #FFFFFF;
-    --content-number-secondary: #E5E7EB;
-    --content-data: #D1D5DB;
-    --content-label: #9CA3AF;
+    --content-primary: #f0f2f5;
+    --content-secondary: #a0a8b8;
+    --content-tertiary: #6b7280;
+    --content-disabled: #4b5563;
+    --content-inverse: #12161f;
+    --content-number: #ffffff;
+    --content-number-secondary: #e5e7eb;
+    --content-data: #d1d5db;
+    --content-label: #9ca3af;
 
     /* Border Colors - New semantic */
-    --border-subtle: #2A3142;
+    --border-subtle: #2a3142;
     --border-default-new: #374151;
-    --border-strong-new: #4B5563;
-    --border-focus-new: #3B82F6;
+    --border-strong-new: #4b5563;
+    --border-focus-new: #3b82f6;
 
     /* Primary Colors - Blue */
-    --primary-new: #3B82F6;
-    --primary-hover-new: #2563EB;
-    --primary-active-new: #1D4ED8;
+    --primary-new: #3b82f6;
+    --primary-hover-new: #2563eb;
+    --primary-active-new: #1d4ed8;
     --primary-soft: rgba(59, 130, 246, 0.15);
     --primary-muted: rgba(59, 130, 246, 0.25);
-    --primary-text: #60A5FA;
+    --primary-text: #60a5fa;
 
     /* Success Colors - Green */
-    --success-new: #10B981;
+    --success-new: #10b981;
     --success-hover-new: #059669;
     --success-soft: rgba(16, 185, 129, 0.15);
     --success-muted: rgba(16, 185, 129, 0.25);
-    --success-text: #34D399;
+    --success-text: #34d399;
     --success-border: rgba(16, 185, 129, 0.3);
     /* Theme-Guide Alias */
-    --success: #10B981;
+    --success: #10b981;
 
     /* Warning Colors - Orange */
-    --warning-new: #F59E0B;
-    --warning-hover-new: #D97706;
+    --warning-new: #f59e0b;
+    --warning-hover-new: #d97706;
     --warning-soft: rgba(245, 158, 11, 0.15);
     --warning-muted: rgba(245, 158, 11, 0.25);
-    --warning-text: #FBBF24;
+    --warning-text: #fbbf24;
     --warning-border: rgba(245, 158, 11, 0.3);
     /* Theme-Guide Alias */
-    --warning: #F59E0B;
+    --warning: #f59e0b;
 
     /* Danger Colors - Red */
-    --danger-new: #EF4444;
-    --danger-hover-new: #DC2626;
+    --danger-new: #ef4444;
+    --danger-hover-new: #dc2626;
     --danger-soft: rgba(239, 68, 68, 0.15);
     --danger-muted: rgba(239, 68, 68, 0.25);
-    --danger-text: #F87171;
+    --danger-text: #f87171;
     --danger-border: rgba(239, 68, 68, 0.3);
     /* Theme-Guide Alias */
-    --error: #EF4444;
+    --error: #ef4444;
 
     /* Info Colors - Cyan */
-    --info-new: #06B6D4;
-    --info-hover-new: #0891B2;
+    --info-new: #06b6d4;
+    --info-hover-new: #0891b2;
     --info-soft: rgba(6, 182, 212, 0.15);
     --info-muted: rgba(6, 182, 212, 0.25);
-    --info-text: #22D3EE;
+    --info-text: #22d3ee;
     --info-border: rgba(6, 182, 212, 0.3);
     /* Theme-Guide Alias */
-    --info: #06B6D4;
+    --info: #06b6d4;
 
     /* Purple Colors */
-    --purple-new: #8B5CF6;
-    --purple-hover-new: #7C3AED;
+    --purple-new: #8b5cf6;
+    --purple-hover-new: #7c3aed;
     --purple-soft: rgba(139, 92, 246, 0.15);
     --purple-muted: rgba(139, 92, 246, 0.25);
-    --purple-text: #A78BFA;
+    --purple-text: #a78bfa;
     --purple-border: rgba(139, 92, 246, 0.3);
 
     /* Data Colors */
-    --data-positive: #34D399;
-    --data-negative: #F87171;
-    --data-neutral: #9CA3AF;
-    --data-highlight: #FBBF24;
+    --data-positive: #34d399;
+    --data-negative: #f87171;
+    --data-neutral: #9ca3af;
+    --data-highlight: #fbbf24;
 
     /* Glow Shadows */
     --shadow-glow-primary: 0 0 20px rgba(59, 130, 246, 0.25);
@@ -471,13 +474,13 @@
     --shadow-glow-danger: 0 0 20px rgba(239, 68, 68, 0.25);
 
     /* Toast Colors */
-    --toast-bg: #1A1F2B;
-    --toast-border: #2A3142;
-    --toast-text: #F0F2F5;
-    --toast-success-primary: #10B981;
-    --toast-success-secondary: #1A1F2B;
-    --toast-error-primary: #EF4444;
-    --toast-error-secondary: #1A1F2B;
+    --toast-bg: #1a1f2b;
+    --toast-border: #2a3142;
+    --toast-text: #f0f2f5;
+    --toast-success-primary: #10b981;
+    --toast-success-secondary: #1a1f2b;
+    --toast-error-primary: #ef4444;
+    --toast-error-secondary: #1a1f2b;
 
     /* Text sizes - Same as light */
     --text-xs: 0.8125rem;
@@ -543,9 +546,12 @@
 
     /* Shadows - Deeper for dark theme */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
 
     /* Component colors */
@@ -573,7 +579,9 @@
     color: var(--text-primary);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
   }
 
   h1 {
@@ -604,10 +612,11 @@
   }
 
   *:not(.no-transition) {
-    transition: background-color 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .theme-transitioning * {
@@ -626,9 +635,9 @@
     stroke-width: 2;
   }
 
-  [data-theme='dark'] .icon-primary,
-  [data-theme='dark'] .icon-secondary,
-  [data-theme='dark'] .icon-tertiary {
+  [data-theme="dark"] .icon-primary,
+  [data-theme="dark"] .icon-secondary,
+  [data-theme="dark"] .icon-tertiary {
     stroke-width: 1.75;
   }
 
@@ -644,10 +653,22 @@
     color: hsl(var(--icon-tertiary));
   }
 
-  .icon-xs { width: 0.9375rem; height: 0.9375rem; }
-  .icon-sm { width: 1.125rem; height: 1.125rem; }
-  .icon-md { width: 1.3125rem; height: 1.3125rem; }
-  .icon-lg { width: 1.5625rem; height: 1.5625rem; }
+  .icon-xs {
+    width: 0.9375rem;
+    height: 0.9375rem;
+  }
+  .icon-sm {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+  .icon-md {
+    width: 1.3125rem;
+    height: 1.3125rem;
+  }
+  .icon-lg {
+    width: 1.5625rem;
+    height: 1.5625rem;
+  }
 
   .status-online {
     background-color: hsl(var(--status-online));
@@ -673,12 +694,24 @@
     font-size: var(--text-sm);
   }
 
-  .text-xs { font-size: var(--text-xs); }
-  .text-sm { font-size: var(--text-sm); }
-  .text-base { font-size: var(--text-base); }
-  .text-lg { font-size: var(--text-lg); }
-  .text-xl { font-size: var(--text-xl); }
-  .text-2xl { font-size: var(--text-2xl); }
+  .text-xs {
+    font-size: var(--text-xs);
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+  }
+  .text-base {
+    font-size: var(--text-base);
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+  }
 }
 
 /* ==========================================
@@ -896,7 +929,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
     color: var(--text-secondary);
   }
 
@@ -945,7 +980,7 @@
   background-color: hsl(var(--card));
   color: var(--text-primary);
   border: 1px solid hsl(var(--border));
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
   font-size: 0.9375rem;
   line-height: 1.6;
   padding: 1rem;
@@ -1010,7 +1045,7 @@ td {
 
 /* Code blocks */
 code {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.9375rem;
   background-color: var(--bg-secondary);
   padding: 0.25rem 0.5rem;
@@ -1032,7 +1067,7 @@ pre code {
   background: hsl(var(--primary) / 0.25);
 }
 
-[data-theme='dark'] ::selection {
+[data-theme="dark"] ::selection {
   background: hsl(var(--ferox-green) / 0.3);
 }
 
@@ -1082,7 +1117,8 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -1264,7 +1300,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
 
   /* Number display utilities */
   .number-display {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
@@ -1272,7 +1308,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   }
 
   .data-cell {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
     font-variant-numeric: tabular-nums;
     color: var(--content-data);
   }
@@ -1354,21 +1390,53 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   }
 
   /* Chart color utilities */
-  .bg-chart-1 { background-color: hsl(var(--chart-1)); }
-  .bg-chart-2 { background-color: hsl(var(--chart-2)); }
-  .bg-chart-3 { background-color: hsl(var(--chart-3)); }
-  .bg-chart-4 { background-color: hsl(var(--chart-4)); }
-  .bg-chart-5 { background-color: hsl(var(--chart-5)); }
-  .bg-chart-6 { background-color: hsl(var(--chart-6)); }
-  .bg-chart-7 { background-color: hsl(var(--chart-7)); }
-  .bg-chart-8 { background-color: hsl(var(--chart-8)); }
+  .bg-chart-1 {
+    background-color: hsl(var(--chart-1));
+  }
+  .bg-chart-2 {
+    background-color: hsl(var(--chart-2));
+  }
+  .bg-chart-3 {
+    background-color: hsl(var(--chart-3));
+  }
+  .bg-chart-4 {
+    background-color: hsl(var(--chart-4));
+  }
+  .bg-chart-5 {
+    background-color: hsl(var(--chart-5));
+  }
+  .bg-chart-6 {
+    background-color: hsl(var(--chart-6));
+  }
+  .bg-chart-7 {
+    background-color: hsl(var(--chart-7));
+  }
+  .bg-chart-8 {
+    background-color: hsl(var(--chart-8));
+  }
 
-  .text-chart-1 { color: hsl(var(--chart-1)); }
-  .text-chart-2 { color: hsl(var(--chart-2)); }
-  .text-chart-3 { color: hsl(var(--chart-3)); }
-  .text-chart-4 { color: hsl(var(--chart-4)); }
-  .text-chart-5 { color: hsl(var(--chart-5)); }
-  .text-chart-6 { color: hsl(var(--chart-6)); }
-  .text-chart-7 { color: hsl(var(--chart-7)); }
-  .text-chart-8 { color: hsl(var(--chart-8)); }
+  .text-chart-1 {
+    color: hsl(var(--chart-1));
+  }
+  .text-chart-2 {
+    color: hsl(var(--chart-2));
+  }
+  .text-chart-3 {
+    color: hsl(var(--chart-3));
+  }
+  .text-chart-4 {
+    color: hsl(var(--chart-4));
+  }
+  .text-chart-5 {
+    color: hsl(var(--chart-5));
+  }
+  .text-chart-6 {
+    color: hsl(var(--chart-6));
+  }
+  .text-chart-7 {
+    color: hsl(var(--chart-7));
+  }
+  .text-chart-8 {
+    color: hsl(var(--chart-8));
+  }
 }

@@ -2,12 +2,12 @@
  * NodeTooltip - Detailed node information panel
  */
 
-import { motion } from 'framer-motion';
-import { X, Terminal, Globe, HardDrive, Cpu, Network } from 'lucide-react';
-import type { NetworkNode } from '../../data/mockNetwork';
-import { typeColors, statusColors } from '../../data/mockNetwork';
-import { tooltipVariants } from './animations';
-import toast from 'react-hot-toast';
+import { motion } from "framer-motion";
+import { X, Terminal, Globe, HardDrive, Cpu, Network } from "lucide-react";
+import type { NetworkNode } from "../../data/mockNetwork";
+import { typeColors, statusColors } from "../../data/mockNetwork";
+import { tooltipVariants } from "./animations";
+import toast from "react-hot-toast";
 
 interface NodeTooltipProps {
   node: NetworkNode;
@@ -44,7 +44,7 @@ export function NodeTooltip({ node, onClose }: NodeTooltipProps) {
             className="w-3 h-3 rounded-full"
             style={{
               backgroundColor: statusColor,
-              boxShadow: `0 0 8px ${statusColor}`
+              boxShadow: `0 0 8px ${statusColor}`,
             }}
           />
           <span className="font-semibold text-sm" style={{ color }}>
@@ -62,7 +62,11 @@ export function NodeTooltip({ node, onClose }: NodeTooltipProps) {
       {/* Content */}
       <div className="p-3 space-y-3">
         <InfoRow icon={Globe} label="IP Address" value={node.ip} />
-        <InfoRow icon={Cpu} label="Type" value={node.type.charAt(0).toUpperCase() + node.type.slice(1)} />
+        <InfoRow
+          icon={Cpu}
+          label="Type"
+          value={node.type.charAt(0).toUpperCase() + node.type.slice(1)}
+        />
         <InfoRow
           icon={Network}
           label="Status"
@@ -70,7 +74,11 @@ export function NodeTooltip({ node, onClose }: NodeTooltipProps) {
           valueColor={statusColor}
         />
         {node.os && (
-          <InfoRow icon={HardDrive} label="OS" value={node.os.charAt(0).toUpperCase() + node.os.slice(1)} />
+          <InfoRow
+            icon={HardDrive}
+            label="OS"
+            value={node.os.charAt(0).toUpperCase() + node.os.slice(1)}
+          />
         )}
 
         {/* Open Ports */}
@@ -78,13 +86,13 @@ export function NodeTooltip({ node, onClose }: NodeTooltipProps) {
           <div className="pt-2 border-t border-dark-600">
             <div className="text-[10px] text-text-muted mb-1.5">Open Ports</div>
             <div className="flex flex-wrap gap-1">
-              {node.ports.map(port => (
+              {node.ports.map((port) => (
                 <span
                   key={port}
                   className="px-1.5 py-0.5 rounded text-[10px] font-mono"
                   style={{
                     backgroundColor: `${color}20`,
-                    color: color
+                    color: color,
                   }}
                 >
                   {port}
@@ -99,18 +107,18 @@ export function NodeTooltip({ node, onClose }: NodeTooltipProps) {
           <ActionButton
             label="Scan"
             color="#00d4ff"
-            onClick={() => handleAction('Scanning')}
+            onClick={() => handleAction("Scanning")}
           />
           <ActionButton
             label="Exploit"
             color="#ff3366"
-            onClick={() => handleAction('Exploiting')}
+            onClick={() => handleAction("Exploiting")}
           />
           <ActionButton
             label="Shell"
             color="#00ff88"
             icon={Terminal}
-            onClick={() => handleAction('Opening shell to')}
+            onClick={() => handleAction("Opening shell to")}
           />
         </div>
       </div>
@@ -122,7 +130,7 @@ function InfoRow({
   icon: Icon,
   label,
   value,
-  valueColor
+  valueColor,
 }: {
   icon: typeof Globe;
   label: string;
@@ -137,7 +145,7 @@ function InfoRow({
       </div>
       <span
         className="text-xs font-medium"
-        style={{ color: valueColor || 'var(--content-secondary)' }}
+        style={{ color: valueColor || "var(--content-secondary)" }}
       >
         {value}
       </span>
@@ -149,7 +157,7 @@ function ActionButton({
   label,
   color,
   icon: Icon,
-  onClick
+  onClick,
 }: {
   label: string;
   color: string;
@@ -163,7 +171,7 @@ function ActionButton({
       style={{
         backgroundColor: `${color}20`,
         color: color,
-        border: `1px solid ${color}40`
+        border: `1px solid ${color}40`,
       }}
     >
       {Icon && <Icon size={10} />}

@@ -1,8 +1,8 @@
 // Session types
-export type PrivilegeLevel = 'user' | 'administrator' | 'system' | 'root';
-export type SessionStatus = 'active' | 'sleeping' | 'dead';
-export type OsType = 'windows' | 'linux' | 'macos' | 'unknown';
-export type Architecture = 'x64' | 'x86' | 'arm64' | 'unknown';
+export type PrivilegeLevel = "user" | "administrator" | "system" | "root";
+export type SessionStatus = "active" | "sleeping" | "dead";
+export type OsType = "windows" | "linux" | "macos" | "unknown";
+export type Architecture = "x64" | "x86" | "arm64" | "unknown";
 
 export interface SessionIntelligence {
   domain: string | null;
@@ -59,21 +59,21 @@ export interface HistoryEntry {
 
 // Tab types
 export type TabType =
-  | 'terminal'
-  | 'filebrowser'
-  | 'processes'
-  | 'network'
-  | 'payloads'
-  | 'scanner'
-  | 'credentials'
-  | 'eventlog'
-  | 'scheduler'
-  | 'notes'
-  | 'postexploitation'
-  | 'networkmap'
-  | 'mitre'
-  | 'reports'
-  | 'opsec';
+  | "terminal"
+  | "filebrowser"
+  | "processes"
+  | "network"
+  | "payloads"
+  | "scanner"
+  | "credentials"
+  | "eventlog"
+  | "scheduler"
+  | "notes"
+  | "postexploitation"
+  | "networkmap"
+  | "mitre"
+  | "reports"
+  | "opsec";
 
 export interface Tab {
   id: string;
@@ -169,7 +169,7 @@ export interface PayloadConfig {
 
 export interface BuildLogEntry {
   timestamp: string;
-  level: 'info' | 'warn' | 'success';
+  level: "info" | "warn" | "success";
   message: string;
 }
 
@@ -181,7 +181,7 @@ export interface RiskFactor {
 
 export interface RiskAnalysis {
   risk_score: number;
-  risk_level: 'low' | 'medium' | 'high' | 'critical';
+  risk_level: "low" | "medium" | "high" | "critical";
   factors: RiskFactor[];
   recommendations: string[];
 }
@@ -249,7 +249,7 @@ export interface SimulatedPort {
   protocol: string;
   service: string;
   version: string;
-  state: 'open' | 'closed' | 'filtered';
+  state: "open" | "closed" | "filtered";
   banner: string | null;
 }
 
@@ -262,7 +262,7 @@ export interface SimulatedHost {
   os_version: string;
   vendor: string;
   ports: SimulatedPort[];
-  status: 'up' | 'down';
+  status: "up" | "down";
   latency_ms: number;
   ttl: number;
   last_seen: string;
@@ -279,12 +279,12 @@ export interface NetworkScanResult {
 // Credentials Viewer
 export interface SimulatedCredential {
   id: string;
-  cred_type: 'password' | 'hash' | 'token' | 'certificate' | 'ticket';
+  cred_type: "password" | "hash" | "token" | "certificate" | "ticket";
   username: string;
   domain: string | null;
   value: string;
   source: string;
-  sensitivity: 'low' | 'medium' | 'high' | 'critical';
+  sensitivity: "low" | "medium" | "high" | "critical";
   cracked: boolean;
   cracked_value: string | null;
   last_used: string | null;
@@ -303,7 +303,7 @@ export interface CredentialDumpResult {
 export interface SimulatedLogEntry {
   id: string;
   timestamp: string;
-  level: 'info' | 'warn' | 'error' | 'success' | 'debug';
+  level: "info" | "warn" | "error" | "success" | "debug";
   module: string;
   message: string;
   details: string | null;
@@ -316,13 +316,13 @@ export interface SimulatedTask {
   name: string;
   command: string;
   schedule: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
+  status: "pending" | "running" | "completed" | "failed" | "paused";
   last_run: string | null;
   next_run: string;
   created_at: string;
   run_count: number;
   last_result: string | null;
-  priority: 'low' | 'normal' | 'high' | 'critical';
+  priority: "low" | "normal" | "high" | "critical";
 }
 
 // Notes
@@ -341,7 +341,7 @@ export interface SimulatedNote {
 export interface SimulatedFileEntry {
   name: string;
   path: string;
-  file_type: 'file' | 'directory';
+  file_type: "file" | "directory";
   size: number;
   modified: string;
   permissions: string;
@@ -367,7 +367,7 @@ export interface SimulatedProcess {
   cpu: number;
   memory: number;
   memory_bytes: number;
-  status: 'running' | 'sleeping' | 'stopped' | 'zombie';
+  status: "running" | "sleeping" | "stopped" | "zombie";
   command: string;
   threads: number;
   start_time: string;

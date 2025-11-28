@@ -1,5 +1,5 @@
-import { Component, type ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Component, type ReactNode } from "react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -22,7 +22,10 @@ interface ErrorBoundaryState {
  * Catches JavaScript errors in child component tree and displays
  * a fallback UI instead of crashing the entire app.
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -33,7 +36,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error(`[ErrorBoundary${this.props.name ? `: ${this.props.name}` : ''}]`, error, errorInfo);
+    console.error(
+      `[ErrorBoundary${this.props.name ? `: ${this.props.name}` : ""}]`,
+      error,
+      errorInfo,
+    );
     this.props.onError?.(error, errorInfo);
   }
 
@@ -53,10 +60,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="flex flex-col items-center justify-center h-full p-4 bg-dark-800">
           <AlertTriangle size={32} className="text-danger mb-3" />
           <h3 className="text-sm font-medium text-text-primary mb-1">
-            {this.props.name ? `${this.props.name} Error` : 'Something went wrong'}
+            {this.props.name
+              ? `${this.props.name} Error`
+              : "Something went wrong"}
           </h3>
           <p className="text-xs text-text-muted text-center mb-4 max-w-[200px]">
-            {this.state.error?.message || 'An unexpected error occurred'}
+            {this.state.error?.message || "An unexpected error occurred"}
           </p>
           <button
             onClick={this.handleRetry}
@@ -79,8 +88,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
  * Minimal error fallback for small components
  */
 export function MinimalErrorFallback({
-  message = 'Error',
-  onRetry
+  message = "Error",
+  onRetry,
 }: {
   message?: string;
   onRetry?: () => void;
@@ -107,7 +116,7 @@ export function MinimalErrorFallback({
 export function PanelErrorFallback({
   panelName,
   error,
-  onRetry
+  onRetry,
 }: {
   panelName: string;
   error?: Error | null;

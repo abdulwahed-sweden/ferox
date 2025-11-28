@@ -1,5 +1,5 @@
-import { useAppStore } from '../store';
-import { Terminal } from './Terminal';
+import { useAppStore } from "../store";
+import { Terminal } from "./Terminal";
 import {
   FileBrowser,
   ProcessViewer,
@@ -10,11 +10,11 @@ import {
   Notes,
   NetworkMap,
   MitreAttack,
-  Reports
-} from './modules';
-import { PayloadBuilder } from './PayloadBuilder';
-import { PostExploitation } from './post_exploitation';
-import { OpsecDashboard } from './modules/opsec';
+  Reports,
+} from "./modules";
+import { PayloadBuilder } from "./PayloadBuilder";
+import { PostExploitation } from "./post_exploitation";
+import { OpsecDashboard } from "./modules/opsec";
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -30,35 +30,35 @@ export function TabContent() {
   }
 
   switch (activeTab.type) {
-    case 'terminal':
+    case "terminal":
       return <Terminal tabId={activeTab.id} sessionId={activeTab.sessionId} />;
-    case 'filebrowser':
+    case "filebrowser":
       return <FileBrowser sessionId={activeTab.sessionId} />;
-    case 'processes':
+    case "processes":
       return <ProcessViewer sessionId={activeTab.sessionId} />;
-    case 'payloads':
+    case "payloads":
       return <PayloadBuilder />;
-    case 'network':
+    case "network":
       return <NetworkScanner sessionId={activeTab.sessionId} />;
-    case 'scanner':
+    case "scanner":
       return <NetworkScanner sessionId={activeTab.sessionId} />;
-    case 'credentials':
+    case "credentials":
       return <CredentialsViewer sessionId={activeTab.sessionId} />;
-    case 'eventlog':
+    case "eventlog":
       return <EventLog sessionId={activeTab.sessionId} />;
-    case 'scheduler':
+    case "scheduler":
       return <TaskScheduler sessionId={activeTab.sessionId} />;
-    case 'notes':
+    case "notes":
       return <Notes sessionId={activeTab.sessionId} />;
-    case 'postexploitation':
+    case "postexploitation":
       return <PostExploitation sessionId={activeTab.sessionId} />;
-    case 'networkmap':
+    case "networkmap":
       return <NetworkMap sessionId={activeTab.sessionId} />;
-    case 'mitre':
+    case "mitre":
       return <MitreAttack sessionId={activeTab.sessionId} />;
-    case 'reports':
+    case "reports":
       return <Reports sessionId={activeTab.sessionId} />;
-    case 'opsec':
+    case "opsec":
       return <OpsecDashboard />;
     default:
       return (

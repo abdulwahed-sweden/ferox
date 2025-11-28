@@ -61,7 +61,8 @@
 
 /* Pulse animation for nodes */
 @keyframes node-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -107,7 +108,8 @@
 
 /* Edge glow pulse */
 @keyframes edge-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     stroke-width: 2;
   }
@@ -128,10 +130,14 @@
 
 /* Neon text glow */
 .neon-text {
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor;
 }
 
 /* Status indicator glow */
 .status-glow {
-  box-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
+  box-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor;
 }

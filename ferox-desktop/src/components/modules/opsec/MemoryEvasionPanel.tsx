@@ -1,42 +1,51 @@
 // ferox-desktop/src/components/modules/opsec/MemoryEvasionPanel.tsx
 // Memory Evasion Panel
 
-import { useState } from 'react';
-import { Cpu, Shield, Lock, Eye, Play, CheckCircle, XCircle, Info } from 'lucide-react';
-import { useOpsec } from '../../../hooks/useOpsec';
-import type { MemoryEvasionResult } from '../../../types/opsec';
+import { useState } from "react";
+import {
+  Cpu,
+  Shield,
+  Lock,
+  Eye,
+  Play,
+  CheckCircle,
+  XCircle,
+  Info,
+} from "lucide-react";
+import { useOpsec } from "../../../hooks/useOpsec";
+import type { MemoryEvasionResult } from "../../../types/opsec";
 
 const MEMORY_TECHNIQUES = [
   {
-    id: 'HeapEncrypt',
-    name: 'Heap Encryption',
-    description: 'Encrypts sensitive data on the heap when not in use',
+    id: "HeapEncrypt",
+    name: "Heap Encryption",
+    description: "Encrypts sensitive data on the heap when not in use",
     icon: Lock,
-    mitre: 'T1027',
+    mitre: "T1027",
     effectiveness: 8,
   },
   {
-    id: 'StackObfuscate',
-    name: 'Stack Obfuscation',
-    description: 'Obfuscates return addresses and stack frames',
+    id: "StackObfuscate",
+    name: "Stack Obfuscation",
+    description: "Obfuscates return addresses and stack frames",
     icon: Shield,
-    mitre: 'T1027',
+    mitre: "T1027",
     effectiveness: 7,
   },
   {
-    id: 'ModuleHide',
-    name: 'Module Hiding',
-    description: 'Unlinks modules from PEB to hide from memory scanners',
+    id: "ModuleHide",
+    name: "Module Hiding",
+    description: "Unlinks modules from PEB to hide from memory scanners",
     icon: Eye,
-    mitre: 'T1055.012',
+    mitre: "T1055.012",
     effectiveness: 9,
   },
   {
-    id: 'PeHeader',
-    name: 'PE Header Wipe',
-    description: 'Zeros PE headers in memory to prevent identification',
+    id: "PeHeader",
+    name: "PE Header Wipe",
+    description: "Zeros PE headers in memory to prevent identification",
     icon: Cpu,
-    mitre: 'T1070',
+    mitre: "T1070",
     effectiveness: 8,
   },
 ];
@@ -44,14 +53,16 @@ const MEMORY_TECHNIQUES = [
 export function MemoryEvasionPanel() {
   const { enableMemoryEvasion, loading, status } = useOpsec();
   const [selectedTechnique] = useState<string | null>(null);
-  const [results, setResults] = useState<Map<string, MemoryEvasionResult>>(new Map());
+  const [results, setResults] = useState<Map<string, MemoryEvasionResult>>(
+    new Map(),
+  );
 
   const handleEnable = async (techniqueId: string) => {
     try {
       const result = await enableMemoryEvasion(techniqueId);
       setResults((prev) => new Map(prev).set(techniqueId, result));
     } catch (e) {
-      console.error('Memory evasion failed:', e);
+      console.error("Memory evasion failed:", e);
     }
   };
 
@@ -75,11 +86,11 @@ export function MemoryEvasionPanel() {
           <div
             className={`px-3 py-1 rounded-lg text-sm font-medium ${
               status?.memoryProtected
-                ? 'bg-success-soft text-success-text'
-                : 'bg-dark-700 text-text-muted'
+                ? "bg-success-soft text-success-text"
+                : "bg-dark-700 text-text-muted"
             }`}
           >
-            {status?.memoryProtected ? 'Protected' : 'Not Protected'}
+            {status?.memoryProtected ? "Protected" : "Not Protected"}
           </div>
         </div>
 
@@ -91,7 +102,7 @@ export function MemoryEvasionPanel() {
             rounded-lg font-medium disabled:opacity-50 transition-colors"
         >
           <Shield className="w-4 h-4" />
-          {loading ? 'Enabling...' : 'Enable All Protections'}
+          {loading ? "Enabling..." : "Enable All Protections"}
         </button>
       </div>
 
@@ -107,22 +118,22 @@ export function MemoryEvasionPanel() {
               key={technique.id}
               className={`bg-dark-800 rounded-lg p-4 border transition-colors ${
                 isEnabled
-                  ? 'border-green-400/50'
+                  ? "border-green-400/50"
                   : selectedTechnique === technique.id
-                  ? 'border-cyan-400'
-                  : 'border-dark-600'
+                    ? "border-cyan-400"
+                    : "border-dark-600"
               }`}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2 rounded-lg ${
-                      isEnabled ? 'bg-success-soft' : 'bg-dark-700'
+                      isEnabled ? "bg-success-soft" : "bg-dark-700"
                     }`}
                   >
                     <Icon
                       className={`w-5 h-5 ${
-                        isEnabled ? 'text-success-text' : 'text-text-secondary'
+                        isEnabled ? "text-success-text" : "text-text-secondary"
                       }`}
                     />
                   </div>
@@ -131,7 +142,9 @@ export function MemoryEvasionPanel() {
                     <p className="text-xs text-text-muted">{technique.mitre}</p>
                   </div>
                 </div>
-                {isEnabled && <CheckCircle className="w-5 h-5 text-success-text" />}
+                {isEnabled && (
+                  <CheckCircle className="w-5 h-5 text-success-text" />
+                )}
               </div>
 
               <p className="text-sm text-text-secondary mb-3">
@@ -159,8 +172,8 @@ export function MemoryEvasionPanel() {
                 <div
                   className={`p-2 rounded-lg text-sm ${
                     result.success
-                      ? 'bg-success-soft text-success-text'
-                      : 'bg-danger-soft text-danger-text'
+                      ? "bg-success-soft text-success-text"
+                      : "bg-danger-soft text-danger-text"
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -210,7 +223,7 @@ export function MemoryEvasionPanel() {
             <p className="text-xl font-bold">
               {Array.from(results.values()).reduce(
                 (acc, r) => acc + (r.regionsProtected || 0),
-                0
+                0,
               )}
             </p>
             <p className="text-xs text-text-muted">Regions Protected</p>

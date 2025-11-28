@@ -3,7 +3,7 @@
  * For demo/training purposes only - no real file system access
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from "react";
 import {
   Folder,
   File,
@@ -16,47 +16,50 @@ import {
   Eye,
   EyeOff,
   Lock,
-} from 'lucide-react';
-import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
-import { Spinner } from '../Loading';
-import { simulateDirectoryListing } from '../../lib/tauri';
-import type { SimulatedFileEntry, DirectoryListing } from '../../types';
+} from "lucide-react";
+import { clsx } from "clsx";
+import toast from "react-hot-toast";
+import { Spinner } from "../Loading";
+import { simulateDirectoryListing } from "../../lib/tauri";
+import type { SimulatedFileEntry, DirectoryListing } from "../../types";
 
 interface FileBrowserProps {
   sessionId: string;
 }
 
 function formatSize(bytes: number): string {
-  if (bytes === 0) return '-';
-  const units = ['B', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return "-";
+  const units = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
 }
 
 export function FileBrowser({ sessionId }: FileBrowserProps) {
-  const [currentPath, setCurrentPath] = useState('/home/user');
+  const [currentPath, setCurrentPath] = useState("/home/user");
   const [listing, setListing] = useState<DirectoryListing | null>(null);
   const [files, setFiles] = useState<SimulatedFileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
 
-  const handleNavigate = useCallback(async (path: string) => {
-    setLoading(true);
-    setSelectedFile(null);
-    try {
-      const result = await simulateDirectoryListing(path, sessionId);
-      setListing(result);
-      setFiles(result.entries);
-      setCurrentPath(result.path);
-    } catch (error) {
-      console.error('Failed to list directory:', error);
-      toast.error('Failed to access directory');
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionId]);
+  const handleNavigate = useCallback(
+    async (path: string) => {
+      setLoading(true);
+      setSelectedFile(null);
+      try {
+        const result = await simulateDirectoryListing(path, sessionId);
+        setListing(result);
+        setFiles(result.entries);
+        setCurrentPath(result.path);
+      } catch (error) {
+        console.error("Failed to list directory:", error);
+        toast.error("Failed to access directory");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionId],
+  );
 
   useEffect(() => {
     handleNavigate(currentPath);
@@ -84,13 +87,13 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
 
   const handleDelete = useCallback(() => {
     if (selectedFile) {
-      setFiles(prev => prev.filter(f => f.path !== selectedFile));
+      setFiles((prev) => prev.filter((f) => f.path !== selectedFile));
       setSelectedFile(null);
-      toast.success('File deleted (simulated)');
+      toast.success("File deleted (simulated)");
     }
   }, [selectedFile]);
 
-  const filteredFiles = showHidden ? files : files.filter(f => !f.hidden);
+  const filteredFiles = showHidden ? files : files.filter((f) => !f.hidden);
 
   return (
     <div className="h-full flex flex-col bg-dark-900">
@@ -98,15 +101,19 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
       <div className="p-3 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
           <Folder className="text-warning-text" size={18} />
-          <h2 className="text-sm font-semibold text-text-primary">File Browser</h2>
-          <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">SIMULATION</span>
+          <h2 className="text-sm font-semibold text-text-primary">
+            File Browser
+          </h2>
+          <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">
+            SIMULATION
+          </span>
         </div>
       </div>
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-2 bg-dark-800 border-b border-dark-600">
         <button
-          onClick={() => handleNavigate('/home/user')}
+          onClick={() => handleNavigate("/home/user")}
           className="p-1.5 hover:bg-dark-600 rounded transition-colors"
           title="Home"
         >
@@ -125,15 +132,17 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
           className="p-1.5 hover:bg-dark-600 rounded transition-colors"
           title="Refresh"
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
         </button>
         <button
           onClick={() => setShowHidden(!showHidden)}
           className={clsx(
-            'p-1.5 rounded transition-colors',
-            showHidden ? 'bg-purple-soft text-purple-text' : 'hover:bg-dark-600'
+            "p-1.5 rounded transition-colors",
+            showHidden
+              ? "bg-purple-soft text-purple-text"
+              : "hover:bg-dark-600",
           )}
-          title={showHidden ? 'Hide hidden files' : 'Show hidden files'}
+          title={showHidden ? "Hide hidden files" : "Show hidden files"}
         >
           {showHidden ? <Eye size={16} /> : <EyeOff size={16} />}
         </button>
@@ -143,7 +152,7 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
             type="text"
             value={currentPath}
             onChange={(e) => setCurrentPath(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleNavigate(currentPath)}
+            onKeyDown={(e) => e.key === "Enter" && handleNavigate(currentPath)}
             className="w-full px-2 py-1 text-sm bg-dark-700 border border-dark-600 rounded text-text-primary font-mono"
           />
         </div>
@@ -197,33 +206,46 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
                 <tr
                   key={file.path}
                   className={clsx(
-                    'cursor-pointer hover:bg-dark-700 transition-colors',
-                    selectedFile === file.path && 'bg-dark-600',
-                    file.hidden && 'opacity-60'
+                    "cursor-pointer hover:bg-dark-700 transition-colors",
+                    selectedFile === file.path && "bg-dark-600",
+                    file.hidden && "opacity-60",
                   )}
                   onClick={() => setSelectedFile(file.path)}
-                  onDoubleClick={() => file.file_type === 'directory' && handleNavigate(file.path)}
+                  onDoubleClick={() =>
+                    file.file_type === "directory" && handleNavigate(file.path)
+                  }
                 >
                   <td className="p-2">
                     <div className="flex items-center gap-2">
-                      {file.file_type === 'directory' ? (
+                      {file.file_type === "directory" ? (
                         <Folder size={16} className="text-warning-text" />
                       ) : (
                         <File size={16} className="text-text-muted" />
                       )}
-                      <span className={clsx('text-text-primary', file.hidden && 'italic')}>
+                      <span
+                        className={clsx(
+                          "text-text-primary",
+                          file.hidden && "italic",
+                        )}
+                      >
                         {file.name}
                       </span>
-                      {file.permissions.includes('------') && (
-                        <span title="Restricted"><Lock size={12} className="text-danger-text" /></span>
+                      {file.permissions.includes("------") && (
+                        <span title="Restricted">
+                          <Lock size={12} className="text-danger-text" />
+                        </span>
                       )}
                     </div>
                   </td>
-                  <td className="p-2 text-right text-text-muted">{formatSize(file.size)}</td>
+                  <td className="p-2 text-right text-text-muted">
+                    {formatSize(file.size)}
+                  </td>
                   <td className="p-2 text-text-muted">
                     {new Date(file.modified).toLocaleDateString()}
                   </td>
-                  <td className="p-2 text-text-muted font-mono text-xs">{file.permissions}</td>
+                  <td className="p-2 text-text-muted font-mono text-xs">
+                    {file.permissions}
+                  </td>
                   <td className="p-2 text-text-muted">{file.owner}</td>
                 </tr>
               ))}
@@ -234,7 +256,10 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
 
       {/* Status bar */}
       <div className="px-3 py-1.5 bg-dark-800 border-t border-dark-600 text-xs text-text-muted flex items-center justify-between">
-        <span>{filteredFiles.length} items {listing && `| ${formatSize(listing.total_size)}`}</span>
+        <span>
+          {filteredFiles.length} items{" "}
+          {listing && `| ${formatSize(listing.total_size)}`}
+        </span>
         <span>Session: {sessionId.slice(0, 8)}...</span>
       </div>
     </div>
