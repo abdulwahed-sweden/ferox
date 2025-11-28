@@ -13,7 +13,6 @@ import { useTauriEvents } from "./hooks/useTauriEvents";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useResizable } from "./hooks/useResizable";
 import {
-  Shield,
   Search,
   X,
   Package,
@@ -29,6 +28,7 @@ import {
   ClipboardList,
   Eye,
 } from "lucide-react";
+import { Logo } from "./components/ui/Logo";
 import { useState, useRef } from "react";
 import { clsx } from "clsx";
 
@@ -175,10 +175,7 @@ function App() {
     <div className="h-screen flex flex-col bg-dark-900 text-text-primary">
       {/* Header / Menu Bar */}
       <header className="h-10 bg-dark-800 border-b border-dark-600 flex items-center px-4 gap-4 select-none">
-        <div className="flex items-center gap-2 text-ferox-green">
-          <Shield size={18} />
-          <span className="font-semibold text-sm">Ferox C2</span>
-        </div>
+        <Logo variant="wordmark" size="md" color="auto" />
         <nav className="flex items-center gap-1 text-sm">
           <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
             File
@@ -395,7 +392,9 @@ function App() {
               </ErrorBoundary>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-text-muted">
-                <Shield size={64} className="mb-4 opacity-20" />
+                <div className="mb-4 opacity-20">
+                  <Logo variant="icon" size="xl" color="auto" />
+                </div>
                 <p className="text-lg">No session selected</p>
                 <p className="text-sm mt-2">
                   Double-click a session to open a terminal
