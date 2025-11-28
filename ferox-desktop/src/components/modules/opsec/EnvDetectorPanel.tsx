@@ -43,9 +43,9 @@ export function EnvDetectorPanel() {
   };
 
   const getSuspicionColor = (score: number) => {
-    if (score > 0.7) return 'text-red-400 bg-red-400/10';
-    if (score > 0.4) return 'text-yellow-400 bg-yellow-400/10';
-    return 'text-green-400 bg-green-400/10';
+    if (score > 0.7) return 'text-danger-text bg-danger-soft';
+    if (score > 0.4) return 'text-warning-text bg-warning-soft';
+    return 'text-success-text bg-success-soft';
   };
 
   return (
@@ -106,15 +106,15 @@ export function EnvDetectorPanel() {
               <div className="flex items-center gap-2">
                 {report.detectedVm ? (
                   <>
-                    <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                    <span className="text-lg font-medium text-yellow-400">
+                    <AlertTriangle className="w-5 h-5 text-warning-text" />
+                    <span className="text-lg font-medium text-warning-text">
                       {report.detectedVm}
                     </span>
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-lg font-medium text-green-400">
+                    <CheckCircle className="w-5 h-5 text-success-text" />
+                    <span className="text-lg font-medium text-success-text">
                       No VM Detected
                     </span>
                   </>
@@ -128,15 +128,15 @@ export function EnvDetectorPanel() {
               <div className="flex items-center gap-2">
                 {report.detectedSandbox ? (
                   <>
-                    <XCircle className="w-5 h-5 text-red-400" />
-                    <span className="text-lg font-medium text-red-400">
+                    <XCircle className="w-5 h-5 text-danger-text" />
+                    <span className="text-lg font-medium text-danger-text">
                       {report.detectedSandbox}
                     </span>
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-lg font-medium text-green-400">
+                    <CheckCircle className="w-5 h-5 text-success-text" />
+                    <span className="text-lg font-medium text-success-text">
                       No Sandbox Detected
                     </span>
                   </>
@@ -149,20 +149,20 @@ export function EnvDetectorPanel() {
           <div
             className={`rounded-lg p-4 border ${
               report.isSafeToExecute
-                ? 'bg-green-400/10 border-green-400/30'
-                : 'bg-red-400/10 border-red-400/30'
+                ? 'bg-success-soft border-green-400/30'
+                : 'bg-danger-soft border-red-400/30'
             }`}
           >
             <div className="flex items-center gap-3">
               {report.isSafeToExecute ? (
-                <Shield className="w-6 h-6 text-green-400" />
+                <Shield className="w-6 h-6 text-success-text" />
               ) : (
-                <AlertTriangle className="w-6 h-6 text-red-400" />
+                <AlertTriangle className="w-6 h-6 text-danger-text" />
               )}
               <div>
                 <p
                   className={`font-medium ${
-                    report.isSafeToExecute ? 'text-green-400' : 'text-red-400'
+                    report.isSafeToExecute ? 'text-success-text' : 'text-danger-text'
                   }`}
                 >
                   {report.isSafeToExecute
@@ -182,14 +182,14 @@ export function EnvDetectorPanel() {
           {report.analysisTools.length > 0 && (
             <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
               <h4 className="font-medium mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                <AlertTriangle className="w-4 h-4 text-warning-text" />
                 Analysis Tools Detected
               </h4>
               <div className="flex flex-wrap gap-2">
                 {report.analysisTools.map((tool, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1 bg-yellow-400/10 text-yellow-400 rounded-lg text-sm"
+                    className="px-3 py-1 bg-warning-soft text-warning-text rounded-lg text-sm"
                   >
                     {tool}
                   </span>
@@ -202,7 +202,7 @@ export function EnvDetectorPanel() {
           {report.timingAnomalies.length > 0 && (
             <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
               <h4 className="font-medium mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-orange-400" />
+                <Clock className="w-4 h-4 text-warning-text" />
                 Timing Anomalies
               </h4>
               <ul className="space-y-2">
@@ -211,7 +211,7 @@ export function EnvDetectorPanel() {
                     key={i}
                     className="flex items-center gap-2 text-sm text-text-secondary"
                   >
-                    <span className="w-1 h-1 bg-orange-400 rounded-full" />
+                    <span className="w-1 h-1 bg-warning-text rounded-full" />
                     {anomaly}
                   </li>
                 ))}

@@ -13,11 +13,11 @@ interface PulseIndicatorProps {
 }
 
 const statusColors: Record<StatusType, { dot: string; ring: string }> = {
-  active: { dot: 'bg-cyan-400', ring: 'bg-cyan-400/30' },
-  success: { dot: 'bg-green-400', ring: 'bg-green-400/30' },
-  warning: { dot: 'bg-yellow-400', ring: 'bg-yellow-400/30' },
-  error: { dot: 'bg-red-400', ring: 'bg-red-400/30' },
-  idle: { dot: 'bg-gray-400', ring: 'bg-gray-400/30' },
+  active: { dot: 'bg-info', ring: 'bg-info/30' },
+  success: { dot: 'bg-success', ring: 'bg-success/30' },
+  warning: { dot: 'bg-warning', ring: 'bg-warning/30' },
+  error: { dot: 'bg-danger', ring: 'bg-danger/30' },
+  idle: { dot: 'bg-[var(--content-tertiary)]', ring: 'bg-[var(--content-tertiary)]/30' },
 };
 
 const sizes = {
@@ -92,7 +92,7 @@ export function ConnectionIndicator({ connected, className = '' }: ConnectionInd
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <PulseIndicator status={connected ? 'success' : 'error'} size="sm" />
-      <span className={`text-sm ${connected ? 'text-green-400' : 'text-red-400'}`}>
+      <span className={`text-sm ${connected ? 'text-success-text' : 'text-danger-text'}`}>
         {connected ? 'Connected' : 'Disconnected'}
       </span>
     </div>

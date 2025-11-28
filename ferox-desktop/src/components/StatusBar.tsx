@@ -98,10 +98,10 @@ export function StatusBar() {
             <motion.div
               className={`h-full rounded-full ${
                 cpuUsage > 70
-                  ? 'bg-red-400'
+                  ? 'bg-danger-text'
                   : cpuUsage > 40
-                  ? 'bg-yellow-400'
-                  : 'bg-cyan-400'
+                  ? 'bg-warning-text'
+                  : 'bg-info-text'
               }`}
               initial={{ width: 0 }}
               animate={{ width: `${cpuUsage}%` }}

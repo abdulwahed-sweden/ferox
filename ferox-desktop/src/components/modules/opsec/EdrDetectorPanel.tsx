@@ -140,10 +140,10 @@ export function EdrDetectorPanel() {
               <p
                 className={`text-2xl font-bold ${
                   results.totalThreatLevel > 7
-                    ? 'text-red-400'
+                    ? 'text-danger-text'
                     : results.totalThreatLevel > 4
-                    ? 'text-yellow-400'
-                    : 'text-green-400'
+                    ? 'text-warning-text'
+                    : 'text-success-text'
                 }`}
               >
                 {results.totalThreatLevel}/10
@@ -160,10 +160,10 @@ export function EdrDetectorPanel() {
 
           {/* Detection List */}
           {(results.detectedEdrs?.length ?? 0) === 0 ? (
-            <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-400" />
+            <div className="flex items-center gap-3 p-4 bg-success-soft border border-green-500/30 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-success-text" />
               <div>
-                <p className="font-medium text-green-400">No EDR Detected</p>
+                <p className="font-medium text-success-text">No EDR Detected</p>
                 <p className="text-sm text-text-muted">
                   Environment appears clean for operation
                 </p>
@@ -186,10 +186,10 @@ export function EdrDetectorPanel() {
                       <AlertTriangle
                         className={`w-5 h-5 ${
                           edr.threatLevel > 7
-                            ? 'text-red-400'
+                            ? 'text-danger-text'
                             : edr.threatLevel > 4
-                            ? 'text-yellow-400'
-                            : 'text-green-400'
+                            ? 'text-warning-text'
+                            : 'text-success-text'
                         }`}
                       />
                       <div className="text-left">
@@ -203,10 +203,10 @@ export function EdrDetectorPanel() {
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           edr.threatLevel > 7
-                            ? 'bg-red-400/10 text-red-400'
+                            ? 'bg-danger-soft text-danger-text'
                             : edr.threatLevel > 4
-                            ? 'bg-yellow-400/10 text-yellow-400'
-                            : 'bg-green-400/10 text-green-400'
+                            ? 'bg-warning-soft text-warning-text'
+                            : 'bg-success-soft text-success-text'
                         }`}
                       >
                         Threat: {edr.threatLevel}/10

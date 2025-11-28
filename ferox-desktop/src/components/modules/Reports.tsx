@@ -55,21 +55,21 @@ export function Reports({ sessionId: _sessionId }: ReportsProps) {
             onClick={() => handleExport('JSON')}
             className="flex-1 py-3 bg-dark-700 border border-dark-600 rounded-lg hover:bg-dark-600 hover:border-dark-500 transition-colors flex items-center justify-center gap-2"
           >
-            <FileJson size={18} className="text-yellow-400" />
+            <FileJson size={18} className="text-warning-text" />
             <span className="text-sm font-medium text-text-primary">Export JSON</span>
           </button>
           <button
             onClick={() => handleExport('HTML')}
             className="flex-1 py-3 bg-dark-700 border border-dark-600 rounded-lg hover:bg-dark-600 hover:border-dark-500 transition-colors flex items-center justify-center gap-2"
           >
-            <FileCode size={18} className="text-orange-400" />
+            <FileCode size={18} className="text-warning-text" />
             <span className="text-sm font-medium text-text-primary">Export HTML</span>
           </button>
           <button
             onClick={() => handleExport('PDF')}
             className="flex-1 py-3 bg-dark-700 border border-dark-600 rounded-lg hover:bg-dark-600 hover:border-dark-500 transition-colors flex items-center justify-center gap-2"
           >
-            <FileText size={18} className="text-red-400" />
+            <FileText size={18} className="text-danger-text" />
             <span className="text-sm font-medium text-text-primary">Export PDF</span>
           </button>
         </div>
@@ -116,9 +116,9 @@ export function Reports({ sessionId: _sessionId }: ReportsProps) {
               className="bg-dark-800 rounded-lg p-4 border border-dark-600 flex items-center justify-between hover:bg-dark-700/50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                {report.type === 'JSON' && <FileJson size={20} className="text-yellow-400" />}
-                {report.type === 'HTML' && <FileCode size={20} className="text-orange-400" />}
-                {report.type === 'PDF' && <FileText size={20} className="text-red-400" />}
+                {report.type === 'JSON' && <FileJson size={20} className="text-warning-text" />}
+                {report.type === 'HTML' && <FileCode size={20} className="text-warning-text" />}
+                {report.type === 'PDF' && <FileText size={20} className="text-danger-text" />}
                 <div>
                   <div className="text-sm font-medium text-text-primary">{report.name}</div>
                   <div className="text-xs text-text-muted flex items-center gap-2">
@@ -130,7 +130,7 @@ export function Reports({ sessionId: _sessionId }: ReportsProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1 text-xs text-green-400">
+                <span className="flex items-center gap-1 text-xs text-success-text">
                   <CheckCircle size={12} />
                   {report.status}
                 </span>

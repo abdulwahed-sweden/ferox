@@ -97,9 +97,9 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
       {/* Header */}
       <div className="p-3 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
-          <Folder className="text-yellow-400" size={18} />
+          <Folder className="text-warning-text" size={18} />
           <h2 className="text-sm font-semibold text-text-primary">File Browser</h2>
-          <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">SIMULATION</span>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
           onClick={() => setShowHidden(!showHidden)}
           className={clsx(
             'p-1.5 rounded transition-colors',
-            showHidden ? 'bg-purple-500/20 text-purple-400' : 'hover:bg-dark-600'
+            showHidden ? 'bg-purple-soft text-purple-text' : 'hover:bg-dark-600'
           )}
           title={showHidden ? 'Hide hidden files' : 'Show hidden files'}
         >
@@ -207,7 +207,7 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
                   <td className="p-2">
                     <div className="flex items-center gap-2">
                       {file.file_type === 'directory' ? (
-                        <Folder size={16} className="text-yellow-400" />
+                        <Folder size={16} className="text-warning-text" />
                       ) : (
                         <File size={16} className="text-text-muted" />
                       )}
@@ -215,7 +215,7 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
                         {file.name}
                       </span>
                       {file.permissions.includes('------') && (
-                        <span title="Restricted"><Lock size={12} className="text-red-400" /></span>
+                        <span title="Restricted"><Lock size={12} className="text-danger-text" /></span>
                       )}
                     </div>
                   </td>

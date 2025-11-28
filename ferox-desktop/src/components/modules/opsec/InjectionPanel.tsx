@@ -173,10 +173,10 @@ export function InjectionPanel() {
                 <span
                   className={`px-2 py-0.5 rounded text-xs ${
                     tech.complexity === 'low'
-                      ? 'bg-green-400/10 text-green-400'
+                      ? 'bg-success-soft text-success-text'
                       : tech.complexity === 'medium'
-                      ? 'bg-yellow-400/10 text-yellow-400'
-                      : 'bg-red-400/10 text-red-400'
+                      ? 'bg-warning-soft text-warning-text'
+                      : 'bg-danger-soft text-danger-text'
                   }`}
                 >
                   {tech.complexity}
@@ -257,10 +257,10 @@ export function InjectionPanel() {
                     <span
                       className={`px-2 py-0.5 rounded text-xs ${
                         target.suitability > 7
-                          ? 'bg-green-400/10 text-green-400'
+                          ? 'bg-success-soft text-success-text'
                           : target.suitability > 4
-                          ? 'bg-yellow-400/10 text-yellow-400'
-                          : 'bg-red-400/10 text-red-400'
+                          ? 'bg-warning-soft text-warning-text'
+                          : 'bg-danger-soft text-danger-text'
                       }`}
                     >
                       Score: {target.suitability}/10
@@ -310,15 +310,15 @@ export function InjectionPanel() {
         <div
           className={`rounded-lg p-4 border ${
             result.success
-              ? 'bg-green-400/10 border-green-400/30'
-              : 'bg-red-400/10 border-red-400/30'
+              ? 'bg-success-soft border-green-400/30'
+              : 'bg-danger-soft border-red-400/30'
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
             {result.success ? (
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <CheckCircle className="w-5 h-5 text-success-text" />
             ) : (
-              <XCircle className="w-5 h-5 text-red-400" />
+              <XCircle className="w-5 h-5 text-danger-text" />
             )}
             <span className="font-medium">
               {result.success ? 'Injection Successful' : 'Injection Failed'}
@@ -332,11 +332,11 @@ export function InjectionPanel() {
       )}
 
       {/* Warning */}
-      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
+      <div className="bg-warning-soft border border-yellow-400/30 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-warning-text mt-0.5" />
           <div>
-            <p className="font-medium text-yellow-400">Security Notice</p>
+            <p className="font-medium text-warning-text">Security Notice</p>
             <p className="text-sm text-text-secondary mt-1">
               Process injection is a monitored technique. Use appropriate stealth
               level and avoid injecting into protected processes like lsass.exe.

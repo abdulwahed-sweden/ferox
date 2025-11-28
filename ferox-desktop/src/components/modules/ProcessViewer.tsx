@@ -109,9 +109,9 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
       {/* Header */}
       <div className="p-3 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
-          <Activity className="text-green-400" size={18} />
+          <Activity className="text-success-text" size={18} />
           <h2 className="text-sm font-semibold text-text-primary">Process Viewer</h2>
-          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <span className="text-xs bg-success-soft text-success-text px-2 py-0.5 rounded">SIMULATION</span>
         </div>
       </div>
 
@@ -149,11 +149,11 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
         {/* Stats */}
         <div className="flex items-center gap-3 pl-3 border-l border-dark-600 text-xs text-text-muted">
           <div className="flex items-center gap-1">
-            <Cpu size={12} className={totalCpu > 50 ? 'text-red-400' : 'text-green-400'} />
+            <Cpu size={12} className={totalCpu > 50 ? 'text-danger-text' : 'text-success-text'} />
             <span>{totalCpu.toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-1">
-            <HardDrive size={12} className={totalMemory > 50 ? 'text-red-400' : 'text-green-400'} />
+            <HardDrive size={12} className={totalMemory > 50 ? 'text-danger-text' : 'text-success-text'} />
             <span>{totalMemory.toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-1">
@@ -234,10 +234,10 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                     </div>
                   </td>
                   <td className="p-2 text-text-muted">{proc.user}</td>
-                  <td className={clsx('p-2 text-right', proc.cpu > 2 && 'text-yellow-400', proc.cpu > 5 && 'text-red-400')}>
+                  <td className={clsx('p-2 text-right', proc.cpu > 2 && 'text-warning-text', proc.cpu > 5 && 'text-danger-text')}>
                     {proc.cpu.toFixed(1)}
                   </td>
-                  <td className={clsx('p-2 text-right', proc.memory > 5 && 'text-yellow-400', proc.memory > 10 && 'text-red-400')}>
+                  <td className={clsx('p-2 text-right', proc.memory > 5 && 'text-warning-text', proc.memory > 10 && 'text-danger-text')}>
                     {proc.memory.toFixed(1)}
                   </td>
                   <td className="p-2 text-text-muted">{proc.threads}</td>
@@ -246,9 +246,9 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
                       className={clsx(
                         'text-xs px-1.5 py-0.5 rounded',
                         proc.status === 'running' && 'bg-ferox-green/20 text-ferox-green',
-                        proc.status === 'sleeping' && 'bg-blue-500/20 text-blue-400',
-                        proc.status === 'stopped' && 'bg-red-500/20 text-red-400',
-                        proc.status === 'zombie' && 'bg-purple-500/20 text-purple-400'
+                        proc.status === 'sleeping' && 'bg-info-soft text-info-text',
+                        proc.status === 'stopped' && 'bg-danger-soft text-danger-text',
+                        proc.status === 'zombie' && 'bg-purple-soft text-purple-text'
                       )}
                     >
                       {proc.status}

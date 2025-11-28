@@ -68,10 +68,10 @@ export function NetworkMap({ sessionId: _sessionId }: NetworkMapProps) {
               animate={{ rotate: isRefreshing ? 360 : 0 }}
               transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
             >
-              <Globe className="text-cyan-400" size={22} style={{ filter: 'drop-shadow(0 0 8px #00d4ff)' }} />
+              <Globe className="text-info-text" size={22} style={{ filter: 'drop-shadow(0 0 8px #00d4ff)' }} />
             </motion.div>
             <h2 className="text-lg font-semibold text-text-primary">Network Topology</h2>
-            <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">LIVE</span>
+            <span className="text-xs bg-info-soft text-info-text px-2 py-0.5 rounded">LIVE</span>
           </div>
 
           {/* Stats badges */}

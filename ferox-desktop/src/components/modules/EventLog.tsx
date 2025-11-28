@@ -77,22 +77,22 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'info': return 'text-blue-400';
-      case 'warn': return 'text-yellow-400';
-      case 'error': return 'text-red-400';
-      case 'success': return 'text-green-400';
-      case 'debug': return 'text-purple-400';
+      case 'info': return 'text-info-text';
+      case 'warn': return 'text-warning-text';
+      case 'error': return 'text-danger-text';
+      case 'success': return 'text-success-text';
+      case 'debug': return 'text-purple-text';
       default: return 'text-text-muted';
     }
   };
 
   const getLevelBg = (level: string) => {
     switch (level) {
-      case 'info': return 'bg-blue-500/10';
-      case 'warn': return 'bg-yellow-500/10';
-      case 'error': return 'bg-red-500/10';
-      case 'success': return 'bg-green-500/10';
-      case 'debug': return 'bg-purple-500/10';
+      case 'info': return 'bg-info-soft';
+      case 'warn': return 'bg-warning-soft';
+      case 'error': return 'bg-danger-soft';
+      case 'success': return 'bg-success-soft';
+      case 'debug': return 'bg-purple-soft';
       default: return 'bg-dark-700';
     }
   };
@@ -121,11 +121,11 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
       {/* Header */}
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
-          <FileText className="text-cyan-400" size={20} />
+          <FileText className="text-info-text" size={20} />
           <h2 className="text-lg font-semibold text-text-primary">Event Log</h2>
-          <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <span className="text-xs bg-info-soft text-info-text px-2 py-0.5 rounded">SIMULATION</span>
           <span className="text-xs text-text-muted ml-2">{logs.length} entries</span>
-          {isLoading && <RefreshCw size={12} className="text-cyan-400 animate-spin ml-2" />}
+          {isLoading && <RefreshCw size={12} className="text-info-text animate-spin ml-2" />}
         </div>
       </div>
 
@@ -136,8 +136,8 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
           className={clsx(
             'px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 transition-colors',
             isPaused
-              ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-              : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+              ? 'bg-success-soft text-success-text hover:bg-success-soft'
+              : 'bg-warning-soft text-warning-text hover:bg-warning-soft'
           )}
         >
           {isPaused ? <Play size={12} /> : <Pause size={12} />}
@@ -182,7 +182,7 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
 
         <button
           onClick={clearLogs}
-          className="px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 bg-dark-700 text-text-secondary hover:text-red-400 transition-colors"
+          className="px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 bg-dark-700 text-text-secondary hover:text-danger-text transition-colors"
         >
           <Trash2 size={12} />
           Clear
@@ -209,7 +209,7 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
                 <span className={clsx('mx-2 px-1.5 py-0.5 rounded text-[10px] uppercase', getLevelColor(log.level))}>
                   {log.level}
                 </span>
-                <span className="text-purple-400">[{log.module}]</span>
+                <span className="text-purple-text">[{log.module}]</span>
                 <span className="text-text-primary ml-2">{log.message}</span>
                 {log.session_id && (
                   <span className="text-text-muted ml-2">({log.session_id})</span>

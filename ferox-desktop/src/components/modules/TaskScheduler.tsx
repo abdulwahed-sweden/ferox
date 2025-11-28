@@ -80,31 +80,31 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'running': return <Play size={14} className="text-green-400" />;
-      case 'pending': return <Clock size={14} className="text-blue-400" />;
-      case 'completed': return <CheckCircle size={14} className="text-green-400" />;
-      case 'failed': return <XCircle size={14} className="text-red-400" />;
-      case 'paused': return <Pause size={14} className="text-yellow-400" />;
+      case 'running': return <Play size={14} className="text-success-text" />;
+      case 'pending': return <Clock size={14} className="text-info-text" />;
+      case 'completed': return <CheckCircle size={14} className="text-success-text" />;
+      case 'failed': return <XCircle size={14} className="text-danger-text" />;
+      case 'paused': return <Pause size={14} className="text-warning-text" />;
       default: return <AlertCircle size={14} className="text-text-muted" />;
     }
   };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'running': return 'bg-green-500/20 text-green-400';
-      case 'pending': return 'bg-blue-500/20 text-blue-400';
-      case 'completed': return 'bg-green-500/20 text-green-400';
-      case 'failed': return 'bg-red-500/20 text-red-400';
-      case 'paused': return 'bg-yellow-500/20 text-yellow-400';
+      case 'running': return 'bg-success-soft text-success-text';
+      case 'pending': return 'bg-info-soft text-info-text';
+      case 'completed': return 'bg-success-soft text-success-text';
+      case 'failed': return 'bg-danger-soft text-danger-text';
+      case 'paused': return 'bg-warning-soft text-warning-text';
       default: return 'bg-dark-600 text-text-muted';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'text-red-400';
-      case 'high': return 'text-orange-400';
-      case 'normal': return 'text-blue-400';
+      case 'critical': return 'text-danger-text';
+      case 'high': return 'text-warning-text';
+      case 'normal': return 'text-info-text';
       case 'low': return 'text-text-muted';
       default: return 'text-text-muted';
     }
@@ -116,10 +116,10 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="text-orange-400" size={20} />
+            <Clock className="text-warning-text" size={20} />
             <h2 className="text-lg font-semibold text-text-primary">Task Scheduler</h2>
-            <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">SIMULATION</span>
-            {isLoading && <RefreshCw size={12} className="text-orange-400 animate-spin ml-2" />}
+            <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">SIMULATION</span>
+            {isLoading && <RefreshCw size={12} className="text-warning-text animate-spin ml-2" />}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -132,7 +132,7 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-3 py-1.5 bg-orange-500 text-white rounded text-sm font-medium flex items-center gap-1.5 hover:bg-orange-600 transition-colors"
+              className="px-3 py-1.5 bg-warning-soft text-warning-text rounded text-sm font-medium flex items-center gap-1.5 hover:bg-warning-soft transition-colors"
             >
               <Plus size={14} />
               Add Task
@@ -198,7 +198,7 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
                 {task.last_result && (
                   <div className="mt-2 text-xs">
                     <span className="text-text-muted">Result: </span>
-                    <span className={task.last_result.includes('Error') ? 'text-red-400' : 'text-green-400'}>
+                    <span className={task.last_result.includes('Error') ? 'text-danger-text' : 'text-success-text'}>
                       {task.last_result}
                     </span>
                   </div>
@@ -214,7 +214,7 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
                   </button>
                   <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className="px-2 py-1 rounded text-xs flex items-center gap-1 bg-dark-700 text-text-secondary hover:text-red-400 transition-colors"
+                    className="px-2 py-1 rounded text-xs flex items-center gap-1 bg-dark-700 text-text-secondary hover:text-danger-text transition-colors"
                   >
                     <Trash2 size={12} />
                     Remove
@@ -281,7 +281,7 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
               </button>
               <button
                 onClick={handleAddTask}
-                className="px-4 py-2 bg-orange-500 text-white rounded text-sm font-medium hover:bg-orange-600 transition-colors"
+                className="px-4 py-2 bg-warning-soft text-warning-text rounded text-sm font-medium hover:bg-warning-soft transition-colors"
               >
                 Schedule Task
               </button>

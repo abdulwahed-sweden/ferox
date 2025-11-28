@@ -124,7 +124,7 @@ export function ExfilPanel() {
                   <span className="text-text-muted">Speed:</span>
                   <div className="flex-1 h-1 bg-dark-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-green-400 rounded-full"
+                      className="h-full bg-success-text rounded-full"
                       style={{ width: `${channel.bandwidthRating * 10}%` }}
                     />
                   </div>
@@ -315,12 +315,12 @@ export function ExfilPanel() {
                   <span
                     className={`px-2 py-0.5 rounded text-xs ${
                       session.status === 'Completed'
-                        ? 'bg-green-400/10 text-green-400'
+                        ? 'bg-success-soft text-success-text'
                         : session.status === 'Failed'
-                        ? 'bg-red-400/10 text-red-400'
+                        ? 'bg-danger-soft text-danger-text'
                         : session.status === 'InProgress'
-                        ? 'bg-cyan-400/10 text-cyan-400'
-                        : 'bg-yellow-400/10 text-yellow-400'
+                        ? 'bg-info-soft text-info-text'
+                        : 'bg-warning-soft text-warning-text'
                     }`}
                   >
                     {session.status}

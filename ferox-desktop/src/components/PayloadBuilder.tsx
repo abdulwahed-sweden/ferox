@@ -123,10 +123,10 @@ export function PayloadBuilder() {
   // Get risk level color
   const getRiskColor = (level: string) => {
     switch (level) {
-      case 'low': return 'text-green-400';
-      case 'medium': return 'text-yellow-400';
-      case 'high': return 'text-orange-400';
-      case 'critical': return 'text-red-400';
+      case 'low': return 'text-success-text';
+      case 'medium': return 'text-warning-text';
+      case 'high': return 'text-warning-text';
+      case 'critical': return 'text-danger-text';
       default: return 'text-text-muted';
     }
   };
@@ -134,9 +134,9 @@ export function PayloadBuilder() {
   // Get log level icon
   const getLogIcon = (level: string) => {
     switch (level) {
-      case 'success': return <CheckCircle size={14} className="text-green-400" />;
-      case 'warn': return <AlertTriangle size={14} className="text-yellow-400" />;
-      default: return <Info size={14} className="text-blue-400" />;
+      case 'success': return <CheckCircle size={14} className="text-success-text" />;
+      case 'warn': return <AlertTriangle size={14} className="text-warning-text" />;
+      default: return <Info size={14} className="text-info-text" />;
     }
   };
 
@@ -149,7 +149,7 @@ export function PayloadBuilder() {
           <h2 className="text-lg font-semibold text-text-primary">
             Payload Builder
           </h2>
-          <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">
+          <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">
             SIMULATION MODE
           </span>
         </div>
@@ -351,7 +351,7 @@ export function PayloadBuilder() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-text-primary flex items-center gap-2">
-                      <CheckCircle size={18} className="text-green-400" />
+                      <CheckCircle size={18} className="text-success-text" />
                       {result.name}
                     </h3>
                     <p className="text-xs text-text-muted mt-1">
@@ -428,8 +428,8 @@ export function PayloadBuilder() {
                         <span className="text-sm text-text-primary">{factor.name}</span>
                         <span className={clsx(
                           'text-xs',
-                          factor.score <= 30 ? 'text-green-400' :
-                          factor.score <= 60 ? 'text-yellow-400' : 'text-red-400'
+                          factor.score <= 30 ? 'text-success-text' :
+                          factor.score <= 60 ? 'text-warning-text' : 'text-danger-text'
                         )}>
                           {factor.score}/100
                         </span>
@@ -459,7 +459,7 @@ export function PayloadBuilder() {
                 expanded={expandedSections.detection}
                 onToggle={() => toggleSection('detection')}
                 badge={
-                  <span className="text-xs text-yellow-400">
+                  <span className="text-xs text-warning-text">
                     Est. Detection: {(result.detection_analysis.estimated_detection_rate * 100).toFixed(0)}%
                   </span>
                 }
@@ -469,7 +469,7 @@ export function PayloadBuilder() {
                     <h4 className="text-xs text-text-secondary mb-2">Likely Detectors</h4>
                     <div className="flex flex-wrap gap-2">
                       {result.detection_analysis.likely_detectors.map((d, i) => (
-                        <span key={i} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs">
+                        <span key={i} className="px-2 py-1 bg-danger-soft text-danger-text rounded text-xs">
                           {d}
                         </span>
                       ))}
@@ -507,7 +507,7 @@ export function PayloadBuilder() {
                   {result.mitre_mapping.map((mapping, i) => (
                     <div key={i} className="bg-dark-900 rounded p-3">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs font-mono">
+                        <span className="px-2 py-0.5 bg-purple-soft text-purple-text rounded text-xs font-mono">
                           {mapping.technique_id}
                         </span>
                         <span className="text-sm text-text-primary">{mapping.technique_name}</span>

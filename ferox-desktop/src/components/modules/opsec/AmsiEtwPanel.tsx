@@ -111,7 +111,7 @@ export function AmsiEtwPanel() {
           <div
             className={`px-3 py-1 rounded-lg text-sm font-medium ${
               status?.amsiBypass
-                ? 'bg-green-400/10 text-green-400'
+                ? 'bg-success-soft text-success-text'
                 : 'bg-dark-700 text-text-muted'
             }`}
           >
@@ -138,10 +138,10 @@ export function AmsiEtwPanel() {
                   <span
                     className={`px-2 py-0.5 rounded text-xs ${
                       technique.risk === 'low'
-                        ? 'bg-green-400/10 text-green-400'
+                        ? 'bg-success-soft text-success-text'
                         : technique.risk === 'medium'
-                        ? 'bg-yellow-400/10 text-yellow-400'
-                        : 'bg-red-400/10 text-red-400'
+                        ? 'bg-warning-soft text-warning-text'
+                        : 'bg-danger-soft text-danger-text'
                     }`}
                   >
                     {technique.risk} risk
@@ -170,15 +170,15 @@ export function AmsiEtwPanel() {
           <div
             className={`mt-4 p-3 rounded-lg border ${
               amsiResult.success
-                ? 'bg-green-400/10 border-green-400/30'
-                : 'bg-red-400/10 border-red-400/30'
+                ? 'bg-success-soft border-green-400/30'
+                : 'bg-danger-soft border-red-400/30'
             }`}
           >
             <div className="flex items-center gap-2">
               {amsiResult.success ? (
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="w-5 h-5 text-success-text" />
               ) : (
-                <XCircle className="w-5 h-5 text-red-400" />
+                <XCircle className="w-5 h-5 text-danger-text" />
               )}
               <span className="font-medium">
                 {amsiResult.success ? 'Bypass Successful' : 'Bypass Failed'}
@@ -206,7 +206,7 @@ export function AmsiEtwPanel() {
           <div
             className={`px-3 py-1 rounded-lg text-sm font-medium ${
               status?.etwPatched
-                ? 'bg-green-400/10 text-green-400'
+                ? 'bg-success-soft text-success-text'
                 : 'bg-dark-700 text-text-muted'
             }`}
           >
@@ -231,7 +231,7 @@ export function AmsiEtwPanel() {
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm">{provider.name}</span>
                   {provider.critical && (
-                    <AlertTriangle className="w-3 h-3 text-yellow-400" />
+                    <AlertTriangle className="w-3 h-3 text-warning-text" />
                   )}
                 </div>
                 <p className="text-xs text-text-muted mt-1">{provider.description}</p>
@@ -256,15 +256,15 @@ export function AmsiEtwPanel() {
           <div
             className={`mt-4 p-3 rounded-lg border ${
               etwResult.success
-                ? 'bg-green-400/10 border-green-400/30'
-                : 'bg-red-400/10 border-red-400/30'
+                ? 'bg-success-soft border-green-400/30'
+                : 'bg-danger-soft border-red-400/30'
             }`}
           >
             <div className="flex items-center gap-2">
               {etwResult.success ? (
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="w-5 h-5 text-success-text" />
               ) : (
-                <XCircle className="w-5 h-5 text-red-400" />
+                <XCircle className="w-5 h-5 text-danger-text" />
               )}
               <span className="font-medium">
                 {etwResult.success ? 'Patch Successful' : 'Patch Failed'}
@@ -288,11 +288,11 @@ export function AmsiEtwPanel() {
       </div>
 
       {/* Warning */}
-      <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
+      <div className="bg-warning-soft border border-yellow-400/30 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-yellow-400 mt-0.5" />
+          <Info className="w-5 h-5 text-warning-text mt-0.5" />
           <div>
-            <p className="font-medium text-yellow-400">Security Notice</p>
+            <p className="font-medium text-warning-text">Security Notice</p>
             <p className="text-sm text-text-secondary mt-1">
               These bypasses modify system behavior and may be detected by advanced
               EDR solutions. Use appropriate stealth level and verify environment

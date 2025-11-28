@@ -62,21 +62,21 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'password': return <Key size={14} className="text-green-400" />;
-      case 'hash': return <Hash size={14} className="text-purple-400" />;
-      case 'token': return <Shield size={14} className="text-blue-400" />;
-      case 'certificate': return <Database size={14} className="text-yellow-400" />;
-      case 'ticket': return <KeyRound size={14} className="text-orange-400" />;
+      case 'password': return <Key size={14} className="text-success-text" />;
+      case 'hash': return <Hash size={14} className="text-purple-text" />;
+      case 'token': return <Shield size={14} className="text-info-text" />;
+      case 'certificate': return <Database size={14} className="text-warning-text" />;
+      case 'ticket': return <KeyRound size={14} className="text-warning-text" />;
       default: return <Key size={14} />;
     }
   };
 
   const getSensitivityColor = (sensitivity: string) => {
     switch (sensitivity) {
-      case 'critical': return 'bg-red-500/20 text-red-400';
-      case 'high': return 'bg-orange-500/20 text-orange-400';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400';
-      case 'low': return 'bg-green-500/20 text-green-400';
+      case 'critical': return 'bg-danger-soft text-danger-text';
+      case 'high': return 'bg-warning-soft text-warning-text';
+      case 'medium': return 'bg-warning-soft text-warning-text';
+      case 'low': return 'bg-success-soft text-success-text';
       default: return 'bg-dark-600 text-text-muted';
     }
   };
@@ -95,14 +95,14 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <KeyRound className="text-yellow-400" size={20} />
+            <KeyRound className="text-warning-text" size={20} />
             <h2 className="text-lg font-semibold text-text-primary">Credentials Viewer</h2>
-            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">SIMULATION</span>
+            <span className="text-xs bg-warning-soft text-warning-text px-2 py-0.5 rounded">SIMULATION</span>
           </div>
           <button
             onClick={loadCredentials}
             disabled={isLoading}
-            className="px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium flex items-center gap-1.5 hover:bg-yellow-500/30 transition-colors disabled:opacity-50"
+            className="px-3 py-1.5 bg-warning-soft text-warning-text rounded text-xs font-medium flex items-center gap-1.5 hover:bg-warning-soft transition-colors disabled:opacity-50"
           >
             <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
             Refresh
@@ -140,7 +140,7 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
               className={clsx(
                 'px-3 py-1.5 rounded text-xs font-medium transition-colors',
                 selectedType === type.id
-                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
+                  ? 'bg-warning-soft text-warning-text border border-warning-soft'
                   : 'bg-dark-700 text-text-secondary border border-dark-600 hover:border-dark-500'
               )}
             >
@@ -165,7 +165,7 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
                         {cred.domain ? `${cred.domain}\\${cred.username}` : cred.username}
                       </span>
                       {cred.cracked && (
-                        <span title="Cracked"><CheckCircle size={12} className="text-green-400" /></span>
+                        <span title="Cracked"><CheckCircle size={12} className="text-success-text" /></span>
                       )}
                     </div>
                     <div className="text-xs text-text-muted mt-1">Source: {cred.source}</div>
@@ -208,8 +208,8 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
 
               {cred.cracked && cred.cracked_value && (
                 <div className="mt-2 flex items-center gap-2 text-xs">
-                  <span className="text-green-400">Cracked:</span>
-                  <code className="px-2 py-1 bg-green-500/10 rounded text-green-400 font-mono">
+                  <span className="text-success-text">Cracked:</span>
+                  <code className="px-2 py-1 bg-success-soft rounded text-success-text font-mono">
                     {cred.cracked_value}
                   </code>
                 </div>

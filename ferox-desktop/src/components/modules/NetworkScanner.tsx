@@ -49,17 +49,17 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
 
   const getPortStateColor = (state: string) => {
     switch (state) {
-      case 'open': return 'text-green-400';
-      case 'closed': return 'text-red-400';
-      case 'filtered': return 'text-yellow-400';
+      case 'open': return 'text-success-text';
+      case 'closed': return 'text-danger-text';
+      case 'filtered': return 'text-warning-text';
       default: return 'text-text-muted';
     }
   };
 
   const getLatencyColor = (ms: number) => {
-    if (ms < 10) return 'text-green-400';
-    if (ms < 50) return 'text-yellow-400';
-    return 'text-red-400';
+    if (ms < 10) return 'text-success-text';
+    if (ms < 50) return 'text-warning-text';
+    return 'text-danger-text';
   };
 
   return (
@@ -67,9 +67,9 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
       {/* Header */}
       <div className="p-4 border-b border-dark-600 bg-dark-800">
         <div className="flex items-center gap-2">
-          <Radar className="text-blue-400" size={20} />
+          <Radar className="text-info-text" size={20} />
           <h2 className="text-lg font-semibold text-text-primary">Network Scanner</h2>
-          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">SIMULATION</span>
+          <span className="text-xs bg-info-soft text-info-text px-2 py-0.5 rounded">SIMULATION</span>
         </div>
         <p className="text-xs text-text-muted mt-1">Simulated network discovery for demo/training</p>
       </div>
@@ -113,8 +113,8 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
               <Clock size={12} />
               {(scanResult.scan_duration_ms / 1000).toFixed(1)}s
             </span>
-            <span className="text-green-400">{scanResult.hosts_up} up</span>
-            <span className="text-red-400">{scanResult.hosts_down} down</span>
+            <span className="text-success-text">{scanResult.hosts_up} up</span>
+            <span className="text-danger-text">{scanResult.hosts_down} down</span>
           </div>
         )}
       </div>
@@ -141,7 +141,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <Server size={14} className={host.status === 'up' ? 'text-green-400' : 'text-red-400'} />
+                    <Server size={14} className={host.status === 'up' ? 'text-success-text' : 'text-danger-text'} />
                     <span className="text-sm font-medium text-text-primary">{host.ip}</span>
                     {host.status === 'up' && (
                       <span className={clsx('text-xs', getLatencyColor(host.latency_ms))}>
@@ -153,7 +153,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                   <div className="text-xs text-text-muted">{host.os}</div>
                   {host.status === 'up' && host.ports.length > 0 && (
                     <div className="flex items-center gap-1 mt-1">
-                      <span className="text-xs text-green-400">{host.ports.filter(p => p.state === 'open').length} open</span>
+                      <span className="text-xs text-success-text">{host.ports.filter(p => p.state === 'open').length} open</span>
                     </div>
                   )}
                 </button>
@@ -168,7 +168,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
             <div className="space-y-4">
               <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
                 <h3 className="text-lg font-semibold text-text-primary flex items-center gap-2">
-                  <Server size={18} className={selectedHost.status === 'up' ? 'text-green-400' : 'text-red-400'} />
+                  <Server size={18} className={selectedHost.status === 'up' ? 'text-success-text' : 'text-danger-text'} />
                   {selectedHost.ip}
                 </h3>
                 <div className="grid grid-cols-2 gap-4 mt-4">
@@ -194,7 +194,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                   </div>
                   <div>
                     <div className="text-xs text-text-muted">Status</div>
-                    <div className={clsx('text-sm', selectedHost.status === 'up' ? 'text-green-400' : 'text-red-400')}>
+                    <div className={clsx('text-sm', selectedHost.status === 'up' ? 'text-success-text' : 'text-danger-text')}>
                       {selectedHost.status.toUpperCase()}
                     </div>
                   </div>
@@ -233,7 +233,7 @@ export function NetworkScanner({ sessionId }: NetworkScannerProps) {
                         </div>
                         <div className="text-xs text-text-muted mt-1">{port.version}</div>
                         {port.banner && (
-                          <div className="text-xs text-purple-400 mt-1 font-mono">Banner: {port.banner}</div>
+                          <div className="text-xs text-purple-text mt-1 font-mono">Banner: {port.banner}</div>
                         )}
                       </div>
                     ))}

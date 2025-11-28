@@ -75,7 +75,7 @@ export function MemoryEvasionPanel() {
           <div
             className={`px-3 py-1 rounded-lg text-sm font-medium ${
               status?.memoryProtected
-                ? 'bg-green-400/10 text-green-400'
+                ? 'bg-success-soft text-success-text'
                 : 'bg-dark-700 text-text-muted'
             }`}
           >
@@ -117,12 +117,12 @@ export function MemoryEvasionPanel() {
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2 rounded-lg ${
-                      isEnabled ? 'bg-green-400/10' : 'bg-dark-700'
+                      isEnabled ? 'bg-success-soft' : 'bg-dark-700'
                     }`}
                   >
                     <Icon
                       className={`w-5 h-5 ${
-                        isEnabled ? 'text-green-400' : 'text-text-secondary'
+                        isEnabled ? 'text-success-text' : 'text-text-secondary'
                       }`}
                     />
                   </div>
@@ -131,7 +131,7 @@ export function MemoryEvasionPanel() {
                     <p className="text-xs text-text-muted">{technique.mitre}</p>
                   </div>
                 </div>
-                {isEnabled && <CheckCircle className="w-5 h-5 text-green-400" />}
+                {isEnabled && <CheckCircle className="w-5 h-5 text-success-text" />}
               </div>
 
               <p className="text-sm text-text-secondary mb-3">
@@ -159,8 +159,8 @@ export function MemoryEvasionPanel() {
                 <div
                   className={`p-2 rounded-lg text-sm ${
                     result.success
-                      ? 'bg-green-400/10 text-green-400'
-                      : 'bg-red-400/10 text-red-400'
+                      ? 'bg-success-soft text-success-text'
+                      : 'bg-danger-soft text-danger-text'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export function MemoryEvasionPanel() {
             <p className="text-xs text-text-muted">Hooks Detected</p>
           </div>
           <div className="p-3 bg-dark-700/50 rounded-lg">
-            <p className="text-xl font-bold text-green-400">Clean</p>
+            <p className="text-xl font-bold text-success-text">Clean</p>
             <p className="text-xs text-text-muted">Memory Status</p>
           </div>
         </div>

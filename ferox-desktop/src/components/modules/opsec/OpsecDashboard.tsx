@@ -24,10 +24,10 @@ import { ExfilPanel } from './ExfilPanel';
 import type { StealthLevel, OpsecStatus } from '../../../types/opsec';
 
 const STEALTH_COLORS: Record<StealthLevel, string> = {
-  Normal: 'text-green-400 bg-green-400/10 border-green-400/30',
-  Quiet: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  Silent: 'text-orange-400 bg-orange-400/10 border-orange-400/30',
-  Ghost: 'text-red-400 bg-red-400/10 border-red-400/30',
+  Normal: 'text-success-text bg-success-soft border-success-border',
+  Quiet: 'text-warning-text bg-warning-soft border-warning-border',
+  Silent: 'text-[var(--warning-text)] bg-[var(--warning-soft)] border-[var(--warning-border)]',
+  Ghost: 'text-danger-text bg-danger-soft border-danger-border',
 };
 
 const STEALTH_DESCRIPTIONS: Record<StealthLevel, string> = {
@@ -45,10 +45,10 @@ interface StatusIndicatorProps {
 
 function StatusIndicator({ label, status, count }: StatusIndicatorProps) {
   const colors = {
-    success: 'text-green-400',
-    warning: 'text-yellow-400',
-    error: 'text-red-400',
-    inactive: 'text-gray-500',
+    success: 'text-success-text',
+    warning: 'text-warning-text',
+    error: 'text-danger-text',
+    inactive: 'text-content-tertiary',
   };
 
   const icons = {
@@ -99,7 +99,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">Stealth Level</span>
               <span
                 className={`px-2 py-1 rounded text-sm font-medium ${
-                  status ? STEALTH_COLORS[status.stealthLevel] : 'text-gray-500'
+                  status ? STEALTH_COLORS[status.stealthLevel] : 'text-content-tertiary'
                 }`}
               >
                 {status?.stealthLevel || 'Unknown'}
@@ -107,7 +107,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-text-secondary">Safe to Execute</span>
-              <span className={status?.isSafe ? 'text-green-400' : 'text-red-400'}>
+              <span className={status?.isSafe ? 'text-success-text' : 'text-danger-text'}>
                 {status?.isSafe ? 'Yes' : 'No'}
               </span>
             </div>
@@ -131,8 +131,8 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.amsiBypass
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? 'text-success-text bg-success-soft'
+                    : 'text-content-tertiary bg-dark-700'
                 }`}
               >
                 {status?.amsiBypass ? 'Active' : 'Inactive'}
@@ -143,8 +143,8 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.etwPatched
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? 'text-success-text bg-success-soft'
+                    : 'text-content-tertiary bg-dark-700'
                 }`}
               >
                 {status?.etwPatched ? 'Yes' : 'No'}
@@ -155,8 +155,8 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span
                 className={`px-2 py-1 rounded text-sm ${
                   status?.memoryProtected
-                    ? 'text-green-400 bg-green-400/10'
-                    : 'text-gray-500 bg-dark-700'
+                    ? 'text-success-text bg-success-soft'
+                    : 'text-content-tertiary bg-dark-700'
                 }`}
               >
                 {status?.memoryProtected ? 'Yes' : 'No'}
@@ -173,7 +173,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">VM Detected</span>
               <span
                 className={
-                  status?.vmDetected ? 'text-yellow-400' : 'text-green-400'
+                  status?.vmDetected ? 'text-warning-text' : 'text-success-text'
                 }
               >
                 {status?.vmDetected || 'None'}
@@ -183,7 +183,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">Sandbox</span>
               <span
                 className={
-                  status?.sandboxDetected ? 'text-red-400' : 'text-green-400'
+                  status?.sandboxDetected ? 'text-danger-text' : 'text-success-text'
                 }
               >
                 {status?.sandboxDetected || 'None'}
@@ -193,7 +193,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
               <span className="text-text-secondary">EDR Products</span>
               <span
                 className={
-                  status?.edrDetected?.length ? 'text-yellow-400' : 'text-green-400'
+                  status?.edrDetected?.length ? 'text-warning-text' : 'text-success-text'
                 }
               >
                 {status?.edrDetected?.length || 0} detected
@@ -207,7 +207,7 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
       {status?.edrDetected && status.edrDetected.length > 0 && (
         <div className="bg-dark-800 rounded-lg p-4 border border-dark-600">
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-yellow-400" />
+            <AlertTriangle className="w-5 h-5 text-warning-text" />
             Detected Security Products
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -225,10 +225,10 @@ function OverviewPanel({ status, onRefresh, loading }: OverviewPanelProps) {
                 <div
                   className={`px-2 py-1 rounded text-xs ${
                     edr.threatLevel > 7
-                      ? 'bg-red-400/10 text-red-400'
+                      ? 'bg-danger-soft text-danger-text'
                       : edr.threatLevel > 4
-                      ? 'bg-yellow-400/10 text-yellow-400'
-                      : 'bg-green-400/10 text-green-400'
+                      ? 'bg-warning-soft text-warning-text'
+                      : 'bg-success-soft text-success-text'
                   }`}
                 >
                   Threat: {edr.threatLevel}/10
@@ -368,13 +368,13 @@ export function OpsecDashboard() {
       <div className="flex-1 overflow-auto p-4">
         {loading && (
           <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-cyan-400 border-t-transparent" />
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-info border-t-transparent" />
           </div>
         )}
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500 rounded-lg p-4 mb-4">
-            <p className="text-red-400">{error}</p>
+          <div className="bg-danger-soft border border-danger-border rounded-lg p-4 mb-4">
+            <p className="text-danger-text">{error}</p>
           </div>
         )}
 
