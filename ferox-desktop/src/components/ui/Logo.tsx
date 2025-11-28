@@ -1,29 +1,83 @@
 /**
- * Logo component - Theme-aware Ferox logo
+ * Logo component - Theme-aware Ferox fox logo
+ * Uses the new minimalist fox silhouette design with negative space details
  */
 
 import { useTheme } from "../../hooks/useTheme";
 
+export type LogoColor = "orange" | "white" | "dark" | "blue" | "auto";
+
 interface LogoProps {
   variant?: "full" | "icon";
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
+  color?: LogoColor;
 }
 
 const sizes = {
   sm: { full: "h-6", icon: "h-6 w-6" },
   md: { full: "h-8", icon: "h-8 w-8" },
   lg: { full: "h-10", icon: "h-10 w-10" },
+  xl: { full: "h-14", icon: "h-14 w-14" },
 };
+
+const colors: Record<LogoColor, { fill: string; bg: string }> = {
+  orange: { fill: "#E07B2E", bg: "#12161F" },
+  white: { fill: "#FFFFFF", bg: "#12161F" },
+  dark: { fill: "#12161F", bg: "#F0F2F5" },
+  blue: { fill: "#3B82F6", bg: "#12161F" },
+  auto: { fill: "", bg: "" }, // Will be determined by theme
+};
+
+// Fox head SVG path - main outline
+const FOX_HEAD_PATH = `M50 5
+  L20 25
+  L15 20
+  L10 35
+  L5 55
+  L15 70
+  L25 80
+  L35 88
+  L50 95
+  L65 88
+  L75 80
+  L85 70
+  L95 55
+  L90 35
+  L85 20
+  L80 25
+  L50 5
+  Z`;
+
+// Negative space paths
+const LEFT_EAR_PATH = "M25 28 L22 38 L28 45 L32 35 L25 28 Z";
+const RIGHT_EAR_PATH = "M75 28 L78 38 L72 45 L68 35 L75 28 Z";
+const LEFT_EYE_PATH = "M30 50 L25 55 L30 60 L38 55 L30 50 Z";
+const RIGHT_EYE_PATH = "M70 50 L75 55 L70 60 L62 55 L70 50 Z";
+const LEFT_CHEEK_PATH = "M18 58 L22 65 L28 62 L24 55 L18 58 Z";
+const RIGHT_CHEEK_PATH = "M82 58 L78 65 L72 62 L76 55 L82 58 Z";
 
 export function Logo({
   variant = "full",
   className = "",
   size = "md",
+  color = "auto",
 }: LogoProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const sizeClass = sizes[size][variant];
+
+  // Determine colors based on theme or explicit color choice
+  let fillColor: string;
+  let bgColor: string;
+
+  if (color === "auto") {
+    fillColor = isDark ? "#E07B2E" : "#12161F";
+    bgColor = isDark ? "#12161F" : "#F0F2F5";
+  } else {
+    fillColor = colors[color].fill;
+    bgColor = colors[color].bg;
+  }
 
   if (variant === "icon") {
     return (
@@ -31,106 +85,55 @@ export function Logo({
         viewBox="0 0 100 100"
         className={`${sizeClass} ${className}`}
         xmlns="http://www.w3.org/2000/svg"
+        aria-label="Ferox Logo"
       >
-        <defs>
-          <linearGradient
-            id="logoIconGradient"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
-          >
-            <stop offset="0%" stopColor={isDark ? "#60A5FA" : "#3B82F6"} />
-            <stop offset="100%" stopColor={isDark ? "#34D399" : "#10B981"} />
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r="48" fill={isDark ? "#12161F" : "#F4F5F7"} />
-        <g transform="translate(50, 50)">
-          <path
-            d="M0 -30 L25 5 L18 35 L0 28 L-18 35 L-25 5 Z"
-            fill="url(#logoIconGradient)"
-          />
-          <path d="M-25 5 L-32 -25 L-12 -10 Z" fill="url(#logoIconGradient)" />
-          <path d="M25 5 L32 -25 L12 -10 Z" fill="url(#logoIconGradient)" />
-          <ellipse
-            cx="-10"
-            cy="0"
-            rx="5"
-            ry="6"
-            fill={isDark ? "#12161F" : "#F4F5F7"}
-          />
-          <ellipse
-            cx="10"
-            cy="0"
-            rx="5"
-            ry="6"
-            fill={isDark ? "#12161F" : "#F4F5F7"}
-          />
-          <circle cx="-8" cy="-2" r="2" fill={isDark ? "#34D399" : "#10B981"} />
-          <circle cx="12" cy="-2" r="2" fill={isDark ? "#34D399" : "#10B981"} />
-        </g>
+        {/* Main fox head outline */}
+        <path d={FOX_HEAD_PATH} fill={fillColor} />
+
+        {/* Negative space details */}
+        <path d={LEFT_EAR_PATH} fill={bgColor} />
+        <path d={RIGHT_EAR_PATH} fill={bgColor} />
+        <path d={LEFT_EYE_PATH} fill={bgColor} />
+        <path d={RIGHT_EYE_PATH} fill={bgColor} />
+        <path d={LEFT_CHEEK_PATH} fill={bgColor} />
+        <path d={RIGHT_CHEEK_PATH} fill={bgColor} />
       </svg>
     );
   }
 
   // Full logo with text
+  const textColor = isDark ? "#F0F2F5" : "#111827";
+
   return (
     <svg
-      viewBox="0 0 200 60"
+      viewBox="0 0 280 100"
       className={`${sizeClass} ${className}`}
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="Ferox - Penetration Testing"
     >
-      <defs>
-        <linearGradient
-          id="logoFullGradient"
-          x1="0%"
-          y1="0%"
-          x2="100%"
-          y2="100%"
-        >
-          <stop offset="0%" stopColor={isDark ? "#60A5FA" : "#3B82F6"} />
-          <stop offset="100%" stopColor={isDark ? "#34D399" : "#10B981"} />
-        </linearGradient>
-      </defs>
-      <g transform="translate(5, 5)">
-        <path
-          d="M25 5 L40 25 L35 45 L25 40 L15 45 L10 25 Z"
-          fill="url(#logoFullGradient)"
-        />
-        <path d="M10 25 L5 8 L18 18 Z" fill="url(#logoFullGradient)" />
-        <path d="M40 25 L45 8 L32 18 Z" fill="url(#logoFullGradient)" />
-        <circle cx="18" cy="25" r="3" fill={isDark ? "#12161F" : "#FFFFFF"} />
-        <circle cx="32" cy="25" r="3" fill={isDark ? "#12161F" : "#FFFFFF"} />
-        <circle cx="19" cy="24" r="1" fill={isDark ? "#34D399" : "#10B981"} />
-        <circle cx="33" cy="24" r="1" fill={isDark ? "#34D399" : "#10B981"} />
-        <path
-          d="M25 32 L22 36 L28 36 Z"
-          fill={isDark ? "#12161F" : "#FFFFFF"}
-        />
+      {/* Fox Head Icon */}
+      <g transform="translate(0, 0)">
+        <path d={FOX_HEAD_PATH} fill={fillColor} />
+        <path d={LEFT_EAR_PATH} fill={bgColor} />
+        <path d={RIGHT_EAR_PATH} fill={bgColor} />
+        <path d={LEFT_EYE_PATH} fill={bgColor} />
+        <path d={RIGHT_EYE_PATH} fill={bgColor} />
+        <path d={LEFT_CHEEK_PATH} fill={bgColor} />
+        <path d={RIGHT_CHEEK_PATH} fill={bgColor} />
       </g>
-      <g transform="translate(60, 15)">
-        <text
-          x="0"
-          y="30"
-          fontFamily="Inter, system-ui, sans-serif"
-          fontSize="32"
-          fontWeight="700"
-          fill={isDark ? "#F0F2F5" : "#111827"}
-        >
-          FEROX
-        </text>
-        <text
-          x="2"
-          y="45"
-          fontFamily="Inter, system-ui, sans-serif"
-          fontSize="8"
-          fontWeight="400"
-          fill={isDark ? "#9CA3AF" : "#6B7280"}
-          letterSpacing="2"
-        >
-          PENETRATION TESTING
-        </text>
-      </g>
+
+      {/* FEROX Text */}
+      <text
+        x="110"
+        y="68"
+        fontFamily="Inter, system-ui, -apple-system, sans-serif"
+        fontSize="56"
+        fontWeight="700"
+        fill={textColor}
+        letterSpacing="-1"
+      >
+        FEROX
+      </text>
     </svg>
   );
 }
