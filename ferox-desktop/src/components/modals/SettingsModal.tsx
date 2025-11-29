@@ -58,23 +58,33 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Settings" size="lg">
-      <div className="flex gap-4 min-h-80">
+      <div className="flex gap-4" style={{ minHeight: "320px" }}>
         {/* Sidebar */}
-        <div className="w-40 shrink-0 border-r border-[var(--border-primary)] pr-4">
+        <div
+          className="shrink-0 pr-4"
+          style={{
+            width: "150px",
+            borderRight: "1px solid var(--border-primary)",
+          }}
+        >
           <nav className="space-y-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={clsx(
-                  "w-full flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors",
+                  "w-full flex items-center gap-2 px-3 py-2 rounded transition-colors",
                   activeTab === tab.id
                     ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
                 )}
+                style={{
+                  fontSize: "13px",
+                  whiteSpace: "nowrap",
+                }}
               >
-                <tab.icon size={16} />
-                {tab.label}
+                <tab.icon size={15} />
+                <span>{tab.label}</span>
               </button>
             ))}
           </nav>
@@ -83,46 +93,53 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         {/* Content */}
         <div className="flex-1">
           {activeTab === "appearance" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+                <h4
+                  className="mb-3"
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    color: "var(--text-primary)",
+                  }}
+                >
                   Theme
                 </h4>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     onClick={setLightTheme}
                     className={clsx(
-                      "flex flex-col items-center gap-2 p-3 rounded border transition-colors",
+                      "flex flex-col items-center gap-2 py-3 rounded border transition-colors",
                       theme === "light"
                         ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
                         : "border-[var(--border-primary)] hover:border-[var(--border-secondary)]"
                     )}
                   >
                     <Sun size={20} className="text-yellow-500" />
-                    <span className="text-xs text-[var(--text-secondary)]">
+                    <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
                       Light
                     </span>
                   </button>
                   <button
                     onClick={setDarkTheme}
                     className={clsx(
-                      "flex flex-col items-center gap-2 p-3 rounded border transition-colors",
+                      "flex flex-col items-center gap-2 py-3 rounded border transition-colors",
                       theme === "dark"
                         ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
                         : "border-[var(--border-primary)] hover:border-[var(--border-secondary)]"
                     )}
                   >
                     <Moon size={20} className="text-blue-400" />
-                    <span className="text-xs text-[var(--text-secondary)]">
+                    <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
                       Dark
                     </span>
                   </button>
                   <button
                     disabled
-                    className="flex flex-col items-center gap-2 p-3 rounded border border-[var(--border-primary)] opacity-50 cursor-not-allowed"
+                    className="flex flex-col items-center gap-2 py-3 rounded border border-[var(--border-primary)] opacity-50 cursor-not-allowed"
                   >
                     <Monitor size={20} className="text-[var(--text-muted)]" />
-                    <span className="text-xs text-[var(--text-muted)]">
+                    <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                       System
                     </span>
                   </button>
@@ -130,7 +147,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
 
               <div>
-                <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+                <h4
+                  className="mb-3"
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    color: "var(--text-primary)",
+                  }}
+                >
                   Accent Color
                 </h4>
                 <div className="flex gap-2">
@@ -150,7 +174,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     )
                   )}
                 </div>
-                <p className="text-xs text-[var(--text-muted)] mt-2">
+                <p
+                  className="mt-2"
+                  style={{ fontSize: "11px", color: "var(--text-muted)" }}
+                >
                   Custom accent colors coming soon
                 </p>
               </div>
@@ -159,7 +186,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {activeTab === "notifications" && (
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+              <h4
+                className="mb-3"
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: "var(--text-primary)",
+                }}
+              >
                 Notification Preferences
               </h4>
 
@@ -187,13 +221,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               ].map((item) => (
                 <label
                   key={item.key}
-                  className="flex items-center justify-between p-3 rounded bg-[var(--surface-secondary)] cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded cursor-pointer"
+                  style={{ backgroundColor: "var(--surface-secondary)" }}
                 >
                   <div>
-                    <p className="text-sm text-[var(--text-primary)]">
+                    <p style={{ fontSize: "13px", color: "var(--text-primary)" }}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-[var(--text-muted)]">
+                    <p style={{ fontSize: "11px", color: "var(--text-muted)" }}>
                       {item.desc}
                     </p>
                   </div>
@@ -208,7 +243,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         [item.key]: e.target.checked,
                       }))
                     }
-                    className="w-4 h-4 rounded border-[var(--border-primary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                    className="w-4 h-4 rounded"
                   />
                 </label>
               ))}
@@ -217,14 +252,26 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {activeTab === "security" && (
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+              <h4
+                className="mb-3"
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: "var(--text-primary)",
+                }}
+              >
                 Security Settings
               </h4>
 
-              <label className="flex items-center justify-between p-3 rounded bg-[var(--surface-secondary)] cursor-pointer">
+              <label
+                className="flex items-center justify-between p-3 rounded cursor-pointer"
+                style={{ backgroundColor: "var(--surface-secondary)" }}
+              >
                 <div>
-                  <p className="text-sm text-[var(--text-primary)]">Auto Lock</p>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p style={{ fontSize: "13px", color: "var(--text-primary)" }}>
+                    Auto Lock
+                  </p>
+                  <p style={{ fontSize: "11px", color: "var(--text-muted)" }}>
                     Lock app after inactivity
                   </p>
                 </div>
@@ -242,8 +289,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </label>
 
               {security.autoLock && (
-                <div className="p-3 rounded bg-[var(--surface-secondary)]">
-                  <label className="text-sm text-[var(--text-primary)]">
+                <div
+                  className="p-3 rounded"
+                  style={{ backgroundColor: "var(--surface-secondary)" }}
+                >
+                  <label style={{ fontSize: "13px", color: "var(--text-primary)" }}>
                     Lock Timeout (minutes)
                   </label>
                   <select
@@ -254,7 +304,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         lockTimeout: Number(e.target.value),
                       }))
                     }
-                    className="mt-1 w-full px-3 py-2 rounded bg-[var(--surface-primary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)]"
+                    className="mt-2 w-full rounded"
+                    style={{
+                      height: "38px",
+                      padding: "0 12px",
+                      fontSize: "13px",
+                      backgroundColor: "var(--surface-primary)",
+                      border: "1px solid var(--border-primary)",
+                      color: "var(--text-primary)",
+                    }}
                   >
                     <option value={1}>1 minute</option>
                     <option value={5}>5 minutes</option>
@@ -264,12 +322,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </div>
               )}
 
-              <label className="flex items-center justify-between p-3 rounded bg-[var(--surface-secondary)] cursor-pointer">
+              <label
+                className="flex items-center justify-between p-3 rounded cursor-pointer"
+                style={{ backgroundColor: "var(--surface-secondary)" }}
+              >
                 <div>
-                  <p className="text-sm text-[var(--text-primary)]">
+                  <p style={{ fontSize: "13px", color: "var(--text-primary)" }}>
                     Clear Data on Exit
                   </p>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p style={{ fontSize: "11px", color: "var(--text-muted)" }}>
                     Clear sensitive data when app closes
                   </p>
                 </div>
@@ -290,35 +351,66 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {activeTab === "data" && (
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+              <h4
+                className="mb-3"
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: "var(--text-primary)",
+                }}
+              >
                 Data Management
               </h4>
 
-              <div className="p-3 rounded bg-[var(--surface-secondary)]">
-                <p className="text-sm text-[var(--text-primary)]">
+              <div
+                className="p-3 rounded"
+                style={{ backgroundColor: "var(--surface-secondary)" }}
+              >
+                <p style={{ fontSize: "13px", color: "var(--text-primary)" }}>
                   Session Data
                 </p>
-                <p className="text-xs text-[var(--text-muted)] mb-2">
+                <p
+                  className="mb-3"
+                  style={{ fontSize: "11px", color: "var(--text-muted)" }}
+                >
                   Clear all stored session information
                 </p>
                 <button
                   onClick={() => toast.success("Session data cleared")}
-                  className="px-3 py-1.5 rounded bg-red-500/10 text-red-400 text-sm hover:bg-red-500/20 transition-colors"
+                  className="rounded transition-colors"
+                  style={{
+                    height: "32px",
+                    padding: "0 12px",
+                    fontSize: "12px",
+                    backgroundColor: "rgba(239, 68, 68, 0.1)",
+                    color: "#f87171",
+                  }}
                 >
                   Clear Sessions
                 </button>
               </div>
 
-              <div className="p-3 rounded bg-[var(--surface-secondary)]">
-                <p className="text-sm text-[var(--text-primary)]">
+              <div
+                className="p-3 rounded"
+                style={{ backgroundColor: "var(--surface-secondary)" }}
+              >
+                <p style={{ fontSize: "13px", color: "var(--text-primary)" }}>
                   Export Settings
                 </p>
-                <p className="text-xs text-[var(--text-muted)] mb-2">
+                <p
+                  className="mb-3"
+                  style={{ fontSize: "11px", color: "var(--text-muted)" }}
+                >
                   Export your settings as JSON
                 </p>
                 <button
                   onClick={() => toast.success("Settings exported")}
-                  className="px-3 py-1.5 rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-sm hover:bg-[var(--color-primary)]/20 transition-colors"
+                  className="rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
+                  style={{
+                    height: "32px",
+                    padding: "0 12px",
+                    fontSize: "12px",
+                  }}
                 >
                   Export Settings
                 </button>
@@ -329,19 +421,33 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-[var(--border-primary)]">
+      <div
+        className="flex justify-end gap-3 mt-4 pt-4"
+        style={{ borderTop: "1px solid var(--border-primary)" }}
+      >
         <button
           onClick={onClose}
-          className="px-4 py-2 rounded text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors"
+          className="rounded hover:bg-[var(--bg-hover)] transition-colors"
+          style={{
+            height: "36px",
+            padding: "0 16px",
+            fontSize: "13px",
+            color: "var(--text-secondary)",
+          }}
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-4 py-2 rounded bg-[var(--color-primary)] text-white text-sm hover:bg-[var(--color-primary)]/90 transition-colors"
+          className="flex items-center gap-2 rounded bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90 transition-colors"
+          style={{
+            height: "36px",
+            padding: "0 16px",
+            fontSize: "13px",
+          }}
         >
           <Save size={14} />
-          Save Changes
+          <span>Save Changes</span>
         </button>
       </div>
     </Modal>

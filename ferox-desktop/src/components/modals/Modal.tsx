@@ -80,7 +80,14 @@ export function Modal({
               sizeClasses[size]
             )}
           >
-            <div className="bg-[var(--surface-primary)] border border-[var(--border-primary)] rounded-lg shadow-2xl">
+            <div
+              className="rounded-lg"
+              style={{
+                backgroundColor: "var(--surface-primary)",
+                border: "1px solid var(--border-primary)",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              }}
+            >
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)]">
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">

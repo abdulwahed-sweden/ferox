@@ -99,6 +99,9 @@
     --surface-input: #ffffff;
     --surface-hover: #f0f1f3;
     --surface-active: #e5e7eb;
+    /* Primary/Secondary surfaces for components */
+    --surface-primary: #ffffff;
+    --surface-secondary: #f4f5f7;
 
     /* Theme-Guide Aliases - Background */
     --bg-base: #f4f5f7;
@@ -382,6 +385,9 @@
     --surface-input: #1a1f2b;
     --surface-hover: #2a3142;
     --surface-active: #323a4d;
+    /* Primary/Secondary surfaces for components */
+    --surface-primary: #1a1f2b;
+    --surface-secondary: #242a38;
 
     /* Theme-Guide Aliases - Background */
     --bg-base: #12161f;

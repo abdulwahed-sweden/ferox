@@ -150,24 +150,30 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="New Session" size="md">
       {/* Connection Method Tabs */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-5">
         {[
-          { id: "demo", label: "Demo Session", icon: Plus },
-          { id: "direct", label: "Direct Connect", icon: Globe },
-          { id: "listener", label: "Start Listener", icon: Wifi },
+          { id: "demo", label: "Demo", icon: Plus },
+          { id: "direct", label: "Direct", icon: Globe },
+          { id: "listener", label: "Listener", icon: Wifi },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setMethod(tab.id as ConnectionMethod)}
             className={clsx(
-              "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded text-sm transition-colors",
+              "flex-1 flex items-center justify-center gap-2 rounded transition-colors",
               method === tab.id
                 ? "bg-[var(--color-primary)] text-white"
-                : "bg-[var(--surface-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
             )}
+            style={{
+              height: "36px",
+              fontSize: "13px",
+              fontWeight: 500,
+              backgroundColor: method === tab.id ? undefined : "var(--surface-secondary)",
+            }}
           >
             <tab.icon size={14} />
-            {tab.label}
+            <span style={{ whiteSpace: "nowrap" }}>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -204,7 +210,10 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
       {method === "direct" && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-[var(--text-secondary)] mb-1">
+            <label
+              className="block mb-1.5"
+              style={{ fontSize: "13px", color: "var(--text-secondary)" }}
+            >
               Target IP Address *
             </label>
             <input
@@ -212,12 +221,23 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
               value={formData.ipAddress}
               onChange={(e) => handleFormChange("ipAddress", e.target.value)}
               placeholder="192.168.1.100"
-              className="w-full px-3 py-2 rounded bg-[var(--surface-secondary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full rounded focus:outline-none"
+              style={{
+                height: "38px",
+                padding: "0 12px",
+                fontSize: "13px",
+                backgroundColor: "var(--surface-secondary)",
+                border: "1px solid var(--border-primary)",
+                color: "var(--text-primary)",
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-sm text-[var(--text-secondary)] mb-1">
+            <label
+              className="block mb-1.5"
+              style={{ fontSize: "13px", color: "var(--text-secondary)" }}
+            >
               Hostname *
             </label>
             <input
@@ -225,12 +245,23 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
               value={formData.hostname}
               onChange={(e) => handleFormChange("hostname", e.target.value)}
               placeholder="target-server"
-              className="w-full px-3 py-2 rounded bg-[var(--surface-secondary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full rounded focus:outline-none"
+              style={{
+                height: "38px",
+                padding: "0 12px",
+                fontSize: "13px",
+                backgroundColor: "var(--surface-secondary)",
+                border: "1px solid var(--border-primary)",
+                color: "var(--text-primary)",
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-sm text-[var(--text-secondary)] mb-1">
+            <label
+              className="block mb-1.5"
+              style={{ fontSize: "13px", color: "var(--text-secondary)" }}
+            >
               Operating System
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -239,14 +270,14 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
                   key={os.value}
                   onClick={() => handleFormChange("os", os.value)}
                   className={clsx(
-                    "flex flex-col items-center gap-1 p-2 rounded border transition-colors",
+                    "flex flex-col items-center gap-1.5 py-2.5 rounded border transition-colors",
                     formData.os === os.value
                       ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
                       : "border-[var(--border-primary)] hover:border-[var(--border-secondary)]"
                   )}
                 >
-                  <os.icon size={16} className="text-[var(--text-secondary)]" />
-                  <span className="text-xs text-[var(--text-secondary)]">
+                  <os.icon size={18} className="text-[var(--text-secondary)]" />
+                  <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
                     {os.label}
                   </span>
                 </button>
@@ -256,7 +287,10 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-[var(--text-secondary)] mb-1">
+              <label
+                className="block mb-1.5"
+                style={{ fontSize: "13px", color: "var(--text-secondary)" }}
+              >
                 Username
               </label>
               <input
@@ -264,11 +298,22 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
                 value={formData.username}
                 onChange={(e) => handleFormChange("username", e.target.value)}
                 placeholder="admin"
-                className="w-full px-3 py-2 rounded bg-[var(--surface-secondary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]"
+                className="w-full rounded focus:outline-none"
+                style={{
+                  height: "38px",
+                  padding: "0 12px",
+                  fontSize: "13px",
+                  backgroundColor: "var(--surface-secondary)",
+                  border: "1px solid var(--border-primary)",
+                  color: "var(--text-primary)",
+                }}
               />
             </div>
             <div>
-              <label className="block text-sm text-[var(--text-secondary)] mb-1">
+              <label
+                className="block mb-1.5"
+                style={{ fontSize: "13px", color: "var(--text-secondary)" }}
+              >
                 Port
               </label>
               <input
@@ -277,7 +322,15 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
                 onChange={(e) =>
                   handleFormChange("port", parseInt(e.target.value))
                 }
-                className="w-full px-3 py-2 rounded bg-[var(--surface-secondary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-primary)]"
+                className="w-full rounded focus:outline-none"
+                style={{
+                  height: "38px",
+                  padding: "0 12px",
+                  fontSize: "13px",
+                  backgroundColor: "var(--surface-secondary)",
+                  border: "1px solid var(--border-primary)",
+                  color: "var(--text-primary)",
+                }}
               />
             </div>
           </div>
@@ -287,44 +340,84 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
       {/* Listener Mode */}
       {method === "listener" && (
         <div className="space-y-4">
-          <div className="p-4 rounded bg-[var(--surface-secondary)]">
+          <div
+            className="p-4 rounded"
+            style={{ backgroundColor: "var(--surface-secondary)" }}
+          >
             <div className="flex items-center gap-2 mb-2">
               <Wifi size={16} className="text-[var(--color-primary)]" />
-              <span className="text-sm font-medium text-[var(--text-primary)]">
+              <span
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "var(--text-primary)",
+                }}
+              >
                 Listener Configuration
               </span>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] mb-4">
+            <p
+              className="mb-4"
+              style={{ fontSize: "12px", color: "var(--text-secondary)" }}
+            >
               Start a listener to wait for incoming connections from implants.
             </p>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">
+                <label
+                  className="block mb-1.5"
+                  style={{ fontSize: "12px", color: "var(--text-secondary)" }}
+                >
                   Listen Address
                 </label>
                 <input
                   type="text"
                   defaultValue="0.0.0.0"
-                  className="w-full px-3 py-2 rounded bg-[var(--surface-primary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-primary)]"
+                  className="w-full rounded focus:outline-none"
+                  style={{
+                    height: "38px",
+                    padding: "0 12px",
+                    fontSize: "13px",
+                    backgroundColor: "var(--surface-primary)",
+                    border: "1px solid var(--border-primary)",
+                    color: "var(--text-primary)",
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">
+                <label
+                  className="block mb-1.5"
+                  style={{ fontSize: "12px", color: "var(--text-secondary)" }}
+                >
                   Listen Port
                 </label>
                 <input
                   type="number"
                   defaultValue={4444}
-                  className="w-full px-3 py-2 rounded bg-[var(--surface-primary)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-primary)]"
+                  className="w-full rounded focus:outline-none"
+                  style={{
+                    height: "38px",
+                    padding: "0 12px",
+                    fontSize: "13px",
+                    backgroundColor: "var(--surface-primary)",
+                    border: "1px solid var(--border-primary)",
+                    color: "var(--text-primary)",
+                  }}
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 p-3 rounded bg-yellow-500/10 border border-yellow-500/20">
-            <Key size={14} className="text-yellow-500" />
-            <span className="text-xs text-yellow-500">
+          <div
+            className="flex items-center gap-2 p-3 rounded"
+            style={{
+              backgroundColor: "rgba(234, 179, 8, 0.1)",
+              border: "1px solid rgba(234, 179, 8, 0.2)",
+            }}
+          >
+            <Key size={14} style={{ color: "#eab308" }} />
+            <span style={{ fontSize: "12px", color: "#eab308" }}>
               Listener mode requires proper authorization and network access
             </span>
           </div>
@@ -333,10 +426,19 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
 
       {/* Footer */}
       {method !== "demo" && (
-        <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-[var(--border-primary)]">
+        <div
+          className="flex justify-end gap-3 mt-6 pt-4"
+          style={{ borderTop: "1px solid var(--border-primary)" }}
+        >
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors"
+            className="rounded hover:bg-[var(--bg-hover)] transition-colors"
+            style={{
+              height: "36px",
+              padding: "0 16px",
+              fontSize: "13px",
+              color: "var(--text-secondary)",
+            }}
           >
             Cancel
           </button>
@@ -344,26 +446,31 @@ export function NewSessionModal({ isOpen, onClose }: NewSessionModalProps) {
             onClick={handleConnect}
             disabled={isConnecting}
             className={clsx(
-              "flex items-center gap-2 px-4 py-2 rounded text-sm text-white transition-colors",
+              "flex items-center gap-2 rounded text-white transition-colors",
               isConnecting
                 ? "bg-[var(--color-primary)]/50 cursor-not-allowed"
                 : "bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90"
             )}
+            style={{
+              height: "36px",
+              padding: "0 16px",
+              fontSize: "13px",
+            }}
           >
             {isConnecting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Connecting...
+                <span>Connecting...</span>
               </>
             ) : method === "listener" ? (
               <>
                 <Wifi size={14} />
-                Start Listener
+                <span>Start Listener</span>
               </>
             ) : (
               <>
                 <Globe size={14} />
-                Connect
+                <span>Connect</span>
               </>
             )}
           </button>

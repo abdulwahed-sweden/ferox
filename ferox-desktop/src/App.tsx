@@ -179,7 +179,13 @@ function App() {
   return (
     <div className="h-screen flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)]">
       {/* Header / Menu Bar */}
-      <header className="h-10 bg-[var(--surface-primary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-4 select-none">
+      <header
+        className="h-10 flex items-center px-4 gap-4 select-none"
+        style={{
+          backgroundColor: "var(--surface-primary)",
+          borderBottom: "1px solid var(--border-primary)",
+        }}
+      >
         <Logo variant="wordmark" size="md" color="auto" />
         <MenuBar
           onNewSession={() => setShowNewSession(true)}
@@ -200,8 +206,11 @@ function App() {
         {/* Sidebar - Session Tree */}
         {sidebarVisible && (
           <aside
-            className="bg-[var(--surface-primary)] flex flex-col relative"
-            style={{ width: sidebarWidth }}
+            className="flex flex-col relative"
+            style={{
+              width: sidebarWidth,
+              backgroundColor: "var(--surface-primary)",
+            }}
           >
             <div className="p-3 border-b border-[var(--border-primary)]">
               <div className="flex items-center justify-between mb-2">

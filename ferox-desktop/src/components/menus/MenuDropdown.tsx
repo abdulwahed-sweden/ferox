@@ -91,14 +91,24 @@ export function MenuDropdown({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.1 }}
-            style={{ top: position.top, left: position.left }}
-            className="fixed z-50 min-w-48 py-1 bg-[var(--surface-primary)] border border-[var(--border-primary)] rounded-lg shadow-xl"
+            className="fixed z-50 rounded-lg"
+            style={{
+              top: position.top,
+              left: position.left,
+              minWidth: "220px",
+              maxWidth: "320px",
+              padding: "4px",
+              backgroundColor: "var(--surface-primary)",
+              border: "1px solid var(--border-primary)",
+              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2)",
+            }}
           >
             {items.map((item, index) =>
               item.separator ? (
                 <div
                   key={`sep-${index}`}
-                  className="h-px bg-[var(--border-primary)] my-1"
+                  className="h-px my-1"
+                  style={{ backgroundColor: "var(--border-primary)" }}
                 />
               ) : (
                 <button
@@ -106,20 +116,37 @@ export function MenuDropdown({
                   onClick={() => handleItemClick(item)}
                   disabled={item.disabled}
                   className={clsx(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
+                    "w-full flex items-center px-3 py-2 rounded transition-colors",
                     item.disabled
-                      ? "text-[var(--text-muted)] cursor-not-allowed"
+                      ? "cursor-not-allowed"
                       : item.danger
-                        ? "text-red-400 hover:bg-red-500/10"
-                        : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                        ? "hover:bg-red-500/10"
+                        : "hover:bg-[var(--bg-hover)]"
                   )}
+                  style={{
+                    fontSize: "13px",
+                    lineHeight: "1.4",
+                    whiteSpace: "nowrap",
+                    color: item.disabled
+                      ? "var(--text-muted)"
+                      : item.danger
+                        ? "#f87171"
+                        : "var(--text-secondary)",
+                  }}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 flex-shrink-0">
                     {item.icon}
-                    {item.label}
+                    <span>{item.label}</span>
                   </span>
                   {item.shortcut && (
-                    <span className="text-xs text-[var(--text-muted)] ml-4">
+                    <span
+                      className="ml-auto pl-4 flex-shrink-0"
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--text-muted)",
+                        opacity: 0.7,
+                      }}
+                    >
                       {item.shortcut}
                     </span>
                   )}
