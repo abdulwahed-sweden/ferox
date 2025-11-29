@@ -8,6 +8,7 @@ import {
   intensityDescriptions,
   discoveryTypeLabels,
   discoveryTypeColors,
+  mobilePlatformLabels,
 } from "../types/workflow";
 import type {
   AssessmentTargetType,
@@ -40,6 +41,8 @@ import {
   Check,
   AlertTriangle,
   Info,
+  Smartphone,
+  Upload,
 } from "lucide-react";
 
 // Step indicator component
@@ -160,6 +163,7 @@ function TemplateCard({
     globe: <Globe size={24} />,
     layout: <Layout size={24} />,
     network: <Network size={24} />,
+    smartphone: <Smartphone size={24} />,
   };
 
   return (
@@ -239,6 +243,7 @@ function TargetStep() {
     target,
     authorized,
     authorizationRef,
+    mobilePlatform,
     setTargetType,
     setTarget,
     setAuthorized,
@@ -253,6 +258,7 @@ function TargetStep() {
     "domain",
     "url",
     "cidr_range",
+    "mobile_app",
   ];
 
   return (
@@ -283,7 +289,7 @@ function TargetStep() {
           <Target size={16} className="text-blue-400" />
           Target Type
         </h3>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {targetTypes.map((type) => (
             <button
               key={type}
@@ -304,23 +310,70 @@ function TargetStep() {
       {/* Target Input */}
       <div>
         <label className="block text-sm font-medium text-text-primary mb-2">
-          Target
+          {targetType === "mobile_app" ? "Mobile App File" : "Target"}
         </label>
-        <input
-          type="text"
-          value={target}
-          onChange={(e) => setTarget(e.target.value)}
-          placeholder={
-            targetType === "ip_address"
-              ? "192.168.1.1"
-              : targetType === "domain"
-                ? "example.com"
-                : targetType === "url"
-                  ? "https://example.com"
-                  : "192.168.1.0/24"
-          }
-          className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-ferox-green/50"
-        />
+        {targetType === "mobile_app" ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={target}
+                onChange={(e) => setTarget(e.target.value)}
+                placeholder="/path/to/app.apk or /path/to/app.ipa"
+                className="flex-1 px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-ferox-green/50"
+              />
+              <button
+                type="button"
+                className="px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-text-secondary hover:bg-dark-600 transition-colors flex items-center gap-2"
+                title="Browse for file"
+              >
+                <Upload size={18} />
+                Browse
+              </button>
+            </div>
+            {target && mobilePlatform && (
+              <div className="flex items-center gap-2 text-sm">
+                <Smartphone size={16} className={clsx(
+                  mobilePlatform === "android" && "text-green-400",
+                  mobilePlatform === "ios" && "text-blue-400",
+                  mobilePlatform === "unknown" && "text-yellow-400",
+                )} />
+                <span className="text-text-secondary">
+                  Detected Platform:{" "}
+                  <span className={clsx(
+                    "font-medium",
+                    mobilePlatform === "android" && "text-green-400",
+                    mobilePlatform === "ios" && "text-blue-400",
+                    mobilePlatform === "unknown" && "text-yellow-400",
+                  )}>
+                    {mobilePlatformLabels[mobilePlatform]}
+                  </span>
+                </span>
+                {mobilePlatform === "unknown" && (
+                  <span className="text-xs text-yellow-400">
+                    (File should end with .apk or .ipa)
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <input
+            type="text"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder={
+              targetType === "ip_address"
+                ? "192.168.1.1"
+                : targetType === "domain"
+                  ? "example.com"
+                  : targetType === "url"
+                    ? "https://example.com"
+                    : "192.168.1.0/24"
+            }
+            className="w-full px-4 py-3 bg-dark-700 border border-dark-600 rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-ferox-green/50"
+          />
+        )}
       </div>
 
       {/* Authorization */}
@@ -364,14 +417,16 @@ function TargetStep() {
 
 // Step 2: Scope Selection
 function ScopeStep() {
-  const { scope, intensity, setScope, setIntensity } = useWorkflowStore();
+  const { scope, intensity, targetType, setScope, setIntensity } = useWorkflowStore();
 
-  const scopes: AssessmentScope[] = [
-    "passive_recon",
-    "active_recon",
-    "discovery",
-    "comprehensive",
-  ];
+  const scopes: AssessmentScope[] = targetType === "mobile_app"
+    ? ["mobile_analysis"]
+    : [
+        "passive_recon",
+        "active_recon",
+        "discovery",
+        "comprehensive",
+      ];
   const intensities: ScanIntensity[] = ["quiet", "normal", "aggressive"];
 
   return (
@@ -585,6 +640,7 @@ function ReviewStep() {
     selectedModules,
     authorized,
     authorizationRef,
+    mobilePlatform,
   } = useWorkflowStore();
 
   const enabledModules = selectedModules.filter((m) => m.enabled);
@@ -603,12 +659,21 @@ function ReviewStep() {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-text-muted">Target:</span>
-            <p className="text-text-primary font-medium mt-1">{target}</p>
+            <p className="text-text-primary font-medium mt-1 break-all">{target}</p>
           </div>
           <div>
             <span className="text-text-muted">Type:</span>
             <p className="text-text-primary font-medium mt-1">
               {targetTypeLabels[targetType]}
+              {targetType === "mobile_app" && mobilePlatform && (
+                <span className={clsx(
+                  "ml-2 text-xs",
+                  mobilePlatform === "android" && "text-green-400",
+                  mobilePlatform === "ios" && "text-blue-400",
+                )}>
+                  ({mobilePlatformLabels[mobilePlatform]})
+                </span>
+              )}
             </p>
           </div>
           <div>
@@ -1078,6 +1143,60 @@ function generateSimulatedDiscoveries(module: WorkflowModule): Discovery[] {
         discovery_type: "asn_info",
         value: "AS15169 - Google LLC",
         details: { asn: "15169", org: "Google LLC" },
+        importance: 4,
+      });
+      break;
+    case "mobile/apk_analyzer":
+      discoveries.push({
+        discovery_type: "vulnerability",
+        value: "Application is debuggable (android:debuggable=true)",
+        details: { severity: "High", owasp_mobile: "M1", cwe: "CWE-489" },
+        importance: 8,
+      });
+      discoveries.push({
+        discovery_type: "misconfiguration",
+        value: "Backup allowed (android:allowBackup=true)",
+        details: { severity: "Medium", owasp_mobile: "M2" },
+        importance: 6,
+      });
+      discoveries.push({
+        discovery_type: "technology",
+        value: "minSdkVersion: 21, targetSdkVersion: 33",
+        details: { platform: "Android" },
+        importance: 3,
+      });
+      break;
+    case "mobile/ipa_analyzer":
+      discoveries.push({
+        discovery_type: "vulnerability",
+        value: "get-task-allow entitlement enabled (debug build)",
+        details: { severity: "High", owasp_mobile: "M1" },
+        importance: 8,
+      });
+      discoveries.push({
+        discovery_type: "misconfiguration",
+        value: "App Transport Security allows arbitrary loads",
+        details: { severity: "Medium", owasp_mobile: "M3" },
+        importance: 6,
+      });
+      discoveries.push({
+        discovery_type: "technology",
+        value: "MinimumOSVersion: 13.0",
+        details: { platform: "iOS" },
+        importance: 3,
+      });
+      break;
+    case "mobile/app_recon":
+      discoveries.push({
+        discovery_type: "technology",
+        value: "Firebase SDK detected",
+        details: { sdk_type: "Analytics" },
+        importance: 4,
+      });
+      discoveries.push({
+        discovery_type: "technology",
+        value: "Facebook SDK detected",
+        details: { sdk_type: "Social" },
         importance: 4,
       });
       break;

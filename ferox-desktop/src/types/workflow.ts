@@ -6,14 +6,19 @@ export type AssessmentTargetType =
   | "domain"
   | "url"
   | "cidr_range"
-  | "multi_target";
+  | "multi_target"
+  | "mobile_app";
+
+// Mobile platform type
+export type MobilePlatform = "android" | "ios" | "unknown";
 
 // Assessment scope
 export type AssessmentScope =
   | "passive_recon"
   | "active_recon"
   | "discovery"
-  | "comprehensive";
+  | "comprehensive"
+  | "mobile_analysis";
 
 // Scan intensity
 export type ScanIntensity = "quiet" | "normal" | "aggressive";
@@ -64,6 +69,7 @@ export interface TargetConfig {
   authorized: boolean;
   authorization_ref: string;
   notes: string;
+  mobile_platform?: MobilePlatform;
 }
 
 // Workflow module
@@ -235,6 +241,13 @@ export const targetTypeLabels: Record<AssessmentTargetType, string> = {
   url: "URL",
   cidr_range: "CIDR Range",
   multi_target: "Multiple Targets",
+  mobile_app: "Mobile Application (APK/IPA)",
+};
+
+export const mobilePlatformLabels: Record<MobilePlatform, string> = {
+  android: "Android",
+  ios: "iOS",
+  unknown: "Unknown",
 };
 
 export const scopeLabels: Record<AssessmentScope, string> = {
@@ -242,6 +255,7 @@ export const scopeLabels: Record<AssessmentScope, string> = {
   active_recon: "Active Reconnaissance",
   discovery: "Discovery Scanning",
   comprehensive: "Comprehensive Assessment",
+  mobile_analysis: "Mobile App Analysis",
 };
 
 export const scopeDescriptions: Record<AssessmentScope, string> = {
@@ -249,7 +263,16 @@ export const scopeDescriptions: Record<AssessmentScope, string> = {
   active_recon: "DNS enumeration, WHOIS lookup, subdomain discovery",
   discovery: "Port scanning, service detection, HTTP fingerprinting",
   comprehensive: "Full reconnaissance and discovery workflow",
+  mobile_analysis: "Static analysis of mobile applications (APK/IPA)",
 };
+
+// Helper to detect mobile platform from file path
+export function detectMobilePlatform(filePath: string): MobilePlatform {
+  const lower = filePath.toLowerCase();
+  if (lower.endsWith(".apk")) return "android";
+  if (lower.endsWith(".ipa")) return "ios";
+  return "unknown";
+}
 
 export const intensityLabels: Record<ScanIntensity, string> = {
   quiet: "Quiet",

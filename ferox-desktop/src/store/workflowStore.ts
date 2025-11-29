@@ -11,7 +11,9 @@ import type {
   Discovery,
   AssessmentReport,
   WorkflowEvent,
+  MobilePlatform,
 } from "../types/workflow";
+import { detectMobilePlatform } from "../types/workflow";
 
 // Default templates
 const defaultTemplates: WorkflowTemplate[] = [
@@ -199,6 +201,60 @@ const defaultTemplates: WorkflowTemplate[] = [
       },
     ],
   },
+  {
+    id: "mobile-app",
+    name: "Mobile App Assessment",
+    description: "Static security analysis of mobile applications (APK/IPA)",
+    recommended_target_type: "mobile_app",
+    default_scope: "mobile_analysis",
+    default_intensity: "normal",
+    icon: "smartphone",
+    tags: ["mobile", "android", "ios", "apk", "ipa"],
+    modules: [
+      {
+        id: "ma-apk",
+        path: "mobile/apk_analyzer",
+        name: "APK Analyzer",
+        description: "Android APK static security analysis",
+        options: {
+          ANALYZE_MANIFEST: "true",
+          CHECK_PERMISSIONS: "true",
+          DETECT_SECRETS: "true",
+        },
+        enabled: true,
+        phase: 1,
+        estimated_duration_secs: 60,
+      },
+      {
+        id: "ma-ipa",
+        path: "mobile/ipa_analyzer",
+        name: "IPA Analyzer",
+        description: "iOS IPA static security analysis",
+        options: {
+          ANALYZE_PLIST: "true",
+          CHECK_ENTITLEMENTS: "true",
+          DETECT_SECRETS: "true",
+        },
+        enabled: true,
+        phase: 1,
+        estimated_duration_secs: 60,
+      },
+      {
+        id: "ma-recon",
+        path: "mobile/app_recon",
+        name: "App Store Recon",
+        description: "Gather app store information and metadata",
+        options: {
+          CHECK_PLAY_STORE: "true",
+          CHECK_APP_STORE: "true",
+          DETECT_SDKS: "true",
+        },
+        enabled: true,
+        phase: 2,
+        estimated_duration_secs: 45,
+      },
+    ],
+  },
 ];
 
 interface WorkflowState {
@@ -212,11 +268,13 @@ interface WorkflowState {
   authorized: boolean;
   authorizationRef: string;
   targetNotes: string;
+  mobilePlatform: MobilePlatform | null;
   setTargetType: (type: AssessmentTargetType) => void;
   setTarget: (target: string) => void;
   setAuthorized: (authorized: boolean) => void;
   setAuthorizationRef: (ref: string) => void;
   setTargetNotes: (notes: string) => void;
+  setMobilePlatform: (platform: MobilePlatform | null) => void;
 
   // Scope configuration
   scope: AssessmentScope;
@@ -281,11 +339,22 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   authorized: false,
   authorizationRef: "",
   targetNotes: "",
+  mobilePlatform: null,
   setTargetType: (targetType) => set({ targetType }),
-  setTarget: (target) => set({ target }),
+  setTarget: (target) => {
+    // Auto-detect mobile platform when target changes
+    const state = get();
+    if (state.targetType === "mobile_app") {
+      const platform = detectMobilePlatform(target);
+      set({ target, mobilePlatform: platform });
+    } else {
+      set({ target });
+    }
+  },
   setAuthorized: (authorized) => set({ authorized }),
   setAuthorizationRef: (authorizationRef) => set({ authorizationRef }),
   setTargetNotes: (targetNotes) => set({ targetNotes }),
+  setMobilePlatform: (mobilePlatform) => set({ mobilePlatform }),
 
   // Scope configuration
   scope: "discovery",
@@ -318,15 +387,40 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     const state = get();
     const template = state.templates.find((t) => t.id === templateId);
     if (template) {
-      // Apply template settings
-      const modulesWithTarget = template.modules.map((m) => ({
+      // For mobile templates, filter modules based on detected platform
+      let filteredModules = template.modules;
+      let detectedPlatform: MobilePlatform | null = null;
+
+      if (template.recommended_target_type === "mobile_app" && state.target) {
+        detectedPlatform = detectMobilePlatform(state.target);
+        if (detectedPlatform === "android") {
+          // Keep APK analyzer, remove IPA analyzer
+          filteredModules = template.modules.filter(
+            (m) => !m.path.includes("ipa_analyzer"),
+          );
+        } else if (detectedPlatform === "ios") {
+          // Keep IPA analyzer, remove APK analyzer
+          filteredModules = template.modules.filter(
+            (m) => !m.path.includes("apk_analyzer"),
+          );
+        }
+      }
+
+      // Apply template settings with target options
+      const modulesWithTarget = filteredModules.map((m) => ({
         ...m,
         id: `${m.id}-${Date.now()}`,
         options: {
           ...m.options,
           ...(m.path.startsWith("scanner/")
             ? { RHOSTS: state.target }
-            : { TARGET: state.target }),
+            : m.path.startsWith("mobile/")
+              ? m.path.includes("apk")
+                ? { APK_PATH: state.target }
+                : m.path.includes("ipa")
+                  ? { IPA_PATH: state.target }
+                  : { APP_ID: state.target }
+              : { TARGET: state.target }),
         },
       }));
 
@@ -336,6 +430,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         scope: template.default_scope,
         intensity: template.default_intensity,
         selectedModules: modulesWithTarget,
+        mobilePlatform: detectedPlatform,
       });
     }
   },
@@ -384,6 +479,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         authorized: state.authorized,
         authorization_ref: state.authorizationRef,
         notes: state.targetNotes,
+        mobile_platform: state.mobilePlatform ?? undefined,
       },
       scope: state.scope,
       intensity: state.intensity,
@@ -402,6 +498,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       authorized: false,
       authorizationRef: "",
       targetNotes: "",
+      mobilePlatform: null,
       scope: "discovery",
       intensity: "normal",
       selectedModules: [],

@@ -30,6 +30,8 @@ pub enum AssessmentTargetType {
     CidrRange,
     /// Multiple targets from list
     MultiTarget,
+    /// Mobile application file (APK or IPA)
+    MobileApp,
 }
 
 impl std::fmt::Display for AssessmentTargetType {
@@ -40,6 +42,43 @@ impl std::fmt::Display for AssessmentTargetType {
             AssessmentTargetType::Url => write!(f, "URL"),
             AssessmentTargetType::CidrRange => write!(f, "CIDR Range"),
             AssessmentTargetType::MultiTarget => write!(f, "Multiple Targets"),
+            AssessmentTargetType::MobileApp => write!(f, "Mobile Application"),
+        }
+    }
+}
+
+/// Mobile platform type for app analysis
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum MobilePlatform {
+    /// Android APK
+    Android,
+    /// iOS IPA
+    Ios,
+    /// Unknown/auto-detect
+    Unknown,
+}
+
+impl MobilePlatform {
+    /// Detect platform from file path/extension
+    pub fn from_path(path: &str) -> Self {
+        let lower = path.to_lowercase();
+        if lower.ends_with(".apk") {
+            MobilePlatform::Android
+        } else if lower.ends_with(".ipa") {
+            MobilePlatform::Ios
+        } else {
+            MobilePlatform::Unknown
+        }
+    }
+}
+
+impl std::fmt::Display for MobilePlatform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MobilePlatform::Android => write!(f, "Android"),
+            MobilePlatform::Ios => write!(f, "iOS"),
+            MobilePlatform::Unknown => write!(f, "Unknown"),
         }
     }
 }
@@ -56,6 +95,8 @@ pub enum AssessmentScope {
     Discovery,
     /// Full reconnaissance + discovery
     Comprehensive,
+    /// Mobile application security analysis
+    MobileAnalysis,
 }
 
 impl std::fmt::Display for AssessmentScope {
@@ -65,6 +106,7 @@ impl std::fmt::Display for AssessmentScope {
             AssessmentScope::ActiveRecon => write!(f, "Active Reconnaissance"),
             AssessmentScope::Discovery => write!(f, "Discovery Scanning"),
             AssessmentScope::Comprehensive => write!(f, "Comprehensive Assessment"),
+            AssessmentScope::MobileAnalysis => write!(f, "Mobile App Analysis"),
         }
     }
 }
@@ -83,6 +125,9 @@ impl AssessmentScope {
             }
             AssessmentScope::Comprehensive => {
                 "Full reconnaissance and discovery workflow"
+            }
+            AssessmentScope::MobileAnalysis => {
+                "Static analysis of mobile applications (APK/IPA)"
             }
         }
     }
@@ -166,6 +211,9 @@ pub struct TargetConfig {
     /// Notes about the target
     #[serde(default)]
     pub notes: String,
+    /// Mobile platform (for MobileApp target type)
+    #[serde(default)]
+    pub mobile_platform: Option<MobilePlatform>,
 }
 
 impl Default for TargetConfig {
@@ -177,6 +225,7 @@ impl Default for TargetConfig {
             authorized: false,
             authorization_ref: String::new(),
             notes: String::new(),
+            mobile_platform: None,
         }
     }
 }
@@ -662,6 +711,54 @@ impl WorkflowTemplate {
         }
     }
 
+    /// Mobile application security assessment template
+    pub fn mobile_app_assessment() -> Self {
+        Self {
+            id: "mobile-app".to_string(),
+            name: "Mobile App Assessment".to_string(),
+            description: "Static security analysis of mobile applications (APK/IPA)".to_string(),
+            recommended_target_type: AssessmentTargetType::MobileApp,
+            default_scope: AssessmentScope::MobileAnalysis,
+            default_intensity: ScanIntensity::Normal,
+            icon: "smartphone".to_string(),
+            tags: vec!["mobile".to_string(), "android".to_string(), "ios".to_string(), "apk".to_string(), "ipa".to_string()],
+            modules: vec![
+                // Phase 1: Static Analysis
+                WorkflowModule::new(
+                    "mobile/apk_analyzer",
+                    "APK Analyzer",
+                    "Android APK static security analysis",
+                    1,
+                )
+                .with_option("ANALYZE_MANIFEST", "true")
+                .with_option("CHECK_PERMISSIONS", "true")
+                .with_option("DETECT_SECRETS", "true")
+                .with_duration(60),
+                WorkflowModule::new(
+                    "mobile/ipa_analyzer",
+                    "IPA Analyzer",
+                    "iOS IPA static security analysis",
+                    1,
+                )
+                .with_option("ANALYZE_PLIST", "true")
+                .with_option("CHECK_ENTITLEMENTS", "true")
+                .with_option("DETECT_SECRETS", "true")
+                .with_duration(60),
+                // Phase 2: Reconnaissance
+                WorkflowModule::new(
+                    "mobile/app_recon",
+                    "App Store Recon",
+                    "Gather app store information and metadata",
+                    2,
+                )
+                .with_option("CHECK_PLAY_STORE", "true")
+                .with_option("CHECK_APP_STORE", "true")
+                .with_option("DETECT_SDKS", "true")
+                .with_duration(45),
+            ],
+        }
+    }
+
     /// Get all available templates
     pub fn all_templates() -> Vec<Self> {
         vec![
@@ -669,6 +766,7 @@ impl WorkflowTemplate {
             Self::domain_recon(),
             Self::web_assessment(),
             Self::network_infrastructure(),
+            Self::mobile_app_assessment(),
         ]
     }
 
@@ -680,6 +778,11 @@ impl WorkflowTemplate {
         config.target.target = target.to_string();
         config.scope = self.default_scope;
         config.intensity = self.default_intensity;
+
+        // Auto-detect mobile platform from file extension
+        if self.recommended_target_type == AssessmentTargetType::MobileApp {
+            config.target.mobile_platform = Some(MobilePlatform::from_path(target));
+        }
 
         // Clone modules and apply target
         config.modules = self
@@ -693,10 +796,36 @@ impl WorkflowTemplate {
                     module.options.insert("RHOSTS".to_string(), target.to_string());
                 } else if module.path.starts_with("recon/") {
                     module.options.insert("TARGET".to_string(), target.to_string());
+                } else if module.path.starts_with("mobile/") {
+                    // Apply file path for mobile analyzers
+                    if module.path.contains("apk") {
+                        module.options.insert("APK_PATH".to_string(), target.to_string());
+                    } else if module.path.contains("ipa") {
+                        module.options.insert("IPA_PATH".to_string(), target.to_string());
+                    } else if module.path.contains("app_recon") {
+                        module.options.insert("APP_ID".to_string(), target.to_string());
+                    }
                 }
                 module
             })
             .collect();
+
+        config
+    }
+
+    /// Convert template to workflow config with platform-specific modules
+    pub fn to_workflow_config_for_mobile(&self, target: &str, platform: MobilePlatform) -> WorkflowConfig {
+        let mut config = self.to_workflow_config(target);
+        config.target.mobile_platform = Some(platform);
+
+        // Filter modules based on platform - only include relevant analyzer
+        config.modules.retain(|m| {
+            match platform {
+                MobilePlatform::Android => !m.path.contains("ipa_analyzer"),
+                MobilePlatform::Ios => !m.path.contains("apk_analyzer"),
+                MobilePlatform::Unknown => true, // Keep both for unknown
+            }
+        });
 
         config
     }
@@ -1094,6 +1223,47 @@ impl WorkflowManager {
                     .with_option("FOLLOW_REDIRECTS", "true")
                     .with_option("PATHS", "/,/robots.txt,/sitemap.xml")
                     .with_duration(60),
+                );
+            }
+            AssessmentScope::MobileAnalysis => {
+                // Mobile-specific modules based on target type
+                // Note: The actual analyzer to use depends on file extension
+                // Both are included; the executor will skip based on platform
+                modules.push(
+                    WorkflowModule::new(
+                        "mobile/apk_analyzer",
+                        "APK Analyzer",
+                        "Android APK static security analysis",
+                        1,
+                    )
+                    .with_option("ANALYZE_MANIFEST", "true")
+                    .with_option("CHECK_PERMISSIONS", "true")
+                    .with_option("DETECT_SECRETS", "true")
+                    .with_duration(60),
+                );
+                modules.push(
+                    WorkflowModule::new(
+                        "mobile/ipa_analyzer",
+                        "IPA Analyzer",
+                        "iOS IPA static security analysis",
+                        1,
+                    )
+                    .with_option("ANALYZE_PLIST", "true")
+                    .with_option("CHECK_ENTITLEMENTS", "true")
+                    .with_option("DETECT_SECRETS", "true")
+                    .with_duration(60),
+                );
+                modules.push(
+                    WorkflowModule::new(
+                        "mobile/app_recon",
+                        "App Store Recon",
+                        "Gather app store information and metadata",
+                        2,
+                    )
+                    .with_option("CHECK_PLAY_STORE", "true")
+                    .with_option("CHECK_APP_STORE", "true")
+                    .with_option("DETECT_SDKS", "true")
+                    .with_duration(45),
                 );
             }
         }
@@ -1556,6 +1726,84 @@ impl WorkflowManagerRef {
                     importance: 4,
                 });
             }
+            "mobile/apk_analyzer" => {
+                // Sample APK analysis findings
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Vulnerability,
+                    value: "Application is debuggable".to_string(),
+                    details: HashMap::from([
+                        ("severity".to_string(), "High".to_string()),
+                        ("owasp_mobile".to_string(), "M1".to_string()),
+                        ("cwe".to_string(), "CWE-489".to_string()),
+                    ]),
+                    importance: 8,
+                });
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Misconfiguration,
+                    value: "Backup allowed (android:allowBackup=true)".to_string(),
+                    details: HashMap::from([
+                        ("severity".to_string(), "Medium".to_string()),
+                        ("owasp_mobile".to_string(), "M2".to_string()),
+                    ]),
+                    importance: 6,
+                });
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Technology,
+                    value: "minSdkVersion: 21, targetSdkVersion: 33".to_string(),
+                    details: HashMap::from([
+                        ("platform".to_string(), "Android".to_string()),
+                    ]),
+                    importance: 3,
+                });
+            }
+            "mobile/ipa_analyzer" => {
+                // Sample IPA analysis findings
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Vulnerability,
+                    value: "get-task-allow entitlement enabled".to_string(),
+                    details: HashMap::from([
+                        ("severity".to_string(), "High".to_string()),
+                        ("owasp_mobile".to_string(), "M1".to_string()),
+                    ]),
+                    importance: 8,
+                });
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Misconfiguration,
+                    value: "App Transport Security allows arbitrary loads".to_string(),
+                    details: HashMap::from([
+                        ("severity".to_string(), "Medium".to_string()),
+                        ("owasp_mobile".to_string(), "M3".to_string()),
+                    ]),
+                    importance: 6,
+                });
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Technology,
+                    value: "MinimumOSVersion: 13.0".to_string(),
+                    details: HashMap::from([
+                        ("platform".to_string(), "iOS".to_string()),
+                    ]),
+                    importance: 3,
+                });
+            }
+            "mobile/app_recon" => {
+                // Sample app store recon findings
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Technology,
+                    value: "Firebase SDK detected".to_string(),
+                    details: HashMap::from([
+                        ("sdk_type".to_string(), "Analytics".to_string()),
+                    ]),
+                    importance: 4,
+                });
+                discoveries.push(Discovery {
+                    discovery_type: DiscoveryType::Technology,
+                    value: "Facebook SDK detected".to_string(),
+                    details: HashMap::from([
+                        ("sdk_type".to_string(), "Social".to_string()),
+                    ]),
+                    importance: 4,
+                });
+            }
             _ => {}
         }
 
@@ -1592,5 +1840,55 @@ mod tests {
         progress.completed_modules = 5;
         progress.update_progress();
         assert!((progress.progress_percent - 50.0).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_mobile_template_creation() {
+        let template = WorkflowTemplate::mobile_app_assessment();
+        assert_eq!(template.id, "mobile-app");
+        assert_eq!(template.recommended_target_type, AssessmentTargetType::MobileApp);
+        assert_eq!(template.default_scope, AssessmentScope::MobileAnalysis);
+        assert_eq!(template.modules.len(), 3);
+    }
+
+    #[test]
+    fn test_mobile_platform_detection() {
+        assert_eq!(MobilePlatform::from_path("/path/to/app.apk"), MobilePlatform::Android);
+        assert_eq!(MobilePlatform::from_path("/path/to/app.APK"), MobilePlatform::Android);
+        assert_eq!(MobilePlatform::from_path("/path/to/app.ipa"), MobilePlatform::Ios);
+        assert_eq!(MobilePlatform::from_path("/path/to/app.IPA"), MobilePlatform::Ios);
+        assert_eq!(MobilePlatform::from_path("/path/to/app.exe"), MobilePlatform::Unknown);
+    }
+
+    #[test]
+    fn test_mobile_config_auto_detect() {
+        let template = WorkflowTemplate::mobile_app_assessment();
+        let config = template.to_workflow_config("/path/to/test.apk");
+        assert_eq!(config.target.mobile_platform, Some(MobilePlatform::Android));
+
+        let config = template.to_workflow_config("/path/to/test.ipa");
+        assert_eq!(config.target.mobile_platform, Some(MobilePlatform::Ios));
+    }
+
+    #[test]
+    fn test_mobile_config_filtered_modules() {
+        let template = WorkflowTemplate::mobile_app_assessment();
+
+        // Android should filter out IPA analyzer
+        let config = template.to_workflow_config_for_mobile("/path/to/test.apk", MobilePlatform::Android);
+        assert!(!config.modules.iter().any(|m| m.path.contains("ipa_analyzer")));
+        assert!(config.modules.iter().any(|m| m.path.contains("apk_analyzer")));
+
+        // iOS should filter out APK analyzer
+        let config = template.to_workflow_config_for_mobile("/path/to/test.ipa", MobilePlatform::Ios);
+        assert!(!config.modules.iter().any(|m| m.path.contains("apk_analyzer")));
+        assert!(config.modules.iter().any(|m| m.path.contains("ipa_analyzer")));
+    }
+
+    #[test]
+    fn test_all_templates_includes_mobile() {
+        let templates = WorkflowTemplate::all_templates();
+        assert!(templates.iter().any(|t| t.id == "mobile-app"));
+        assert_eq!(templates.len(), 5);
     }
 }
