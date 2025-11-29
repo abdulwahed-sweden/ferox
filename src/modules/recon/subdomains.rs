@@ -291,6 +291,7 @@ impl Module for SubdomainEnum {
             .build()?;
 
         let results: Arc<Mutex<Vec<SubdomainRecord>>> = Arc::new(Mutex::new(Vec::new()));
+        let seen_subdomains: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
         let semaphore = Arc::new(Semaphore::new(threads));
 
         // Spawn tasks
@@ -302,6 +303,7 @@ impl Module for SubdomainEnum {
             let resolver = resolver.clone();
             let client = client.clone();
             let results = results.clone();
+            let seen = seen_subdomains.clone();
 
             let handle = tokio::spawn(async move {
                 let _permit = permit;
@@ -320,10 +322,14 @@ impl Module for SubdomainEnum {
                     record.title = title;
                 }
 
-                // Store only if resolved
+                // Store only if resolved AND not already seen (atomic deduplication)
                 if record.resolved {
-                    let mut guard = results.lock().await;
-                    guard.push(record);
+                    let mut seen_guard = seen.lock().await;
+                    if seen_guard.insert(record.subdomain.clone()) {
+                        drop(seen_guard); // Release seen lock before acquiring results lock
+                        let mut results_guard = results.lock().await;
+                        results_guard.push(record);
+                    }
                 }
             });
 
@@ -335,14 +341,9 @@ impl Module for SubdomainEnum {
             let _ = handle.await;
         }
 
-        // Collect and deduplicate results
+        // Collect results (already deduplicated during scanning)
         let guard = results.lock().await;
-        let mut seen_subdomains = HashSet::new();
-        let found: Vec<SubdomainRecord> = guard
-            .iter()
-            .filter(|r| seen_subdomains.insert(r.subdomain.clone()))
-            .cloned()
-            .collect();
+        let found: Vec<SubdomainRecord> = guard.clone();
         drop(guard);
 
         // Prepare result
