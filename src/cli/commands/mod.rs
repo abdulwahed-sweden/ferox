@@ -7,6 +7,7 @@ pub mod opsec;
 pub mod persist;
 pub mod privesc;
 pub mod sessions;
+pub mod wizard;
 
 pub use c2::{C2CommandHandler, C2Commands};
 pub use creds::{CredsCommandHandler, CredsCommands};
@@ -17,3 +18,4 @@ pub use opsec::{OpsecCommandHandler, OpsecCommands};
 pub use persist::{PersistCommandHandler, PersistCommands};
 pub use privesc::{PrivEscCommandHandler, PrivEscCommands};
 pub use sessions::{SessionCommandHandler, SessionsCommands};
+pub use wizard::{WizardCommandHandler, WizardCommands};

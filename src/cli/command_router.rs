@@ -9,6 +9,7 @@ use crate::cli::commands::{
     LateralCommandHandler, LateralCommands, MemoryCommandHandler, MemoryCommands,
     OpsecCommandHandler, OpsecCommands, PersistCommandHandler, PersistCommands,
     PrivEscCommandHandler, PrivEscCommands, SessionCommandHandler, SessionsCommands,
+    WizardCommandHandler, WizardCommands,
 };
 use crate::cli::doctor::DoctorCommands;
 use crate::cli::theme::Theme;
@@ -96,6 +97,10 @@ impl CommandRouter {
                 OpsecCommandHandler::new().run(cmd).await?;
                 Ok(RouterDispatch::Handled)
             }
+            Some(RouterCommand::Wizard(cmd)) => {
+                WizardCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
             Some(RouterCommand::Console) => {
                 self.print_usage();
                 self.ensure_memory_toolchain();
@@ -116,7 +121,7 @@ impl CommandRouter {
     fn print_banner(&self) {
         println!("============================================================================");
         println!("                     Ferox CLI Integration Layer                              ");
-        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral | opsec | console");
+        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral | opsec | wizard | console");
         println!("============================================================================");
     }
 
@@ -131,6 +136,7 @@ impl CommandRouter {
         Theme::command_help("ferox creds <cmd>", CredsCommandHandler::describe());
         Theme::command_help("ferox lateral <cmd>", LateralCommandHandler::describe());
         Theme::command_help("ferox opsec <cmd>", OpsecCommandHandler::describe());
+        Theme::command_help("ferox wizard", WizardCommandHandler::describe());
         Theme::command_help("ferox console", "Launch interactive console");
     }
 
@@ -204,6 +210,8 @@ pub enum RouterCommand {
     /// OPSEC engine commands
     #[command(subcommand)]
     Opsec(OpsecCommands),
+    /// Attack wizard - guided penetration testing
+    Wizard(WizardCommands),
     /// Skip router messaging and jump into console
     Console,
 }
