@@ -1,10 +1,18 @@
-# 🦊 Ferox Framework
+# 🦊 Ferox Security Framework v4.0
 
 [![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange)]()
 [![License](https://img.shields.io/badge/License-MIT-blue)]()
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)]()
+[![Version](https://img.shields.io/badge/Version-4.0.0-brightgreen)]()
 
 **Ferox** is a modern Rust-native offensive security framework designed for authorized penetration testing, security research, and red team operations. Built with performance, safety, and observability in mind.
+
+## What's New in 4.0
+
+- **Mobile App Analysis** - APK and IPA security assessment modules
+- **Security Assessment Wizard** - Guided workflow for comprehensive assessments
+- **Enhanced Progress Tracking** - Real-time progress with discoveries
+- **Desktop Application** - Modern React-based Tauri interface
 
 ---
 
@@ -56,9 +64,23 @@ cargo build --release --features memory-forensics
 - **Listener Command Helpers**: Netcat, Socat, Metasploit, Python
 - **C2 Integration**: Teams, GitHub Gist, DNS-over-HTTPS, HTTP Beacon
 
+### 📱 Mobile App Analysis (New in 4.0)
+
+- **APK Analyzer** - Android app security analysis
+  - Manifest parsing & permission analysis
+  - Code decompilation & secrets detection
+  - Network security config analysis
+  - Certificate validation checks
+- **IPA Analyzer** - iOS app security analysis
+  - Info.plist analysis & entitlements extraction
+  - Binary protections check (PIE, ARC, stack canaries)
+  - URL scheme & deep link analysis
+  - Third-party SDK detection
+- **App Reconnaissance** - App store intelligence gathering
+
 ### 🔧 Security Operations
 
-- Reconnaissance (ASN, DNS, WHOIS)
+- Reconnaissance (ASN, DNS, WHOIS, Subdomains)
 - High-speed scanning
 - Exploitation (authorized)
 - Post-exploitation: credentials, persistence, lateral movement
@@ -204,6 +226,39 @@ ferox creds describe lsass_memory
 ferox creds show
 ```
 
+### Mobile App Analysis
+
+```bash
+# Android APK Analysis
+ferox> use mobile/apk_analyzer
+ferox (mobile/apk_analyzer)> set APK_PATH /path/to/app.apk
+ferox (mobile/apk_analyzer)> run
+
+# iOS IPA Analysis
+ferox> use mobile/ipa_analyzer
+ferox (mobile/ipa_analyzer)> set IPA_PATH /path/to/app.ipa
+ferox (mobile/ipa_analyzer)> run
+
+# App Store Reconnaissance
+ferox> use mobile/app_recon
+ferox (mobile/app_recon)> set BUNDLE_ID com.example.app
+ferox (mobile/app_recon)> run
+```
+
+### Security Assessment Wizard
+
+```bash
+# Launch interactive wizard
+ferox> wizard
+
+# Select assessment template:
+# 1. Full Penetration Test
+# 2. Web Application Assessment
+# 3. Network Security Audit
+# 4. Mobile App Assessment
+# 5. Cloud Security Review
+```
+
 ## 🎨 Interface — Mixed Predator Theme
 
 - Dark, high-contrast security palette
@@ -245,6 +300,7 @@ Security Engine (Async Rust)
 | --------------------- | --- | ----------------------------------------------- |
 | Scanner               | 8   | Port & service detection                        |
 | Recon                 | 6   | Information gathering                           |
+| **Mobile**            | 3   | APK/IPA analysis, app reconnaissance            |
 | Exploit               | 4   | Authorized exploitation                         |
 | **Payloads**          | 3   | Smart payload generation with encryption        |
 | Memory Forensics      | 8   | Volatility3 workflows                           |
@@ -331,6 +387,7 @@ See [Desktop Documentation](docs/developer/architecture.md) for details.
 - [x] **Phase 4** – Smart Payload System with execution command generators
 - [x] **Phase 5** – Post-Exploitation Engines (Persistence, PrivEsc, Credentials)
 - [x] **Phase 6** – Ferox Desktop (Tauri + React operations console)
+- [x] **v4.0.0** – Mobile App Analysis (APK/IPA) & Security Assessment Wizard
 - [ ] Signed plugin marketplace
 - [ ] Hardware-backed credential vault
 - [ ] Extended evasion techniques

@@ -1,6 +1,6 @@
 [package]
 name = "ferox-desktop"
-version = "1.0.0"
+version = "4.0.0"
 description = "Ferox C2 Desktop - Professional Red Team Operations Console"
 authors = ["Abdulwahed Mansour <abdulwahed.mansour@gmail.com>"]
 edition = "2021"
