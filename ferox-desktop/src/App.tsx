@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAppStore } from "./store";
 import { getSessions, getSessionTree } from "./lib/tauri";
@@ -12,30 +12,20 @@ import { Spinner } from "./components/Loading";
 import { useTauriEvents } from "./hooks/useTauriEvents";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useResizable } from "./hooks/useResizable";
+import { MenuBar } from "./components/menus/MenuBar";
 import {
-  Search,
-  X,
-  Package,
-  Radar,
-  KeyRound,
-  FileText,
-  Clock,
-  StickyNote,
-  ChevronDown,
-  Crosshair,
-  Globe,
-  Grid3X3,
-  ClipboardList,
-  Eye,
-  Shield,
-} from "lucide-react";
+  AboutModal,
+  ShortcutsModal,
+  SettingsModal,
+  NewSessionModal,
+} from "./components/modals";
+import { Search, X, Plus } from "lucide-react";
 import { Logo } from "./components/ui/Logo";
-import { useState, useRef } from "react";
 import { clsx } from "clsx";
 
 // Lazy load heavy components for better initial load time
 const TabContent = lazy(() =>
-  import("./components/TabContent").then((m) => ({ default: m.TabContent })),
+  import("./components/TabContent").then((m) => ({ default: m.TabContent }))
 );
 
 function App() {
@@ -50,48 +40,17 @@ function App() {
     setSessionsLoading,
     setSessionsError,
     setSidebarWidth,
-    addTab,
-    tabs,
+    sessions,
   } = useAppStore();
 
-  // Tools dropdown state
-  const [toolsOpen, setToolsOpen] = useState(false);
-  const toolsRef = useRef<HTMLDivElement>(null);
+  // Modal states
+  const [showAbout, setShowAbout] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showNewSession, setShowNewSession] = useState(false);
 
-  // Generic tab opener
-  const openToolTab = (
-    type:
-      | "payloads"
-      | "scanner"
-      | "credentials"
-      | "eventlog"
-      | "scheduler"
-      | "notes"
-      | "postexploitation"
-      | "networkmap"
-      | "mitre"
-      | "reports"
-      | "opsec"
-      | "workflow",
-    title: string,
-    icon: string,
-  ) => {
-    const existing = tabs.find((t) => t.type === type);
-    if (existing) {
-      useAppStore.getState().setActiveTab(existing.id);
-      setToolsOpen(false);
-      return;
-    }
-
-    addTab({
-      id: `${type}-${Date.now()}`,
-      type,
-      sessionId: "",
-      title,
-      icon,
-    });
-    setToolsOpen(false);
-  };
+  // Sidebar visibility
+  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   // Resizable sidebar
   const {
@@ -110,6 +69,58 @@ function App() {
 
   // Register keyboard shortcuts
   const { searchInputRef } = useKeyboardShortcuts();
+
+  // Enhanced keyboard shortcuts for menu actions
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMeta = e.metaKey || e.ctrlKey;
+
+      // Cmd+N: New Session
+      if (isMeta && e.key === "n") {
+        e.preventDefault();
+        setShowNewSession(true);
+        return;
+      }
+
+      // Cmd+,: Settings
+      if (isMeta && e.key === ",") {
+        e.preventDefault();
+        setShowSettings(true);
+        return;
+      }
+
+      // Cmd+B: Toggle Sidebar
+      if (isMeta && e.key === "b") {
+        e.preventDefault();
+        setSidebarVisible((prev) => !prev);
+        return;
+      }
+
+      // Cmd+Shift+T: Toggle Theme
+      if (isMeta && e.shiftKey && e.key === "T") {
+        e.preventDefault();
+        // Theme toggle is handled by useTheme hook in MenuBar
+        return;
+      }
+
+      // Cmd+Shift+/: Show Shortcuts
+      if (isMeta && e.shiftKey && e.key === "?") {
+        e.preventDefault();
+        setShowShortcuts(true);
+        return;
+      }
+
+      // F1: Documentation
+      if (e.key === "F1") {
+        e.preventDefault();
+        window.open("https://github.com/abdulwahed-sweden/ferox", "_blank");
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Load sessions on mount
   useEffect(() => {
@@ -133,7 +144,7 @@ function App() {
         console.error("Failed to load sessions:", error);
         if (mounted) {
           setSessionsError(
-            error instanceof Error ? error.message : "Failed to load sessions",
+            error instanceof Error ? error.message : "Failed to load sessions"
           );
         }
       } finally {
@@ -153,235 +164,115 @@ function App() {
     };
   }, [setSessions, setSessionTree, setSessionsLoading, setSessionsError]);
 
-  // Close context menu and tools dropdown on click outside
+  // Close context menu on click outside
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = () => {
       if (contextMenu.visible) {
         hideContextMenu();
-      }
-      // Close tools dropdown when clicking outside
-      if (
-        toolsOpen &&
-        toolsRef.current &&
-        !toolsRef.current.contains(e.target as Node)
-      ) {
-        setToolsOpen(false);
       }
     };
 
     window.addEventListener("click", handleClick);
     return () => window.removeEventListener("click", handleClick);
-  }, [contextMenu.visible, hideContextMenu, toolsOpen]);
+  }, [contextMenu.visible, hideContextMenu]);
 
   return (
-    <div className="h-screen flex flex-col bg-dark-900 text-text-primary">
+    <div className="h-screen flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)]">
       {/* Header / Menu Bar */}
-      <header className="h-10 bg-dark-800 border-b border-dark-600 flex items-center px-4 gap-4 select-none">
+      <header className="h-10 bg-[var(--surface-primary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-4 select-none">
         <Logo variant="wordmark" size="md" color="auto" />
-        <nav className="flex items-center gap-1 text-sm">
-          <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
-            File
-          </button>
-          <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
-            Session
-          </button>
-          <div className="relative" ref={toolsRef}>
-            <button
-              onClick={() => setToolsOpen(!toolsOpen)}
-              className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
-            >
-              Tools
-              <ChevronDown
-                size={12}
-                className={clsx(
-                  "transition-transform",
-                  toolsOpen && "rotate-180",
-                )}
-              />
-            </button>
-            {toolsOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-xl py-1 min-w-48 z-50">
-                <button
-                  onClick={() =>
-                    openToolTab("workflow", "Assessment Wizard", "shield")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Shield size={14} className="text-ferox-green" />
-                  Assessment Wizard
-                </button>
-                <div className="h-px bg-dark-600 my-1" />
-                <button
-                  onClick={() =>
-                    openToolTab("payloads", "Payload Builder", "package")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Package size={14} className="text-purple-400" />
-                  Payload Builder
-                </button>
-                <button
-                  onClick={() =>
-                    openToolTab("scanner", "Network Scanner", "radar")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Radar size={14} className="text-blue-400" />
-                  Network Scanner
-                </button>
-                <button
-                  onClick={() =>
-                    openToolTab(
-                      "credentials",
-                      "Credentials Viewer",
-                      "key-round",
-                    )
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <KeyRound size={14} className="text-yellow-400" />
-                  Credentials Viewer
-                </button>
-                <div className="h-px bg-dark-600 my-1" />
-                <button
-                  onClick={() =>
-                    openToolTab("eventlog", "Event Log", "file-text")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <FileText size={14} className="text-cyan-400" />
-                  Event Log
-                </button>
-                <button
-                  onClick={() =>
-                    openToolTab("scheduler", "Task Scheduler", "clock")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Clock size={14} className="text-orange-400" />
-                  Task Scheduler
-                </button>
-                <button
-                  onClick={() => openToolTab("notes", "Notes", "sticky-note")}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <StickyNote size={14} className="text-pink-400" />
-                  Notes
-                </button>
-                <div className="h-px bg-dark-600 my-1" />
-                <button
-                  onClick={() =>
-                    openToolTab(
-                      "postexploitation",
-                      "Post-Exploitation",
-                      "crosshair",
-                    )
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Crosshair size={14} className="text-red-400" />
-                  Post-Exploitation
-                </button>
-                <div className="h-px bg-dark-600 my-1" />
-                <button
-                  onClick={() =>
-                    openToolTab("networkmap", "Network Map", "globe")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Globe size={14} className="text-cyan-400" />
-                  Network Map
-                </button>
-                <button
-                  onClick={() => openToolTab("mitre", "MITRE ATT&CK", "grid")}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Grid3X3 size={14} className="text-purple-400" />
-                  MITRE ATT&CK
-                </button>
-                <button
-                  onClick={() =>
-                    openToolTab("reports", "Reports", "clipboard-list")
-                  }
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <ClipboardList size={14} className="text-emerald-400" />
-                  Reports
-                </button>
-                <div className="h-px bg-dark-600 my-1" />
-                <button
-                  onClick={() => openToolTab("opsec", "OPSEC Dashboard", "eye")}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
-                >
-                  <Eye size={14} className="text-cyan-400" />
-                  OPSEC Dashboard
-                </button>
-              </div>
-            )}
-          </div>
-          <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
-            View
-          </button>
-          <button className="px-3 py-1 rounded hover:bg-dark-600 text-text-secondary hover:text-text-primary transition-colors">
-            Help
-          </button>
-        </nav>
+        <MenuBar
+          onNewSession={() => setShowNewSession(true)}
+          onSettings={() => setShowSettings(true)}
+          onAbout={() => setShowAbout(true)}
+          onShortcuts={() => setShowShortcuts(true)}
+          sidebarVisible={sidebarVisible}
+          onToggleSidebar={() => setSidebarVisible((prev) => !prev)}
+        />
         <div className="flex-1" />
-        <div className="text-xs text-text-muted">v1.0.0</div>
+        <div className="text-xs text-[var(--text-muted)]">v4.0.0</div>
       </header>
 
       {/* Main Content */}
-      <div className={clsx("flex-1 flex min-h-0", isResizing && "select-none")}>
+      <div
+        className={clsx("flex-1 flex min-h-0", isResizing && "select-none")}
+      >
         {/* Sidebar - Session Tree */}
-        <aside
-          className="bg-dark-800 flex flex-col relative"
-          style={{ width: sidebarWidth }}
-        >
-          <div className="p-3 border-b border-dark-600">
-            <h2 className="text-sm font-semibold text-text-primary mb-2">
-              Sessions
-            </h2>
-            {/* Search Input */}
-            <div className="relative">
-              <Search
-                size={14}
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted"
-              />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search... (/)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-7 pr-7 py-1.5 text-xs bg-dark-700 border border-dark-600 rounded text-text-primary placeholder:text-text-muted focus:outline-none focus:border-ferox-green/50"
-              />
-              {searchQuery && (
+        {sidebarVisible && (
+          <aside
+            className="bg-[var(--surface-primary)] flex flex-col relative"
+            style={{ width: sidebarWidth }}
+          >
+            <div className="p-3 border-b border-[var(--border-primary)]">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+                  Sessions
+                </h2>
                 <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                  onClick={() => setShowNewSession(true)}
+                  className="p-1 rounded hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors"
+                  title="New Session (Cmd+N)"
                 >
-                  <X size={14} />
+                  <Plus size={16} />
                 </button>
-              )}
+              </div>
+              {/* Search Input */}
+              <div className="relative">
+                <Search
+                  size={14}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search... (/)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-7 pr-7 py-1.5 text-xs bg-[var(--surface-secondary)] border border-[var(--border-primary)] rounded text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/50"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-          <SessionFilters />
-          <div className="flex-1 overflow-auto">
-            <ErrorBoundary name="Sessions">
-              <SessionTree />
-            </ErrorBoundary>
-          </div>
+            <SessionFilters />
+            <div className="flex-1 overflow-auto">
+              <ErrorBoundary name="Sessions">
+                <SessionTree />
+              </ErrorBoundary>
+            </div>
 
-          {/* Resize handle */}
-          <div
-            onMouseDown={handleMouseDown}
-            className={clsx(
-              "absolute right-0 top-0 bottom-0 w-1 cursor-col-resize",
-              "hover:bg-ferox-green/30 transition-colors",
-              isResizing && "bg-ferox-green/50",
+            {/* Empty state with demo session button */}
+            {sessions.length === 0 && (
+              <div className="p-4 text-center">
+                <p className="text-sm text-[var(--text-muted)] mb-3">
+                  No sessions yet
+                </p>
+                <button
+                  onClick={() => setShowNewSession(true)}
+                  className="px-3 py-1.5 rounded bg-[var(--color-primary)] text-white text-xs hover:bg-[var(--color-primary)]/90 transition-colors"
+                >
+                  Create Demo Session
+                </button>
+              </div>
             )}
-          />
-        </aside>
+
+            {/* Resize handle */}
+            <div
+              onMouseDown={handleMouseDown}
+              className={clsx(
+                "absolute right-0 top-0 bottom-0 w-1 cursor-col-resize",
+                "hover:bg-[var(--color-primary)]/30 transition-colors",
+                isResizing && "bg-[var(--color-primary)]/50"
+              )}
+            />
+          </aside>
+        )}
 
         {/* Main Panel */}
         <main className="flex-1 flex flex-col min-w-0">
@@ -403,7 +294,7 @@ function App() {
                 </Suspense>
               </ErrorBoundary>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-text-muted">
+              <div className="h-full flex flex-col items-center justify-center text-[var(--text-muted)]">
                 <div className="mb-4 opacity-20">
                   <Logo variant="icon" size="xl" color="auto" />
                 </div>
@@ -411,6 +302,12 @@ function App() {
                 <p className="text-sm mt-2">
                   Double-click a session to open a terminal
                 </p>
+                <button
+                  onClick={() => setShowNewSession(true)}
+                  className="mt-4 px-4 py-2 rounded bg-[var(--color-primary)] text-white text-sm hover:bg-[var(--color-primary)]/90 transition-colors"
+                >
+                  Create Demo Session
+                </button>
               </div>
             )}
           </div>
@@ -422,6 +319,21 @@ function App() {
 
       {/* Context Menu */}
       {contextMenu.visible && <ContextMenu />}
+
+      {/* Modals */}
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <ShortcutsModal
+        isOpen={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+      />
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
+      <NewSessionModal
+        isOpen={showNewSession}
+        onClose={() => setShowNewSession(false)}
+      />
 
       {/* Toast notifications */}
       <Toaster
