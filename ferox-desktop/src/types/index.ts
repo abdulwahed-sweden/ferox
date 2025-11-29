@@ -73,7 +73,8 @@ export type TabType =
   | "networkmap"
   | "mitre"
   | "reports"
-  | "opsec";
+  | "opsec"
+  | "workflow";
 
 export interface Tab {
   id: string;

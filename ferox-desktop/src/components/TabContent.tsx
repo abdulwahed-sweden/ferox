@@ -15,6 +15,7 @@ import {
 import { PayloadBuilder } from "./PayloadBuilder";
 import { PostExploitation } from "./post_exploitation";
 import { OpsecDashboard } from "./modules/opsec";
+import { WorkflowWizard } from "./WorkflowWizard";
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -60,6 +61,8 @@ export function TabContent() {
       return <Reports sessionId={activeTab.sessionId} />;
     case "opsec":
       return <OpsecDashboard />;
+    case "workflow":
+      return <WorkflowWizard />;
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">

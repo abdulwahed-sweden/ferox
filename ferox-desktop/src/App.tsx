@@ -27,6 +27,7 @@ import {
   Grid3X3,
   ClipboardList,
   Eye,
+  Shield,
 } from "lucide-react";
 import { Logo } from "./components/ui/Logo";
 import { useState, useRef } from "react";
@@ -70,7 +71,8 @@ function App() {
       | "networkmap"
       | "mitre"
       | "reports"
-      | "opsec",
+      | "opsec"
+      | "workflow",
     title: string,
     icon: string,
   ) => {
@@ -199,6 +201,16 @@ function App() {
             </button>
             {toolsOpen && (
               <div className="absolute top-full left-0 mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-xl py-1 min-w-48 z-50">
+                <button
+                  onClick={() =>
+                    openToolTab("workflow", "Assessment Wizard", "shield")
+                  }
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-dark-700 text-text-secondary hover:text-text-primary flex items-center gap-2"
+                >
+                  <Shield size={14} className="text-ferox-green" />
+                  Assessment Wizard
+                </button>
+                <div className="h-px bg-dark-600 my-1" />
                 <button
                   onClick={() =>
                     openToolTab("payloads", "Payload Builder", "package")

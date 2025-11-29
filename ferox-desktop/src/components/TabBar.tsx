@@ -18,6 +18,7 @@ import {
   Grid3X3,
   ClipboardList,
   Eye,
+  Shield,
 } from "lucide-react";
 import { clsx } from "clsx";
 import type { TabType } from "../types";
@@ -38,6 +39,7 @@ const tabIcons: Record<TabType, typeof Terminal> = {
   mitre: Grid3X3,
   reports: ClipboardList,
   opsec: Eye,
+  workflow: Shield,
 };
 
 export function TabBar() {

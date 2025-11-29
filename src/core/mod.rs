@@ -13,3 +13,4 @@ pub mod result_store;
 pub mod session;
 pub mod session_db;
 pub mod theme;
+pub mod workflow_manager;
