@@ -5,10 +5,12 @@ use anyhow::Result;
 use clap::Subcommand;
 
 use crate::cli::commands::{
-    C2CommandHandler, C2Commands, CredsCommandHandler, CredsCommands, DoctorCommandHandler,
-    LateralCommandHandler, LateralCommands, MemoryCommandHandler, MemoryCommands,
-    MobileCommandHandler, MobileCommands, OpsecCommandHandler, OpsecCommands,
-    PersistCommandHandler, PersistCommands, PrivEscCommandHandler, PrivEscCommands,
+    C2CommandHandler, C2Commands, CleanupCommandHandler, CleanupCommands, CredsCommandHandler,
+    CredsCommands, DoctorCommandHandler, ExfilCommandHandler, ExfilCommands,
+    ExploitCommandHandler, ExploitCommands, LateralCommandHandler, LateralCommands,
+    MemoryCommandHandler, MemoryCommands, MobileCommandHandler, MobileCommands,
+    OpsecCommandHandler, OpsecCommands, PersistCommandHandler, PersistCommands,
+    PostCommandHandler, PostCommands, PrivEscCommandHandler, PrivEscCommands,
     SessionCommandHandler, SessionsCommands, WizardCommandHandler, WizardCommands,
 };
 use crate::cli::doctor::DoctorCommands;
@@ -105,6 +107,22 @@ impl CommandRouter {
                 MobileCommandHandler::new().run(cmd).await?;
                 Ok(RouterDispatch::Handled)
             }
+            Some(RouterCommand::Exploit(cmd)) => {
+                ExploitCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
+            Some(RouterCommand::Post(cmd)) => {
+                PostCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
+            Some(RouterCommand::Exfil(cmd)) => {
+                ExfilCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
+            Some(RouterCommand::Cleanup(cmd)) => {
+                CleanupCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
             Some(RouterCommand::Console) => {
                 self.print_usage();
                 self.ensure_memory_toolchain();
@@ -125,8 +143,8 @@ impl CommandRouter {
     fn print_banner(&self) {
         println!("============================================================================");
         println!("                     Ferox CLI Integration Layer                              ");
-        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral");
-        println!("  opsec | wizard | mobile | console");
+        println!("  doctor | memory | exploit | post | privesc | creds | lateral | persist");
+        println!("  opsec | c2 | exfil | cleanup | wizard | mobile | sessions | console");
         println!("============================================================================");
     }
 
@@ -134,15 +152,19 @@ impl CommandRouter {
         Theme::section("CLI Quick Start");
         Theme::command_help("ferox doctor <cmd>", DoctorCommandHandler::describe());
         Theme::command_help("ferox memory <cmd>", MemoryCommandHandler::describe());
-        Theme::command_help("ferox c2 <cmd>", C2CommandHandler::describe());
-        Theme::command_help("ferox sessions <cmd>", SessionCommandHandler::describe());
-        Theme::command_help("ferox persist <cmd>", PersistCommandHandler::describe());
+        Theme::command_help("ferox exploit <cmd>", ExploitCommandHandler::describe());
+        Theme::command_help("ferox post <cmd>", PostCommandHandler::describe());
         Theme::command_help("ferox privesc <cmd>", PrivEscCommandHandler::describe());
         Theme::command_help("ferox creds <cmd>", CredsCommandHandler::describe());
         Theme::command_help("ferox lateral <cmd>", LateralCommandHandler::describe());
+        Theme::command_help("ferox persist <cmd>", PersistCommandHandler::describe());
         Theme::command_help("ferox opsec <cmd>", OpsecCommandHandler::describe());
+        Theme::command_help("ferox c2 <cmd>", C2CommandHandler::describe());
+        Theme::command_help("ferox exfil <cmd>", ExfilCommandHandler::describe());
+        Theme::command_help("ferox cleanup <cmd>", CleanupCommandHandler::describe());
         Theme::command_help("ferox wizard", WizardCommandHandler::describe());
         Theme::command_help("ferox mobile <cmd>", MobileCommandHandler::describe());
+        Theme::command_help("ferox sessions <cmd>", SessionCommandHandler::describe());
         Theme::command_help("ferox console", "Launch interactive console");
     }
 
@@ -195,32 +217,44 @@ pub enum RouterCommand {
     /// Memory forensics helpers
     #[command(subcommand)]
     Memory(MemoryCommands),
-    /// Command-and-control orchestration helpers
+    /// Exploitation engine commands (Phase 3)
     #[command(subcommand)]
-    C2(C2Commands),
-    /// Session database helpers
+    Exploit(ExploitCommands),
+    /// Post-exploitation engine commands (Phase 4)
     #[command(subcommand)]
-    Sessions(SessionsCommands),
-    /// Persistence engine commands
-    #[command(subcommand)]
-    Persist(PersistCommands),
-    /// Privilege escalation engine commands
+    Post(PostCommands),
+    /// Privilege escalation engine commands (Phase 5)
     #[command(subcommand, name = "privesc")]
     PrivEsc(PrivEscCommands),
     /// Credential harvesting engine commands
     #[command(subcommand)]
     Creds(CredsCommands),
-    /// Lateral movement engine commands
+    /// Lateral movement engine commands (Phase 6)
     #[command(subcommand)]
     Lateral(LateralCommands),
-    /// OPSEC engine commands
+    /// Persistence engine commands (Phase 8)
+    #[command(subcommand)]
+    Persist(PersistCommands),
+    /// OPSEC / evasion engine commands (Phase 7)
     #[command(subcommand)]
     Opsec(OpsecCommands),
+    /// Command-and-control orchestration helpers (Phase 8)
+    #[command(subcommand)]
+    C2(C2Commands),
+    /// Data exfiltration engine commands (Phase 9)
+    #[command(subcommand)]
+    Exfil(ExfilCommands),
+    /// Cleanup and anti-forensics commands (Phase 10)
+    #[command(subcommand)]
+    Cleanup(CleanupCommands),
     /// Attack wizard - guided penetration testing
     Wizard(WizardCommands),
     /// Mobile app security analysis (APK/IPA)
     #[command(subcommand)]
     Mobile(MobileCommands),
+    /// Session database helpers
+    #[command(subcommand)]
+    Sessions(SessionsCommands),
     /// Skip router messaging and jump into console
     Console,
 }
