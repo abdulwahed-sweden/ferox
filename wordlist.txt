@@ -238,3 +238,25 @@ community
 9000
 9090
 27017
+
+# ============  ============
+www
+mail
+ftp
+admin
+blog
+dev
+api
+test
+staging
+ns1
+ns2
+mx
+smtp
+pop
+imap
+vpn
+remote
+secure
+portal
+shop
