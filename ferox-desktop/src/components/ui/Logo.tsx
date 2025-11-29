@@ -3,7 +3,6 @@
  * Official design with eyes and wordmark variant
  */
 
-import { useTheme } from "../../hooks/useTheme";
 
 export type LogoVariant = "icon" | "wordmark";
 export type LogoColor = "auto" | "orange" | "white" | "dark";
@@ -33,9 +32,9 @@ const wordmarkSizes: Record<LogoSize, { height: string; textSize: string }> = {
 };
 
 const colors: Record<Exclude<LogoColor, "auto">, { fox: string; detail: string }> = {
-  orange: { fox: "#FF7F00", detail: "#FFFFFF" },
+  orange: { fox: "#FA7209", detail: "#FFFFFF" },
   white: { fox: "#FFFFFF", detail: "#FFFFFF" },
-  dark: { fox: "#1a1a2e", detail: "#1a1a2e" },
+  dark: { fox: "#12161F", detail: "#12161F" },
 };
 
 // Official Ferox fox logo paths with eyes
@@ -80,16 +79,14 @@ export function Logo({
   variant = "icon",
   color = "auto",
 }: LogoProps) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
-  // Determine fill colors based on color prop and theme
+  // Determine fill colors based on color prop
   let foxColor: string;
   let detailColor: string;
 
   if (color === "auto") {
-    foxColor = isDark ? "#FFFFFF" : "#1a1a2e";
-    detailColor = isDark ? "#FFFFFF" : "#1a1a2e";
+    // Auto mode uses orange fox with white details (eyes/ears)
+    foxColor = "#FA7209";
+    detailColor = "#FFFFFF";
   } else if (color === "orange") {
     foxColor = colors.orange.fox;
     detailColor = colors.orange.detail;
