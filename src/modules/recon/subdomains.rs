@@ -3,7 +3,7 @@ use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use hickory_resolver::TokioResolver;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -52,19 +52,24 @@ impl SubdomainEnum {
     fn read_wordlist<P: AsRef<Path>>(path: P) -> Result<Vec<String>> {
         let file = File::open(path)?;
         let reader = BufReader::new(file);
+        let mut seen = HashSet::new();
         let mut words = Vec::new();
 
         for line in reader.lines() {
             let line = line?;
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
+            let word = line.trim().to_lowercase();
+            // Skip empty lines, comments, and duplicates
+            if word.is_empty() || word.starts_with('#') || word.starts_with('/') {
                 continue;
             }
-            words.push(line.to_string());
+            // Only add if not seen before (deduplication)
+            if seen.insert(word.clone()) {
+                words.push(word);
+            }
         }
 
         if words.is_empty() {
-            return Err(anyhow!("Wordlist is empty"));
+            return Err(anyhow!("Wordlist is empty or contains no valid subdomains"));
         }
 
         Ok(words)
@@ -330,9 +335,14 @@ impl Module for SubdomainEnum {
             let _ = handle.await;
         }
 
-        // Collect results
+        // Collect and deduplicate results
         let guard = results.lock().await;
-        let found: Vec<SubdomainRecord> = guard.clone();
+        let mut seen_subdomains = HashSet::new();
+        let found: Vec<SubdomainRecord> = guard
+            .iter()
+            .filter(|r| seen_subdomains.insert(r.subdomain.clone()))
+            .cloned()
+            .collect();
         drop(guard);
 
         // Prepare result
