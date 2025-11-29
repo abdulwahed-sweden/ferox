@@ -13,5 +13,5 @@ mod multi;
 
 pub use tracker::{ProgressTracker, ProgressUpdate, ProgressCallback};
 pub use bars::{ProgressBar, ProgressStyle};
-pub use spinner::Spinner;
+pub use spinner::{Spinner, SpinnerStyle};
 pub use multi::{MultiProgress, PhaseProgress};

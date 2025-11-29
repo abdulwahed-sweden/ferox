@@ -7,9 +7,9 @@ use clap::Subcommand;
 use crate::cli::commands::{
     C2CommandHandler, C2Commands, CredsCommandHandler, CredsCommands, DoctorCommandHandler,
     LateralCommandHandler, LateralCommands, MemoryCommandHandler, MemoryCommands,
-    OpsecCommandHandler, OpsecCommands, PersistCommandHandler, PersistCommands,
-    PrivEscCommandHandler, PrivEscCommands, SessionCommandHandler, SessionsCommands,
-    WizardCommandHandler, WizardCommands,
+    MobileCommandHandler, MobileCommands, OpsecCommandHandler, OpsecCommands,
+    PersistCommandHandler, PersistCommands, PrivEscCommandHandler, PrivEscCommands,
+    SessionCommandHandler, SessionsCommands, WizardCommandHandler, WizardCommands,
 };
 use crate::cli::doctor::DoctorCommands;
 use crate::cli::theme::Theme;
@@ -101,6 +101,10 @@ impl CommandRouter {
                 WizardCommandHandler::new().run(cmd).await?;
                 Ok(RouterDispatch::Handled)
             }
+            Some(RouterCommand::Mobile(cmd)) => {
+                MobileCommandHandler::new().run(cmd).await?;
+                Ok(RouterDispatch::Handled)
+            }
             Some(RouterCommand::Console) => {
                 self.print_usage();
                 self.ensure_memory_toolchain();
@@ -121,7 +125,8 @@ impl CommandRouter {
     fn print_banner(&self) {
         println!("============================================================================");
         println!("                     Ferox CLI Integration Layer                              ");
-        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral | opsec | wizard | console");
+        println!("  doctor | memory | c2 | sessions | persist | privesc | creds | lateral");
+        println!("  opsec | wizard | mobile | console");
         println!("============================================================================");
     }
 
@@ -137,6 +142,7 @@ impl CommandRouter {
         Theme::command_help("ferox lateral <cmd>", LateralCommandHandler::describe());
         Theme::command_help("ferox opsec <cmd>", OpsecCommandHandler::describe());
         Theme::command_help("ferox wizard", WizardCommandHandler::describe());
+        Theme::command_help("ferox mobile <cmd>", MobileCommandHandler::describe());
         Theme::command_help("ferox console", "Launch interactive console");
     }
 
@@ -212,6 +218,9 @@ pub enum RouterCommand {
     Opsec(OpsecCommands),
     /// Attack wizard - guided penetration testing
     Wizard(WizardCommands),
+    /// Mobile app security analysis (APK/IPA)
+    #[command(subcommand)]
+    Mobile(MobileCommands),
     /// Skip router messaging and jump into console
     Console,
 }
