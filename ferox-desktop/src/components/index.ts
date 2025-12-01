@@ -4,3 +4,5 @@ export { TabContent } from "./TabContent";
 export { Terminal } from "./Terminal";
 export { ContextMenu } from "./ContextMenu";
 export { StatusBar } from "./StatusBar";
+export { ErrorBoundary, InlineErrorFallback, withErrorBoundary } from "./ErrorBoundary";
+export { ConnectionStatus, ConnectionToast, useConnectionStatus } from "./ConnectionStatus";
