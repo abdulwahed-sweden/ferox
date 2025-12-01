@@ -16,6 +16,7 @@ import { PayloadBuilder } from "./PayloadBuilder";
 import { PostExploitation } from "./post_exploitation";
 import { OpsecDashboard } from "./modules/opsec";
 import { WorkflowWizard } from "./WorkflowWizard";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export function TabContent() {
   const { tabs, activeTabId } = useAppStore();
@@ -30,39 +31,100 @@ export function TabContent() {
     );
   }
 
+  // Wrap each module component with ErrorBoundary for graceful error handling
   switch (activeTab.type) {
     case "terminal":
       return <Terminal tabId={activeTab.id} sessionId={activeTab.sessionId} />;
     case "filebrowser":
-      return <FileBrowser sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="FileBrowser">
+          <FileBrowser sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "processes":
-      return <ProcessViewer sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="ProcessViewer">
+          <ProcessViewer sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "payloads":
-      return <PayloadBuilder />;
+      return (
+        <ErrorBoundary name="PayloadBuilder">
+          <PayloadBuilder />
+        </ErrorBoundary>
+      );
     case "network":
-      return <NetworkScanner sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="NetworkScanner">
+          <NetworkScanner sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "scanner":
-      return <NetworkScanner sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="NetworkScanner">
+          <NetworkScanner sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "credentials":
-      return <CredentialsViewer sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="CredentialsViewer">
+          <CredentialsViewer sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "eventlog":
-      return <EventLog sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="EventLog">
+          <EventLog sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "scheduler":
-      return <TaskScheduler sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="TaskScheduler">
+          <TaskScheduler sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "notes":
-      return <Notes sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="Notes">
+          <Notes sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "postexploitation":
-      return <PostExploitation sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="PostExploitation">
+          <PostExploitation sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "networkmap":
-      return <NetworkMap sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="NetworkMap">
+          <NetworkMap sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "mitre":
-      return <MitreAttack sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="MitreAttack">
+          <MitreAttack sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "reports":
-      return <Reports sessionId={activeTab.sessionId} />;
+      return (
+        <ErrorBoundary name="Reports">
+          <Reports sessionId={activeTab.sessionId} />
+        </ErrorBoundary>
+      );
     case "opsec":
-      return <OpsecDashboard />;
+      return (
+        <ErrorBoundary name="OpsecDashboard">
+          <OpsecDashboard />
+        </ErrorBoundary>
+      );
     case "workflow":
-      return <WorkflowWizard />;
+      return (
+        <ErrorBoundary name="WorkflowWizard">
+          <WorkflowWizard />
+        </ErrorBoundary>
+      );
     default:
       return (
         <div className="h-full flex items-center justify-center text-text-muted">

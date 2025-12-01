@@ -19,6 +19,7 @@ import {
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
 import { simulateScheduledTasks } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedTask } from "../../types";
 
 interface TaskSchedulerProps {
@@ -27,7 +28,6 @@ interface TaskSchedulerProps {
 
 export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
   const [tasks, setTasks] = useState<SimulatedTask[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTask, setNewTask] = useState({
     name: "",
@@ -35,21 +35,22 @@ export function TaskScheduler({ sessionId }: TaskSchedulerProps) {
     schedule: "once",
   });
 
-  const loadTasks = async () => {
-    setIsLoading(true);
-    try {
-      const data = await simulateScheduledTasks(sessionId);
+  // Use the new async command hook for task loading
+  const { loading: isLoading, execute: loadTasks } = useAsyncCommand<
+    SimulatedTask[]
+  >(() => simulateScheduledTasks(sessionId), {
+    onSuccess: (data) => {
       setTasks(data);
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to load tasks:", error);
       toast.error("Failed to load scheduled tasks");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   useEffect(() => {
     loadTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const handleAddTask = () => {

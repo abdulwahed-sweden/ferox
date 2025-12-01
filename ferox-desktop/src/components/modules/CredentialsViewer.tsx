@@ -21,6 +21,7 @@ import {
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
 import { simulateCredentialDump } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedCredential, CredentialDumpResult } from "../../types";
 
 interface CredentialsViewerProps {
@@ -33,26 +34,32 @@ export function CredentialsViewer({ sessionId }: CredentialsViewerProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [showValues, setShowValues] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const loadCredentials = async () => {
-    setIsLoading(true);
-    try {
-      toast.loading("Harvesting credentials...", { id: "creds" });
-      const data = await simulateCredentialDump(sessionId, []);
-      setResult(data);
-      setCredentials(data.credentials);
-      toast.success(`Found ${data.total_found} credentials`, { id: "creds" });
-    } catch (error) {
-      console.error("Failed to load credentials:", error);
-      toast.error("Failed to harvest credentials", { id: "creds" });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Use the new async command hook for credential harvesting
+  const { loading: isLoading, execute: loadCredentials } =
+    useAsyncCommand<CredentialDumpResult>(
+      async () => {
+        toast.loading("Harvesting credentials...", { id: "creds" });
+        return simulateCredentialDump(sessionId, []);
+      },
+      {
+        onSuccess: (data) => {
+          setResult(data);
+          setCredentials(data.credentials);
+          toast.success(`Found ${data.total_found} credentials`, {
+            id: "creds",
+          });
+        },
+        onError: (error) => {
+          console.error("Failed to load credentials:", error);
+          toast.error("Failed to harvest credentials", { id: "creds" });
+        },
+      }
+    );
 
   useEffect(() => {
     loadCredentials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const filteredCredentials = credentials.filter((cred) => {

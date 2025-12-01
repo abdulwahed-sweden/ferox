@@ -19,8 +19,9 @@ import {
 } from "lucide-react";
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
-import { Spinner } from "../Loading";
+import { Spinner } from "../ui/Loading";
 import { simulateDirectoryListing } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedFileEntry, DirectoryListing } from "../../types";
 
 interface FileBrowserProps {
@@ -39,30 +40,35 @@ export function FileBrowser({ sessionId }: FileBrowserProps) {
   const [listing, setListing] = useState<DirectoryListing | null>(null);
   const [files, setFiles] = useState<SimulatedFileEntry[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
 
-  const handleNavigate = useCallback(
-    async (path: string) => {
-      setLoading(true);
-      setSelectedFile(null);
-      try {
-        const result = await simulateDirectoryListing(path, sessionId);
-        setListing(result);
-        setFiles(result.entries);
-        setCurrentPath(result.path);
-      } catch (error) {
-        console.error("Failed to list directory:", error);
-        toast.error("Failed to access directory");
-      } finally {
-        setLoading(false);
-      }
+  // Use the new async command hook for directory listing
+  const { loading, execute: fetchDirectory } = useAsyncCommand<
+    DirectoryListing,
+    [string]
+  >((path: string) => simulateDirectoryListing(path, sessionId), {
+    onSuccess: (result) => {
+      setListing(result);
+      setFiles(result.entries);
+      setCurrentPath(result.path);
     },
-    [sessionId],
+    onError: (error) => {
+      console.error("Failed to list directory:", error);
+      toast.error("Failed to access directory");
+    },
+  });
+
+  const handleNavigate = useCallback(
+    (path: string) => {
+      setSelectedFile(null);
+      fetchDirectory(path);
+    },
+    [fetchDirectory]
   );
 
   useEffect(() => {
     handleNavigate(currentPath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGoUp = useCallback(() => {

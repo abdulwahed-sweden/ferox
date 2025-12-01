@@ -16,6 +16,8 @@ import {
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
 import { simulateNetworkScan } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
+import { CidrSchema } from "../../lib/validation";
 import type { SimulatedHost, NetworkScanResult } from "../../types";
 
 interface NetworkScannerProps {
@@ -23,38 +25,51 @@ interface NetworkScannerProps {
 }
 
 export function NetworkScanner({ sessionId }: NetworkScannerProps) {
-  const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<NetworkScanResult | null>(null);
   const [hosts, setHosts] = useState<SimulatedHost[]>([]);
   const [selectedHost, setSelectedHost] = useState<SimulatedHost | null>(null);
   const [scanRange, setScanRange] = useState("192.168.1.0/24");
 
-  const handleScan = async () => {
-    setIsScanning(true);
+  // Use the new async command hook for network scanning
+  const { loading: isScanning, execute: executeScan } = useAsyncCommand<
+    NetworkScanResult,
+    [string]
+  >(
+    async (subnet: string) => {
+      toast.loading("Scanning network...", { id: "scan" });
+      return simulateNetworkScan(subnet, sessionId);
+    },
+    {
+      onSuccess: async (result) => {
+        // Simulate progressive discovery for better UX
+        for (let i = 0; i < result.hosts.length; i++) {
+          await new Promise((r) => setTimeout(r, 200 + Math.random() * 300));
+          setHosts((prev) => [...prev, result.hosts[i]]);
+        }
+        setScanResult(result);
+        toast.success(`Scan complete: ${result.hosts_up} hosts up`, {
+          id: "scan",
+        });
+      },
+      onError: (error) => {
+        console.error("Scan failed:", error);
+        toast.error("Scan failed", { id: "scan" });
+      },
+    }
+  );
+
+  const handleScan = () => {
+    // Validate CIDR input before scanning
+    const validation = CidrSchema.safeParse(scanRange);
+    if (!validation.success) {
+      toast.error("Invalid CIDR format (e.g., 192.168.1.0/24)");
+      return;
+    }
+
     setHosts([]);
     setSelectedHost(null);
     setScanResult(null);
-
-    try {
-      toast.loading("Scanning network...", { id: "scan" });
-      const result = await simulateNetworkScan(scanRange, sessionId);
-
-      // Simulate progressive discovery for better UX
-      for (let i = 0; i < result.hosts.length; i++) {
-        await new Promise((r) => setTimeout(r, 200 + Math.random() * 300));
-        setHosts((prev) => [...prev, result.hosts[i]]);
-      }
-
-      setScanResult(result);
-      toast.success(`Scan complete: ${result.hosts_up} hosts up`, {
-        id: "scan",
-      });
-    } catch (error) {
-      console.error("Scan failed:", error);
-      toast.error("Scan failed", { id: "scan" });
-    } finally {
-      setIsScanning(false);
-    }
+    executeScan(scanRange);
   };
 
   const getPortStateColor = (state: string) => {

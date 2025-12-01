@@ -17,6 +17,7 @@ import {
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
 import { simulateSessionNotes } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedNote } from "../../types";
 
 interface NotesProps {
@@ -29,23 +30,23 @@ export function Notes({ sessionId }: NotesProps) {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editTags, setEditTags] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const loadNotes = async () => {
-    setIsLoading(true);
-    try {
-      const data = await simulateSessionNotes(sessionId);
+  // Use the new async command hook for notes loading
+  const { loading: isLoading, execute: loadNotes } = useAsyncCommand<
+    SimulatedNote[]
+  >(() => simulateSessionNotes(sessionId), {
+    onSuccess: (data) => {
       setNotes(data);
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to load notes:", error);
       toast.error("Failed to load notes");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   useEffect(() => {
     loadNotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const handleNewNote = () => {

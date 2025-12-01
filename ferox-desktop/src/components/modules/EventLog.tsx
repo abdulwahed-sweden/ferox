@@ -15,6 +15,7 @@ import {
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
 import { simulateEventLog } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedLogEntry } from "../../types";
 
 const MODULES = [
@@ -39,37 +40,41 @@ export function EventLog({ sessionId: _sessionId }: EventLogProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
   const [levelFilter, setLevelFilter] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
+
+  // Use the new async command hook for event log loading
+  const { loading: isLoading, execute: fetchLogs } = useAsyncCommand<
+    SimulatedLogEntry[],
+    [number | undefined]
+  >((count?: number) => simulateEventLog(count), {
+    onError: (error) => {
+      console.error("Failed to load logs:", error);
+    },
+  });
 
   const loadLogs = useCallback(
     async (append = false) => {
       if (isPaused && append) return;
 
-      setIsLoading(true);
-      try {
-        const newLogs = await simulateEventLog(append ? 5 : 50);
+      const newLogs = await fetchLogs(append ? 5 : 50);
+      if (!newLogs) return;
 
-        if (append) {
-          setLogs((prev) => {
-            const combined = [...newLogs.slice(0, 5), ...prev];
-            return combined.slice(0, 200); // Keep max 200 logs
-          });
-        } else {
-          setLogs(newLogs);
-        }
-      } catch (error) {
-        console.error("Failed to load logs:", error);
-      } finally {
-        setIsLoading(false);
+      if (append) {
+        setLogs((prev) => {
+          const combined = [...newLogs.slice(0, 5), ...prev];
+          return combined.slice(0, 200); // Keep max 200 logs
+        });
+      } else {
+        setLogs(newLogs);
       }
     },
-    [isPaused],
+    [isPaused, fetchLogs]
   );
 
   // Initial load
   useEffect(() => {
     loadLogs(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-refresh with simulated new logs

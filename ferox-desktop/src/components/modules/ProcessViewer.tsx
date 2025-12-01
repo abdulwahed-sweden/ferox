@@ -15,8 +15,9 @@ import {
 } from "lucide-react";
 import { clsx } from "clsx";
 import toast from "react-hot-toast";
-import { Spinner } from "../Loading";
+import { Spinner } from "../ui/Loading";
 import { simulateProcessList } from "../../lib/tauri";
+import { useAsyncCommand } from "../../hooks";
 import type { SimulatedProcess, ProcessListResult } from "../../types";
 
 interface ProcessViewerProps {
@@ -27,28 +28,27 @@ export function ProcessViewer({ sessionId }: ProcessViewerProps) {
   const [result, setResult] = useState<ProcessListResult | null>(null);
   const [processes, setProcesses] = useState<SimulatedProcess[]>([]);
   const [selectedPid, setSelectedPid] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<keyof SimulatedProcess>("cpu");
   const [sortDesc, setSortDesc] = useState(true);
 
-  const loadProcesses = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await simulateProcessList(sessionId);
-      setResult(data);
-      setProcesses(data.processes);
-    } catch (error) {
-      console.error("Failed to load processes:", error);
-      toast.error("Failed to enumerate processes");
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionId]);
+  // Use the new async command hook for process listing
+  const { loading, execute: loadProcesses } =
+    useAsyncCommand<ProcessListResult>(() => simulateProcessList(sessionId), {
+      onSuccess: (data) => {
+        setResult(data);
+        setProcesses(data.processes);
+      },
+      onError: (error) => {
+        console.error("Failed to load processes:", error);
+        toast.error("Failed to enumerate processes");
+      },
+    });
 
   useEffect(() => {
     loadProcesses();
-  }, [loadProcesses]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRefresh = useCallback(() => {
     loadProcesses();
