@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEROX Framework - Penetration Testing Scenarios</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           SIMPLIFIED COLOR PALETTE
+           - White backgrounds
+           - Dark gray text: #374151
+           - Accent (coral red): #E94560
+           - Subtle borders: #E5E7EB
+           ============================================ */
+        :root {
+            --white: #FFFFFF;
+            --bg-light: #FAFAFA;
+            --text-primary: #374151;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --accent: #E94560;
+            --accent-dark: #D63853;
+            --border: #E5E7EB;
+            --border-light: #F3F4F6;
+        }
+
+        /* ============================================
+           BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           HEADER STYLES
+           ============================================ */
+        .header {
+            background: var(--white);
+            padding: 80px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: 6px;
+        }
+
+        .logo-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+            background: var(--bg-light);
+        }
+
+        /* ============================================
+           MAIN CONTENT AREA
+           ============================================ */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* ============================================
+           SECTION TITLES
+           ============================================ */
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 80px 0 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* ============================================
+           SCENARIO CARDS
+           ============================================ */
+        .scenario {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 48px;
+            margin-top: 40px;
+            transition: border-color 0.2s ease;
+        }
+
+        .scenario:hover {
+            border-color: var(--accent);
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .scenario-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .scenario-number {
+            background: var(--accent);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           BADGES
+           ============================================ */
+        .badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            background: var(--bg-light);
+        }
+
+        .badge-basic {
+            border-color: var(--text-muted);
+        }
+
+        .badge-advanced {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--white);
+        }
+
+        .badge-expert {
+            border-color: var(--accent);
+            color: var(--white);
+            background: var(--accent);
+        }
+
+        /* ============================================
+           SUB-SCENARIOS
+           ============================================ */
+        .sub-scenario {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            margin: 32px 0;
+            border-left: 3px solid var(--accent);
+        }
+
+        .sub-scenario-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        /* ============================================
+           HEADINGS
+           ============================================ */
+        h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+        }
+
+        h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 24px 0 12px;
+        }
+
+        /* ============================================
+           PARAGRAPHS & TEXT
+           ============================================ */
+        p {
+            margin: 12px 0 20px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           CODE BLOCKS
+           ============================================ */
+        .code-block {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 28px 0;
+        }
+
+        .code-header {
+            background: var(--text-primary);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .dot:nth-child(1) { background: #EF4444; }
+        .dot:nth-child(2) { background: #F59E0B; }
+        .dot:nth-child(3) { background: #10B981; }
+
+        .lang {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .code-content {
+            padding: 28px;
+            overflow-x: auto;
+            line-height: 2.0;
+        }
+
+        .code-content code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            display: block;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting - Simplified */
+        .cmd { color: var(--text-muted); font-weight: 600; }
+        .keyword { color: var(--accent); font-weight: 600; }
+        .param { color: #0369A1; }
+        .value { color: #059669; }
+        .string { color: #0369A1; }
+        .number { color: #7C3AED; }
+        .comment { color: var(--text-muted); font-style: italic; }
+
+        /* Inline Code */
+        code:not(.code-content code) {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================
+           TABLES
+           ============================================ */
+        .table-container {
+            overflow-x: auto;
+            margin: 28px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: var(--accent);
+            color: var(--white);
+            padding: 16px 24px;
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg-light);
+        }
+
+        tr:nth-child(odd) {
+            background: var(--white);
+        }
+
+        /* ============================================
+           ALERT BOXES - Simplified with accent
+           ============================================ */
+        .alert-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 24px 28px;
+            margin: 28px 0;
+        }
+
+        .alert-box h4 {
+            color: var(--text-primary);
+            margin: 0 0 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .alert-box p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* ============================================
+           LISTS
+           ============================================ */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 28px;
+        }
+
+        li {
+            margin: 12px 0;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* ============================================
+           STATS CARDS
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            transition: border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ============================================
+           FEATURE GRID
+           ============================================ */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            transition: border-color 0.2s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+        }
+
+        .feature-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--white);
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+            color: var(--white);
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            background: var(--bg-light);
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: 4px;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 60px 24px;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .content {
+                padding: 40px 24px;
+            }
+
+            .scenario {
+                padding: 32px 24px;
+            }
+
+            .sub-scenario {
+                padding: 24px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+                margin: 60px 0 30px;
+            }
+
+            .code-content {
+                padding: 20px;
+            }
+
+            th, td {
+                padding: 14px 16px;
+            }
+
+            .scenario-header {
+                flex-direction: column;
+            }
+
+            .nav-content {
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .scenario-title {
+                font-size: 1.15rem;
+            }
+
+            .nav-link {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">FEROX</h1>
+            <p class="logo-subtitle">Advanced Penetration Testing Framework</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="#reconnaissance" class="nav-link">Reconnaissance</a>
+            <a href="#scanning" class="nav-link">Scanning</a>
+            <a href="#exploitation" class="nav-link">Exploitation</a>
+            <a href="#post-exploitation" class="nav-link">Post-Exploitation</a>
+            <a href="#persistence" class="nav-link">Persistence</a>
+            <a href="#reporting" class="nav-link">Reporting</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Introduction Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">30</div>
+                <div class="stat-label">Test Scenarios</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">150+</div>
+                <div class="stat-label">Integrated Tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Modules</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Open Source</div>
+            </div>
+        </div>
+
+        <!-- Section: Reconnaissance -->
+        <section id="reconnaissance">
+            <h2 class="section-title">Reconnaissance Phase</h2>
+
+            <!-- Scenario 1 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">01</span>
+                        Subdomain Enumeration
+                    </h3>
+                    <span class="badge badge-basic">Basic</span>
+                </div>
+
+                <p>This scenario enables comprehensive subdomain information gathering using multiple data sources including DNS records, certificate transparency logs, and search engines.</p>
+
+                <div class="alert-box">
+                    <h4>Important Note</h4>
+                    <p>Ensure you have proper authorization before conducting any reconnaissance activities on target systems.</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">recon/subdomain_enum</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DOMAIN</span> <span class="string">example.com</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">THREADS</span> <span class="number">50</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">OUTPUT</span> <span class="string">./results/subdomains.txt</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span>
+
+<span class="comment"># Expected output:</span>
+<span class="comment"># [+] Found: api.example.com</span>
+<span class="comment"># [+] Found: mail.example.com</span>
+<span class="comment"># [+] Found: admin.example.com</span></code>
+                    </div>
+                </div>
+
+                <div class="sub-scenario">
+                    <h4 class="sub-scenario-title">Advanced Options</h4>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Description</th>
+                                    <th>Default Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>DOMAIN</code></td>
+                                    <td>Target domain</td>
+                                    <td>Required</td>
+                                </tr>
+                                <tr>
+                                    <td><code>THREADS</code></td>
+                                    <td>Number of concurrent threads</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td><code>WORDLIST</code></td>
+                                    <td>Custom wordlist path</td>
+                                    <td>default.txt</td>
+                                </tr>
+                                <tr>
+                                    <td><code>RECURSIVE</code></td>
+                                    <td>Enable recursive search</td>
+                                    <td>false</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Security Warning</h4>
+                    <p>Using a high number of threads may result in your IP being blocked. Start with lower values and increase gradually.</p>
+                </div>
+            </article>
+
+            <!-- Scenario 2 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">02</span>
+                        DNS Record Analysis
+                    </h3>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+
+                <p>Comprehensive DNS record analysis to discover infrastructure details and associated services of the target organization.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">recon/dns_analysis</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TARGET</span> <span class="string">example.com</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">RECORD_TYPES</span> <span class="string">A,AAAA,MX,TXT,NS,SOA</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DNS_SERVER</span> <span class="string">8.8.8.8</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Pro Tip</h4>
+                    <p>Use multiple DNS servers to get more comprehensive results and verify consistency across different resolvers.</p>
+                </div>
+            </article>
+
+            <!-- Scenario 3 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">03</span>
+                        OSINT Data Collection
+                    </h3>
+                    <span class="badge badge-expert">Expert</span>
+                </div>
+
+                <p>Leverage open-source intelligence to gather comprehensive information about the target organization from public sources.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4 class="feature-title">Web Search</h4>
+                        <p class="feature-description">Gather information from search engines and web archives.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="feature-title">Email Discovery</h4>
+                        <p class="feature-description">Discover associated email addresses and patterns.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="feature-title">Employee Profiles</h4>
+                        <p class="feature-description">Collect employee information from professional networks.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="feature-title">Document Analysis</h4>
+                        <p class="feature-description">Extract metadata from publicly available files.</p>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">recon/osint_collector</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">COMPANY</span> <span class="string">"Example Corp"</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DOMAIN</span> <span class="string">example.com</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">MODULES</span> <span class="string">all</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DEPTH</span> <span class="number">3</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Legal Notice</h4>
+                    <p>Ensure compliance with local laws and privacy policies when collecting OSINT data.</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- Section: Scanning -->
+        <section id="scanning">
+            <h2 class="section-title">Scanning Phase</h2>
+
+            <!-- Scenario 4 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">04</span>
+                        Advanced Port Scanning
+                    </h3>
+                    <span class="badge badge-basic">Basic</span>
+                </div>
+
+                <p>Perform comprehensive port scanning using multiple techniques to evade detection while maintaining accuracy.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">scan/port_scanner</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TARGET</span> <span class="string">192.168.1.0/24</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">PORTS</span> <span class="string">1-65535</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SCAN_TYPE</span> <span class="string">SYN</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">RATE</span> <span class="number">1000</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TIMEOUT</span> <span class="number">3000</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="sub-scenario">
+                    <h4 class="sub-scenario-title">Supported Scan Types</h4>
+
+                    <ul>
+                        <li><strong>SYN Scan:</strong> Half-open scan, fast and stealthy</li>
+                        <li><strong>TCP Connect:</strong> Full connection scan, more reliable</li>
+                        <li><strong>UDP Scan:</strong> For detecting UDP services</li>
+                        <li><strong>ACK Scan:</strong> For firewall rule detection</li>
+                        <li><strong>FIN/NULL/Xmas:</strong> For evading some detection systems</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Scenario 5 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">05</span>
+                        Automated Vulnerability Detection
+                    </h3>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+
+                <p>Automated scanning for known vulnerabilities using the latest CVE database and custom detection signatures.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">scan/vuln_scanner</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TARGET</span> <span class="string">192.168.1.100</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SCAN_TYPE</span> <span class="string">comprehensive</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">CVE_DB</span> <span class="string">latest</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span>
+
+<span class="comment"># Sample output:</span>
+<span class="comment"># [CRITICAL] CVE-2021-44228 - Log4Shell</span>
+<span class="comment"># [HIGH] CVE-2021-34527 - PrintNightmare</span>
+<span class="comment"># [MEDIUM] CVE-2020-1472 - Zerologon</span></code>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Severity Level</th>
+                                <th>CVSS Score</th>
+                                <th>Recommended Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Critical</td>
+                                <td>9.0 - 10.0</td>
+                                <td>Immediate remediation</td>
+                            </tr>
+                            <tr>
+                                <td>High</td>
+                                <td>7.0 - 8.9</td>
+                                <td>Remediate within 24 hours</td>
+                            </tr>
+                            <tr>
+                                <td>Medium</td>
+                                <td>4.0 - 6.9</td>
+                                <td>Remediate within 1 week</td>
+                            </tr>
+                            <tr>
+                                <td>Low</td>
+                                <td>0.1 - 3.9</td>
+                                <td>Schedule for maintenance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <!-- Section: Exploitation -->
+        <section id="exploitation">
+            <h2 class="section-title">Exploitation Phase</h2>
+
+            <!-- Scenario 6 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">06</span>
+                        Web Application Exploitation
+                    </h3>
+                    <span class="badge badge-expert">Expert</span>
+                </div>
+
+                <p>Comprehensive web application testing toolkit including SQL Injection, XSS, and CSRF testing capabilities.</p>
+
+                <div class="alert-box">
+                    <h4>Important Warning</h4>
+                    <p>Only use these tools on systems you have explicit authorization to test. Unauthorized use is a criminal offense.</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="comment"># SQL Injection Testing</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">exploit/web/sqli</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">URL</span> <span class="string">"http://target.com/login.php"</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">PARAM</span> <span class="string">username</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TECHNIQUE</span> <span class="string">UNION</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DBMS</span> <span class="string">MySQL</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="sub-scenario">
+                    <h4 class="sub-scenario-title">Supported SQL Injection Techniques</h4>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Technique</th>
+                                    <th>Description</th>
+                                    <th>Effectiveness</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>UNION</td>
+                                    <td>Extract data via UNION SELECT</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td>Boolean-based</td>
+                                    <td>Infer data from response differences</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td>Time-based</td>
+                                    <td>Infer data from time delays</td>
+                                    <td>Slow</td>
+                                </tr>
+                                <tr>
+                                    <td>Error-based</td>
+                                    <td>Extract data from error messages</td>
+                                    <td>High</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Scenario 7 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">07</span>
+                        Password Cracking
+                    </h3>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+
+                <p>Advanced tools for auditing password strength and testing authentication mechanisms across multiple protocols.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">exploit/auth/brute_force</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TARGET</span> <span class="string">ssh://192.168.1.100</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">USERLIST</span> <span class="string">./wordlists/users.txt</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">PASSLIST</span> <span class="string">./wordlists/rockyou.txt</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">THREADS</span> <span class="number">10</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">DELAY</span> <span class="number">500</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Supported Protocols</h4>
+                    <p>SSH, FTP, Telnet, HTTP Basic/Digest, SMB, RDP, MySQL, PostgreSQL, MSSQL, Oracle, VNC, LDAP</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- Section: Post-Exploitation -->
+        <section id="post-exploitation">
+            <h2 class="section-title">Post-Exploitation Phase</h2>
+
+            <!-- Scenario 8 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">08</span>
+                        Privilege Escalation
+                    </h3>
+                    <span class="badge badge-expert">Expert</span>
+                </div>
+
+                <p>Advanced techniques for privilege escalation on Windows and Linux systems.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="comment"># Windows Privilege Escalation</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">post/windows/privesc</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SESSION</span> <span class="number">1</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TECHNIQUE</span> <span class="string">auto</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span>
+
+<span class="comment"># Discovered techniques:</span>
+<span class="comment"># [+] Unquoted Service Path: VulnService</span>
+<span class="comment"># [+] Weak Service Permissions: BackupSvc</span>
+<span class="comment"># [+] AlwaysInstallElevated: Enabled</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Best Practice</h4>
+                    <p>Always document each step of privilege escalation for the final report.</p>
+                </div>
+            </article>
+
+            <!-- Scenario 9 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">09</span>
+                        Credential Harvesting
+                    </h3>
+                    <span class="badge badge-advanced">Advanced</span>
+                </div>
+
+                <p>Extract passwords and certificates from compromised systems using multiple collection techniques.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">post/credentials/dump</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SESSION</span> <span class="number">1</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SOURCES</span> <span class="string">all</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span>
+
+<span class="comment"># Supported sources:</span>
+<span class="comment"># - SAM Database</span>
+<span class="comment"># - LSASS Memory</span>
+<span class="comment"># - Browser Credentials</span>
+<span class="comment"># - Cached Credentials</span>
+<span class="comment"># - Kerberos Tickets</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Security Notice</h4>
+                    <p>Ensure all extracted credentials are encrypted and stored securely according to data handling policies.</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- Section: Persistence -->
+        <section id="persistence">
+            <h2 class="section-title">Persistence Phase</h2>
+
+            <!-- Scenario 10 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">10</span>
+                        Encrypted Communication Channels
+                    </h3>
+                    <span class="badge badge-expert">Expert</span>
+                </div>
+
+                <p>Establish encrypted communication channels for persistent access during authorized testing engagements.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">persist/tunnel/encrypted</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">SESSION</span> <span class="number">1</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">PROTOCOL</span> <span class="string">DNS</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">ENCRYPTION</span> <span class="string">AES-256</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">CALLBACK</span> <span class="string">c2.example.com</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Important Reminder</h4>
+                    <p>Ensure all persistence mechanisms are removed after the agreed testing period ends.</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- Section: Reporting -->
+        <section id="reporting">
+            <h2 class="section-title">Reporting Phase</h2>
+
+            <!-- Scenario 11 -->
+            <article class="scenario">
+                <div class="scenario-header">
+                    <h3 class="scenario-title">
+                        <span class="scenario-number">11</span>
+                        Automated Report Generation
+                    </h3>
+                    <span class="badge badge-basic">Basic</span>
+                </div>
+
+                <p>Generate professional reports in multiple formats with risk classification and remediation recommendations.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="lang">ferox-console</span>
+                    </div>
+                    <div class="code-content">
+                        <code><span class="cmd">ferox&gt;</span> <span class="keyword">use</span> <span class="value">report/generate</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">PROJECT</span> <span class="string">"Pentest_2024"</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">FORMAT</span> <span class="string">PDF,HTML,JSON</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">TEMPLATE</span> <span class="string">executive</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">set</span> <span class="param">INCLUDE_EVIDENCE</span> <span class="string">true</span>
+<span class="cmd">ferox&gt;</span> <span class="keyword">run</span></code>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4 class="feature-title">Executive Summary</h4>
+                        <p class="feature-description">High-level overview for senior management with key findings.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="feature-title">Technical Report</h4>
+                        <p class="feature-description">Detailed findings for the technical security team.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4 class="feature-title">Remediation Plan</h4>
+                        <p class="feature-description">Prioritized recommendations for fixing vulnerabilities.</p>
+                    </div>
+                </div>
+
+                <div class="alert-box">
+                    <h4>Complete</h4>
+                    <p>You have completed all basic penetration testing scenarios. Review the final report before client delivery.</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- Additional Resources -->
+        <section id="resources">
+            <h2 class="section-title">Additional Resources</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4 class="feature-title">Documentation</h4>
+                    <p class="feature-description">Complete official documentation for all modules and commands.</p>
+                    <a href="#" class="btn" style="margin-top: 16px;">View Docs</a>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">Training Courses</h4>
+                    <p class="feature-description">Advanced training courses to master the framework.</p>
+                    <a href="#" class="btn" style="margin-top: 16px;">Start Learning</a>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">Community Support</h4>
+                    <p class="feature-description">Join our active community for help and discussions.</p>
+                    <a href="#" class="btn" style="margin-top: 16px;">Join Now</a>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">Updates</h4>
+                    <p class="feature-description">Stay updated with the latest features and improvements.</p>
+                    <a href="#" class="btn" style="margin-top: 16px;">View Updates</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">FEROX</div>
+            <p class="footer-text">Advanced Penetration Testing Framework - Built with Rust</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">GitHub</a>
+                <a href="#" class="footer-link">Documentation</a>
+                <a href="#" class="footer-link">Support</a>
+                <a href="#" class="footer-link">Blog</a>
+                <a href="#" class="footer-link">MIT License</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth Scroll Script -->
+    <script>
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
