@@ -1,93 +1,124 @@
 /* ==========================================
    Ferox Desktop - Professional Theme System
-   "Arctic Professional" (Light) + "Midnight Operations" (Dark)
-   Enhanced with Ferox Theme System variables
-   Optimized for security tools & extended use
+   Complete UI/UX Overhaul
    ========================================== */
 
 @layer base {
   :root {
-    /* ==========================================
-       LIGHT THEME - "Arctic Professional"
-       Clean, corporate, high readability
-       ========================================== */
+    /* ========== LIGHT THEME ========== */
 
-    /* Backgrounds - Cool, clean blue-gray */
-    --background: 210 20% 96%; /* Crisp light gray with cool undertone */
-    --foreground: 220 25% 12%; /* Soft dark (not pure black - easier on eyes) */
+    /* Core Colors */
+    --background: 220 20% 98%;
+    --foreground: 220 15% 25%;
 
-    /* Cards & Panels - Pure white for clear hierarchy */
-    --card: 0 0% 100%; /* Pure white */
-    --card-foreground: 220 25% 12%; /* Matching dark text */
+    /* Card/Surface */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 25%;
 
-    /* Popovers & Dropdowns */
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 12%;
+    --popover-foreground: 220 15% 25%;
 
-    /* Primary Brand - Trustworthy corporate blue */
-    --primary: 215 85% 48%; /* Professional blue */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
+    /* Primary (FEROX Red) */
+    --primary: 349 81% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary Elements - Clean, not muddy */
-    --secondary: 210 15% 92%; /* Light, clean gray */
-    --secondary-foreground: 220 20% 18%; /* Readable dark */
+    /* Secondary */
+    --secondary: 220 20% 93%;
+    --secondary-foreground: 220 15% 20%;
 
-    /* Muted/Subtle - Balanced visibility */
-    --muted: 210 15% 92%;
-    --muted-foreground: 215 15% 38%; /* Sweet spot - visible but subtle */
+    /* Muted */
+    --muted: 220 20% 93%;
+    --muted-foreground: 220 10% 40%;
 
-    /* Accent Color - Subtle blue tint */
-    --accent: 210 25% 90%;
-    --accent-foreground: 220 20% 18%;
+    /* Accent (Yellow/Gold) */
+    --accent: 45 93% 47%;
+    --accent-foreground: 45 93% 15%;
 
-    /* Destructive/Error - Refined red */
-    --destructive: 0 72% 48%; /* Professional, not aggressive */
+    /* Destructive/Error */
+    --destructive: 354 70% 50%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-bg: 354 70% 95%;
+    --destructive-text: 354 70% 30%;
+    --destructive-border: 354 70% 50%;
 
-    /* Borders & Inputs */
-    --border: 214 20% 78%; /* Visible but not harsh */
-    --input: 214 20% 78%;
-    --ring: 215 85% 48%; /* Match primary */
+    /* Success */
+    --success: 140 60% 35%;
+    --success-foreground: 0 0% 100%;
+    --success-bg: 140 60% 95%;
+    --success-text: 140 60% 20%;
+    --success-border: 140 60% 35%;
 
-    /* Sidebar - Dark sidebar for contrast */
-    --sidebar-background: 220 20% 12%; /* Deep slate */
-    --sidebar-foreground: 210 15% 95%; /* Soft white */
-    --sidebar-primary: 210 15% 95%;
-    --sidebar-primary-foreground: 220 20% 12%;
-    --sidebar-accent: 220 18% 18%;
-    --sidebar-accent-foreground: 210 15% 95%;
-    --sidebar-border: 220 18% 18%;
-    --sidebar-ring: 210 15% 95%;
+    /* Warning */
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
+    --warning-bg: 38 92% 95%;
+    --warning-text: 38 92% 20%;
+    --warning-border: 38 92% 45%;
 
-    /* Chart Colors - Professional palette */
-    --chart-1: 215 85% 48%; /* Primary blue */
-    --chart-2: 162 60% 38%; /* Teal */
-    --chart-3: 25 85% 45%; /* Burnt orange */
-    --chart-4: 270 50% 50%; /* Purple */
-    --chart-5: 152 55% 38%; /* Green */
-    --chart-6: 0 72% 48%; /* Red */
-    --chart-7: 330 65% 45%; /* Pink */
-    --chart-8: 85 55% 40%; /* Lime */
+    /* Info */
+    --info: 210 90% 40%;
+    --info-foreground: 0 0% 100%;
+    --info-bg: 210 90% 95%;
+    --info-text: 210 90% 20%;
+    --info-border: 210 90% 40%;
 
-    /* Ferox Brand - Sophisticated teal-green */
-    --ferox-green: 162 72% 32%; /* Deep, professional teal */
-    --ferox-green-hover: 162 72% 28%; /* Darker on hover */
-    --ferox-green-bright: 162 72% 42%; /* For emphasis */
+    /* Border & Input */
+    --border: 220 13% 85%;
+    --input: 220 13% 91%;
+    --ring: 349 81% 50%;
 
-    /* Status Colors - Clear, professional */
-    --status-online: 152 60% 32%; /* Deep green - authority */
-    --status-offline: 0 72% 48%; /* Refined red */
-    --status-idle: 25 85% 42%; /* Burnt orange - professional */
-    --status-away: 270 50% 45%; /* Muted purple */
+    /* Sidebar (Always Dark) */
+    --sidebar-background: 222 24% 10%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 349 81% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 23% 16%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 222 18% 22%;
+    --sidebar-ring: 349 81% 59%;
+
+    /* Code Block (Light) */
+    --code-bg: 220 15% 95%;
+    --code-header-bg: 220 15% 90%;
+    --code-text: 220 15% 25%;
+    --code-keyword: 349 81% 40%;
+    --code-param: 38 92% 30%;
+    --code-value: 140 60% 28%;
+    --code-comment: 220 10% 50%;
+    --code-cmd: 220 10% 35%;
+
+    /* Charts */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --chart-6: 0 72% 48%;
+    --chart-7: 330 65% 45%;
+    --chart-8: 85 55% 40%;
+
+    /* Ferox Brand - Professional teal-green */
+    --ferox-green: 162 72% 32%;
+    --ferox-green-hover: 162 72% 28%;
+    --ferox-green-bright: 162 72% 42%;
+
+    /* Status Colors */
+    --status-online: 152 60% 32%;
+    --status-offline: 0 72% 48%;
+    --status-idle: 25 85% 42%;
+    --status-away: 270 50% 45%;
 
     /* Icon Colors - High contrast for visibility */
-    --icon-primary: 220 25% 12%; /* Match foreground */
-    --icon-secondary: 215 15% 38%; /* Match muted-foreground */
-    --icon-tertiary: 215 12% 52%; /* Lighter */
+    --icon-primary: 220 25% 12%;
+    --icon-secondary: 215 15% 38%;
+    --icon-tertiary: 215 12% 52%;
+    --icon-primary-color: 220 25% 12%;
+    --icon-secondary-color: 215 15% 38%;
+    --icon-tertiary-color: 215 12% 52%;
 
     /* ==========================================
-       NEW FEROX THEME - Surface & Content System
-       Semantic naming for better maintainability
+       Surface & Content System (Light)
        ========================================== */
 
     /* Surface Colors - Backgrounds */
@@ -99,7 +130,6 @@
     --surface-input: #ffffff;
     --surface-hover: #f0f1f3;
     --surface-active: #e5e7eb;
-    /* Primary/Secondary surfaces for components */
     --surface-primary: #ffffff;
     --surface-secondary: #f4f5f7;
 
@@ -124,35 +154,31 @@
     --border-subtle: #e5e7eb;
     --border-default-new: #d1d5db;
     --border-strong-new: #9ca3af;
-    --border-focus-new: #2563eb;
+    --border-focus-new: hsl(349, 81%, 50%);
 
-    /* Primary Colors - Blue */
-    --primary-new: #2563eb;
-    --primary-hover-new: #1d4ed8;
-    --primary-active-new: #1e40af;
-    --primary-soft: rgba(37, 99, 235, 0.1);
-    --primary-muted: rgba(37, 99, 235, 0.15);
-    --primary-text: #1d4ed8;
+    /* Primary Colors - FEROX Red */
+    --primary-new: hsl(349, 81%, 50%);
+    --primary-hover-new: hsl(349, 81%, 45%);
+    --primary-active-new: hsl(349, 81%, 40%);
+    --primary-soft: hsla(349, 81%, 50%, 0.1);
+    --primary-muted: hsla(349, 81%, 50%, 0.15);
+    --primary-text: hsl(349, 81%, 40%);
 
     /* Success Colors - Green */
     --success-new: #059669;
     --success-hover-new: #047857;
     --success-soft: rgba(5, 150, 105, 0.15);
     --success-muted: rgba(5, 150, 105, 0.15);
-    --success-text: #047857;
-    --success-border: rgba(5, 150, 105, 0.25);
-    /* Theme-Guide Alias */
-    --success: #059669;
+    --success-text-new: #047857;
+    --success-border-new: rgba(5, 150, 105, 0.25);
 
     /* Warning Colors - Orange */
     --warning-new: #d97706;
     --warning-hover-new: #b45309;
     --warning-soft: rgba(217, 119, 6, 0.15);
     --warning-muted: rgba(217, 119, 6, 0.15);
-    --warning-text: #b45309;
-    --warning-border: rgba(217, 119, 6, 0.25);
-    /* Theme-Guide Alias */
-    --warning: #d97706;
+    --warning-text-new: #b45309;
+    --warning-border-new: rgba(217, 119, 6, 0.25);
 
     /* Danger Colors - Red */
     --danger-new: #dc2626;
@@ -161,18 +187,14 @@
     --danger-muted: rgba(220, 38, 38, 0.15);
     --danger-text: #b91c1c;
     --danger-border: rgba(220, 38, 38, 0.25);
-    /* Theme-Guide Alias */
-    --error: #dc2626;
 
-    /* Info Colors - Cyan */
+    /* Info Colors - Blue */
     --info-new: #0891b2;
     --info-hover-new: #0e7490;
     --info-soft: rgba(8, 145, 178, 0.15);
     --info-muted: rgba(8, 145, 178, 0.15);
-    --info-text: #0e7490;
-    --info-border: rgba(8, 145, 178, 0.25);
-    /* Theme-Guide Alias */
-    --info: #0891b2;
+    --info-text-new: #0e7490;
+    --info-border-new: rgba(8, 145, 178, 0.25);
 
     /* Purple Colors */
     --purple-new: #7c3aed;
@@ -189,7 +211,7 @@
     --data-highlight: #d97706;
 
     /* Glow Shadows */
-    --shadow-glow-primary: 0 0 20px rgba(37, 99, 235, 0.15);
+    --shadow-glow-primary: 0 0 20px hsla(349, 81%, 50%, 0.15);
     --shadow-glow-success: 0 0 20px rgba(5, 150, 105, 0.15);
     --shadow-glow-danger: 0 0 20px rgba(220, 38, 38, 0.15);
 
@@ -203,12 +225,12 @@
     --toast-error-secondary: #ffffff;
 
     /* Text Size Scale */
-    --text-xs: 0.8125rem; /* 13px */
-    --text-sm: 0.9375rem; /* 15px */
-    --text-base: 1.0625rem; /* 17px */
-    --text-lg: 1.1875rem; /* 19px */
-    --text-xl: 1.3125rem; /* 21px */
-    --text-2xl: 1.5625rem; /* 25px */
+    --text-xs: 0.8125rem;
+    --text-sm: 0.9375rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
 
     /* Line Height */
     --leading-tight: 1.3;
@@ -216,7 +238,7 @@
     --leading-relaxed: 1.75;
 
     /* Border Radius */
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     --radius-xs: 4px;
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -256,17 +278,17 @@
 
     /* Brand Colors */
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: hsl(215 85% 42%);
-    --color-primary-light: hsl(215 85% 58%);
+    --color-primary-hover: hsl(349 81% 45%);
+    --color-primary-light: hsl(349 81% 60%);
 
     --color-accent: hsl(var(--accent));
-    --color-accent-hover: hsl(210 25% 85%);
+    --color-accent-hover: hsl(45 93% 42%);
 
     /* Semantic Colors */
-    --color-success: hsl(var(--status-online));
-    --color-warning: hsl(var(--status-idle));
+    --color-success: hsl(var(--success));
+    --color-warning: hsl(var(--warning));
     --color-error: hsl(var(--destructive));
-    --color-info: hsl(var(--primary));
+    --color-info: hsl(var(--info));
 
     /* Ferox Brand mapped */
     --color-ferox-green: hsl(var(--ferox-green));
@@ -274,14 +296,14 @@
     --color-ferox-green-dim: hsl(var(--ferox-green-bright));
 
     /* Shadows - Subtle for light theme */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    --shadow-md:
-      0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-lg:
-      0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-    --shadow-xl:
-      0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-    --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08),
+      0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.08);
 
     /* Component colors */
     --dark-900: hsl(var(--background));
@@ -294,86 +316,120 @@
   }
 
   [data-theme="dark"] {
-    /* ==========================================
-       DARK THEME - "Midnight Operations"
-       Neutral dark, optimized for long sessions
-       ========================================== */
+    /* ========== DARK THEME ========== */
 
-    /* Backgrounds - Neutral dark, easy on eyes */
-    --background: 220 18% 10%; /* Near-black with subtle blue */
-    --foreground: 210 15% 95%; /* Soft white (not pure white) */
+    /* Core Colors */
+    --background: 222 24% 9%;
+    --foreground: 210 20% 95%;
 
-    /* Cards & Panels - Clear layer separation */
-    --card: 220 15% 15%; /* Distinct from background */
-    --card-foreground: 210 15% 95%;
+    /* Card/Surface */
+    --card: 222 23% 12%;
+    --card-foreground: 210 20% 95%;
 
-    /* Popovers & Dropdowns */
-    --popover: 220 18% 12%;
-    --popover-foreground: 210 15% 95%;
+    /* Popover */
+    --popover: 222 24% 11%;
+    --popover-foreground: 210 20% 95%;
 
-    /* Primary Brand - Bright comfortable blue */
-    --primary: 215 80% 58%; /* Vibrant but not harsh */
-    --primary-foreground: 220 18% 10%; /* Dark text on blue */
+    /* Primary (FEROX Red) */
+    --primary: 349 81% 59%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary Elements - Subtle elevation */
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 210 15% 92%;
+    /* Secondary */
+    --secondary: 222 22% 16%;
+    --secondary-foreground: 210 20% 95%;
 
-    /* Muted/Subtle */
-    --muted: 220 12% 18%;
-    --muted-foreground: 215 12% 62%; /* Good contrast ratio */
+    /* Muted */
+    --muted: 222 22% 18%;
+    --muted-foreground: 220 10% 60%;
 
-    /* Accent Color */
-    --accent: 220 15% 20%;
-    --accent-foreground: 210 15% 92%;
+    /* Accent (Yellow/Gold) */
+    --accent: 48 96% 53%;
+    --accent-foreground: 222 24% 9%;
 
     /* Destructive/Error */
-    --destructive: 0 65% 52%;
-    --destructive-foreground: 210 15% 95%;
+    --destructive: 354 70% 54%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-bg: 354 70% 54% / 0.15;
+    --destructive-text: 354 70% 70%;
+    --destructive-border: 354 70% 54%;
 
-    /* Borders & Inputs - Subtle but visible */
-    --border: 220 12% 22%;
-    --input: 220 12% 22%;
-    --ring: 215 80% 58%;
+    /* Success */
+    --success: 140 60% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-bg: 140 60% 45% / 0.15;
+    --success-text: 140 60% 70%;
+    --success-border: 140 60% 45%;
 
-    /* Sidebar - Slightly darker than background */
-    --sidebar-background: 220 20% 8%;
-    --sidebar-foreground: 210 15% 95%;
-    --sidebar-primary: 210 15% 95%;
-    --sidebar-primary-foreground: 220 20% 8%;
-    --sidebar-accent: 220 15% 15%;
-    --sidebar-accent-foreground: 210 15% 95%;
-    --sidebar-border: 220 15% 15%;
-    --sidebar-ring: 210 15% 95%;
+    /* Warning */
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 24% 9%;
+    --warning-bg: 38 92% 55% / 0.15;
+    --warning-text: 38 92% 70%;
+    --warning-border: 38 92% 55%;
 
-    /* Chart Colors - Vibrant for dark backgrounds */
-    --chart-1: 215 80% 62%; /* Bright blue */
-    --chart-2: 160 65% 52%; /* Teal */
-    --chart-3: 35 85% 58%; /* Warm orange */
-    --chart-4: 280 55% 62%; /* Purple */
-    --chart-5: 152 60% 52%; /* Green */
-    --chart-6: 0 65% 55%; /* Red */
-    --chart-7: 330 70% 55%; /* Pink */
-    --chart-8: 85 60% 50%; /* Lime */
+    /* Info */
+    --info: 200 95% 55%;
+    --info-foreground: 222 24% 9%;
+    --info-bg: 200 95% 55% / 0.15;
+    --info-text: 200 95% 75%;
+    --info-border: 200 95% 55%;
+
+    /* Border & Input */
+    --border: 222 18% 22%;
+    --input: 222 22% 16%;
+    --ring: 349 81% 59%;
+
+    /* Sidebar */
+    --sidebar-background: 222 24% 7%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 349 81% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 23% 14%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 222 18% 18%;
+    --sidebar-ring: 349 81% 59%;
+
+    /* Code Block (Dark) */
+    --code-bg: 222 24% 7%;
+    --code-header-bg: 222 24% 5%;
+    --code-text: 210 20% 90%;
+    --code-keyword: 349 81% 65%;
+    --code-param: 48 96% 60%;
+    --code-value: 140 60% 55%;
+    --code-comment: 220 10% 50%;
+    --code-cmd: 220 10% 55%;
+
+    /* Charts (same) */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --chart-6: 0 65% 55%;
+    --chart-7: 330 70% 55%;
+    --chart-8: 85 60% 50%;
 
     /* Ferox Brand - Vibrant but not harsh */
-    --ferox-green: 160 70% 48%; /* Balanced brightness */
-    --ferox-green-hover: 160 70% 55%; /* Brighter on hover */
-    --ferox-green-bright: 160 70% 58%; /* For emphasis */
+    --ferox-green: 160 70% 48%;
+    --ferox-green-hover: 160 70% 55%;
+    --ferox-green-bright: 160 70% 58%;
 
     /* Status Colors - Softer for dark mode */
-    --status-online: 152 55% 48%; /* Soft green */
-    --status-offline: 0 65% 55%; /* Soft red */
-    --status-idle: 35 80% 55%; /* Warm amber */
-    --status-away: 270 55% 62%; /* Soft purple */
+    --status-online: 152 55% 48%;
+    --status-offline: 0 65% 55%;
+    --status-idle: 35 80% 55%;
+    --status-away: 270 55% 62%;
 
     /* Icon Colors - Bright for dark theme */
-    --icon-primary: 210 15% 95%; /* Match foreground */
-    --icon-secondary: 215 12% 62%; /* Match muted-foreground */
-    --icon-tertiary: 215 10% 48%; /* Dimmer */
+    --icon-primary: 210 15% 95%;
+    --icon-secondary: 215 12% 62%;
+    --icon-tertiary: 215 10% 48%;
+    --icon-primary-color: 210 15% 95%;
+    --icon-secondary-color: 215 12% 62%;
+    --icon-tertiary-color: 215 10% 48%;
 
     /* ==========================================
-       NEW FEROX THEME - Surface & Content System (Dark)
+       Surface & Content System (Dark)
        ========================================== */
 
     /* Surface Colors - Backgrounds */
@@ -385,7 +441,6 @@
     --surface-input: #1a1f2b;
     --surface-hover: #2a3142;
     --surface-active: #323a4d;
-    /* Primary/Secondary surfaces for components */
     --surface-primary: #1a1f2b;
     --surface-secondary: #242a38;
 
@@ -410,35 +465,31 @@
     --border-subtle: #2a3142;
     --border-default-new: #374151;
     --border-strong-new: #4b5563;
-    --border-focus-new: #3b82f6;
+    --border-focus-new: hsl(349, 81%, 59%);
 
-    /* Primary Colors - Blue */
-    --primary-new: #3b82f6;
-    --primary-hover-new: #2563eb;
-    --primary-active-new: #1d4ed8;
-    --primary-soft: rgba(59, 130, 246, 0.15);
-    --primary-muted: rgba(59, 130, 246, 0.25);
-    --primary-text: #60a5fa;
+    /* Primary Colors - FEROX Red */
+    --primary-new: hsl(349, 81%, 59%);
+    --primary-hover-new: hsl(349, 81%, 65%);
+    --primary-active-new: hsl(349, 81%, 55%);
+    --primary-soft: hsla(349, 81%, 59%, 0.15);
+    --primary-muted: hsla(349, 81%, 59%, 0.25);
+    --primary-text: hsl(349, 81%, 70%);
 
     /* Success Colors - Green */
     --success-new: #10b981;
     --success-hover-new: #059669;
     --success-soft: rgba(16, 185, 129, 0.15);
     --success-muted: rgba(16, 185, 129, 0.25);
-    --success-text: #34d399;
-    --success-border: rgba(16, 185, 129, 0.3);
-    /* Theme-Guide Alias */
-    --success: #10b981;
+    --success-text-new: #34d399;
+    --success-border-new: rgba(16, 185, 129, 0.3);
 
     /* Warning Colors - Orange */
     --warning-new: #f59e0b;
     --warning-hover-new: #d97706;
     --warning-soft: rgba(245, 158, 11, 0.15);
     --warning-muted: rgba(245, 158, 11, 0.25);
-    --warning-text: #fbbf24;
-    --warning-border: rgba(245, 158, 11, 0.3);
-    /* Theme-Guide Alias */
-    --warning: #f59e0b;
+    --warning-text-new: #fbbf24;
+    --warning-border-new: rgba(245, 158, 11, 0.3);
 
     /* Danger Colors - Red */
     --danger-new: #ef4444;
@@ -447,18 +498,14 @@
     --danger-muted: rgba(239, 68, 68, 0.25);
     --danger-text: #f87171;
     --danger-border: rgba(239, 68, 68, 0.3);
-    /* Theme-Guide Alias */
-    --error: #ef4444;
 
     /* Info Colors - Cyan */
     --info-new: #06b6d4;
     --info-hover-new: #0891b2;
     --info-soft: rgba(6, 182, 212, 0.15);
     --info-muted: rgba(6, 182, 212, 0.25);
-    --info-text: #22d3ee;
-    --info-border: rgba(6, 182, 212, 0.3);
-    /* Theme-Guide Alias */
-    --info: #06b6d4;
+    --info-text-new: #22d3ee;
+    --info-border-new: rgba(6, 182, 212, 0.3);
 
     /* Purple Colors */
     --purple-new: #8b5cf6;
@@ -475,7 +522,7 @@
     --data-highlight: #fbbf24;
 
     /* Glow Shadows */
-    --shadow-glow-primary: 0 0 20px rgba(59, 130, 246, 0.25);
+    --shadow-glow-primary: 0 0 20px hsla(349, 81%, 59%, 0.25);
     --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.25);
     --shadow-glow-danger: 0 0 20px rgba(239, 68, 68, 0.25);
 
@@ -487,19 +534,6 @@
     --toast-success-secondary: #1a1f2b;
     --toast-error-primary: #ef4444;
     --toast-error-secondary: #1a1f2b;
-
-    /* Text sizes - Same as light */
-    --text-xs: 0.8125rem;
-    --text-sm: 0.9375rem;
-    --text-base: 1.0625rem;
-    --text-lg: 1.1875rem;
-    --text-xl: 1.3125rem;
-    --text-2xl: 1.5625rem;
-
-    /* Line height - Same as light */
-    --leading-tight: 1.3;
-    --leading-normal: 1.6;
-    --leading-relaxed: 1.75;
 
     /* ==========================================
        Legacy Ferox Variable Mappings (Dark)
@@ -533,17 +567,17 @@
 
     /* Brand Colors */
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: hsl(215 80% 65%);
-    --color-primary-light: hsl(215 80% 70%);
+    --color-primary-hover: hsl(349 81% 65%);
+    --color-primary-light: hsl(349 81% 70%);
 
     --color-accent: hsl(var(--accent));
-    --color-accent-hover: hsl(220 15% 25%);
+    --color-accent-hover: hsl(48 96% 60%);
 
     /* Semantic Colors */
-    --color-success: hsl(var(--status-online));
-    --color-warning: hsl(var(--status-idle));
+    --color-success: hsl(var(--success));
+    --color-warning: hsl(var(--warning));
     --color-error: hsl(var(--destructive));
-    --color-info: hsl(200 80% 55%);
+    --color-info: hsl(200 95% 55%);
 
     /* Ferox Brand mapped */
     --color-ferox-green: hsl(var(--ferox-green));
@@ -552,12 +586,12 @@
 
     /* Shadows - Deeper for dark theme */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md:
-      0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-    --shadow-lg:
-      0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-    --shadow-xl:
-      0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5),
+      0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
+      0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6),
+      0 8px 10px -6px rgba(0, 0, 0, 0.5);
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
 
     /* Component colors */
@@ -583,26 +617,28 @@
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    font-family: "Inter", system-ui, sans-serif;
     font-size: var(--text-base);
     line-height: var(--leading-normal);
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1 {
+    font-family: "JetBrains Mono", monospace;
     font-size: var(--text-2xl);
     line-height: var(--leading-tight);
     font-weight: 700;
   }
 
   h2 {
+    font-family: "JetBrains Mono", monospace;
     font-size: var(--text-xl);
     line-height: var(--leading-tight);
     font-weight: 600;
   }
 
   h3 {
+    font-family: "JetBrains Mono", monospace;
     font-size: var(--text-lg);
     line-height: var(--leading-tight);
     font-weight: 600;
@@ -610,7 +646,7 @@
 
   p {
     line-height: var(--leading-relaxed);
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   small {
@@ -618,11 +654,8 @@
   }
 
   *:not(.no-transition) {
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease,
+      border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .theme-transitioning * {
@@ -699,25 +732,6 @@
     padding: 0.375rem 0.75rem;
     font-size: var(--text-sm);
   }
-
-  .text-xs {
-    font-size: var(--text-xs);
-  }
-  .text-sm {
-    font-size: var(--text-sm);
-  }
-  .text-base {
-    font-size: var(--text-base);
-  }
-  .text-lg {
-    font-size: var(--text-lg);
-  }
-  .text-xl {
-    font-size: var(--text-xl);
-  }
-  .text-2xl {
-    font-size: var(--text-2xl);
-  }
 }
 
 /* ==========================================
@@ -725,6 +739,7 @@
    ========================================== */
 
 @layer components {
+  /* Buttons */
   .btn-primary {
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
@@ -733,10 +748,14 @@
     padding: 0.625rem 1.25rem;
     font-weight: 500;
     border-radius: var(--radius);
+    transition: all 0.2s ease;
   }
 
-  .btn-primary:hover {
-    background-color: hsl(var(--primary) / 0.9);
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
   }
 
   .btn-secondary {
@@ -747,28 +766,86 @@
     padding: 0.625rem 1.25rem;
     font-weight: 500;
     border-radius: var(--radius);
+    transition: all 0.2s ease;
   }
 
-  .btn-secondary:hover {
-    background-color: hsl(var(--secondary) / 0.8);
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    border-color: hsl(var(--primary));
   }
 
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--text-secondary);
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: hsl(var(--primary));
+    color: hsl(var(--primary));
+  }
+
+  .btn-danger {
+    background-color: var(--color-error);
+    color: white;
+    padding: 0.625rem 1rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  /* Cards */
   .card {
     background-color: hsl(var(--card));
     color: hsl(var(--card-foreground));
     border: 1px solid hsl(var(--border));
-    padding: 1.25rem;
-    border-radius: var(--radius);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
   }
 
+  .card-hover:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  /* Inputs */
   .input {
     background-color: var(--bg-input);
     color: var(--text-primary);
     border: 1px solid hsl(var(--input));
     font-size: var(--text-base);
-    padding: 0.625rem 0.875rem;
+    padding: 0.75rem 1rem;
     line-height: var(--leading-normal);
     border-radius: var(--radius);
+    transition: all 0.2s ease;
   }
 
   .input::placeholder {
@@ -789,6 +866,7 @@
     display: block;
   }
 
+  /* Sidebar */
   .sidebar {
     background-color: hsl(var(--sidebar-background));
     color: hsl(var(--sidebar-foreground));
@@ -799,39 +877,46 @@
     padding: 0.75rem 1rem;
     font-size: var(--text-base);
     font-weight: 500;
+    transition: all 0.2s ease;
   }
 
   .sidebar-item:hover {
     background-color: hsl(var(--sidebar-accent));
   }
 
+  /* Badges */
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: calc(var(--radius) / 2);
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-sm);
     font-size: var(--text-xs);
-    font-weight: 500;
+    font-weight: 600;
+    font-family: "JetBrains Mono", monospace;
   }
 
   .badge-success {
-    background-color: hsl(var(--status-online) / 0.15);
-    color: hsl(var(--status-online));
+    background-color: hsl(var(--success-bg));
+    color: hsl(var(--success-text));
+    border: 1px solid hsl(var(--success-border));
   }
 
   .badge-warning {
-    background-color: hsl(var(--status-idle) / 0.15);
-    color: hsl(var(--status-idle));
+    background-color: hsl(var(--warning-bg));
+    color: hsl(var(--warning-text));
+    border: 1px solid hsl(var(--warning-border));
   }
 
   .badge-danger {
-    background-color: hsl(var(--status-offline) / 0.15);
-    color: hsl(var(--status-offline));
+    background-color: hsl(var(--destructive-bg));
+    color: hsl(var(--destructive-text));
+    border: 1px solid hsl(var(--destructive-border));
   }
 
   .badge-info {
-    background-color: hsl(var(--primary) / 0.15);
-    color: hsl(var(--primary));
+    background-color: hsl(var(--info-bg));
+    color: hsl(var(--info-text));
+    border: 1px solid hsl(var(--info-border));
   }
 
   .badge-gray {
@@ -839,6 +924,17 @@
     color: var(--text-secondary);
   }
 
+  .badge-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .badge-expert {
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    color: white;
+  }
+
+  /* Status Dots */
   .status-dot {
     width: 0.5rem;
     height: 0.5rem;
@@ -858,6 +954,7 @@
     background-color: var(--color-error);
   }
 
+  /* Privilege Colors */
   .priv-user {
     color: var(--text-secondary);
   }
@@ -874,54 +971,13 @@
     color: var(--color-error);
   }
 
-  .btn-ghost {
-    background-color: transparent;
-    color: var(--text-secondary);
-    padding: 0.625rem 1rem;
-    font-size: var(--text-base);
-    font-weight: 500;
-    border-radius: var(--radius);
-  }
-
-  .btn-ghost:hover:not(:disabled) {
-    background-color: var(--bg-hover);
-    color: var(--text-primary);
-  }
-
-  .btn-outline {
-    background-color: transparent;
-    border: 1px solid var(--border-primary);
-    color: var(--text-secondary);
-    padding: 0.625rem 1rem;
-    font-size: var(--text-base);
-    font-weight: 500;
-    border-radius: var(--radius);
-  }
-
-  .btn-outline:hover:not(:disabled) {
-    border-color: var(--color-ferox-green);
-    color: var(--color-ferox-green);
-  }
-
-  .btn-danger {
-    background-color: var(--color-error);
-    color: white;
-    padding: 0.625rem 1rem;
-    font-size: var(--text-base);
-    font-weight: 500;
-    border-radius: var(--radius);
-  }
-
-  .btn-danger:hover:not(:disabled) {
-    filter: brightness(1.1);
-  }
-
+  /* Context Menu */
   .context-menu {
     position: absolute;
     z-index: 50;
     border-radius: var(--radius);
     box-shadow: var(--shadow-xl);
-    padding: 0.25rem 0;
+    padding: 0.5rem 0;
     min-width: 200px;
     animation: fade-in 0.15s ease-out;
     background-color: var(--bg-panel);
@@ -929,15 +985,13 @@
   }
 
   .context-menu-item {
-    padding: 0.625rem 0.875rem;
+    padding: 0.625rem 1rem;
     font-size: var(--text-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
+    gap: 0.75rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
     color: var(--text-secondary);
   }
 
@@ -947,17 +1001,390 @@
   }
 
   .context-menu-divider {
-    margin: 0.25rem 0;
+    margin: 0.5rem 0;
     border-top: 1px solid var(--border-secondary);
   }
 
   .context-menu-header {
-    padding: 0.5rem 0.875rem;
+    padding: 0.5rem 1rem;
     font-size: var(--text-xs);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
+  }
+
+  /* Alert Boxes */
+  .alert-box {
+    display: flex;
+    gap: 1rem;
+    border-radius: var(--radius-lg);
+    border-width: 1px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .alert-warning {
+    background-color: hsl(var(--warning-bg));
+    border-color: hsl(var(--warning-border));
+  }
+
+  .alert-warning .alert-icon {
+    color: hsl(var(--warning-border));
+  }
+
+  .alert-warning .alert-title,
+  .alert-warning .alert-content {
+    color: hsl(var(--warning-text));
+  }
+
+  .alert-info {
+    background-color: hsl(var(--info-bg));
+    border-color: hsl(var(--info-border));
+  }
+
+  .alert-info .alert-icon {
+    color: hsl(var(--info-border));
+  }
+
+  .alert-info .alert-title,
+  .alert-info .alert-content {
+    color: hsl(var(--info-text));
+  }
+
+  .alert-success {
+    background-color: hsl(var(--success-bg));
+    border-color: hsl(var(--success-border));
+  }
+
+  .alert-success .alert-icon {
+    color: hsl(var(--success-border));
+  }
+
+  .alert-success .alert-title,
+  .alert-success .alert-content {
+    color: hsl(var(--success-text));
+  }
+
+  .alert-danger {
+    background-color: hsl(var(--destructive-bg));
+    border-color: hsl(var(--destructive-border));
+  }
+
+  .alert-danger .alert-icon {
+    color: hsl(var(--destructive-border));
+  }
+
+  .alert-danger .alert-title,
+  .alert-danger .alert-content {
+    color: hsl(var(--destructive-text));
+  }
+
+  .alert-icon {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .alert-title {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .alert-content {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+
+  /* Code Blocks */
+  .code-block {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    margin: 1.5rem 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: hsl(var(--code-header-bg));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .code-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+  }
+
+  .code-dot-red {
+    background-color: hsl(354, 70%, 54%);
+  }
+  .code-dot-yellow {
+    background-color: hsl(45, 93%, 47%);
+  }
+  .code-dot-green {
+    background-color: hsl(140, 60%, 45%);
+  }
+
+  .code-lang {
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background-color: hsl(var(--muted));
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .code-content {
+    padding: 1.5rem;
+    background-color: hsl(var(--code-bg));
+    overflow-x: auto;
+  }
+
+  .code-content pre {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.875rem;
+    line-height: 2;
+    color: hsl(var(--code-text));
+    margin: 0;
+  }
+
+  /* Syntax Highlighting */
+  .code-cmd {
+    color: hsl(var(--code-cmd));
+    font-weight: 600;
+  }
+
+  .code-keyword {
+    color: hsl(var(--code-keyword));
+    font-weight: 600;
+  }
+
+  .code-param {
+    color: hsl(var(--code-param));
+  }
+
+  .code-value {
+    color: hsl(var(--code-value));
+  }
+
+  .code-comment {
+    color: hsl(var(--code-comment));
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* Scenario Cards */
+  .scenario-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin-top: 2.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .scenario-card:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+    transform: translateY(-2px);
+  }
+
+  .scenario-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .scenario-number {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-radius: var(--radius-lg);
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--text-xl);
+    font-weight: 700;
+  }
+
+  .scenario-title {
+    flex: 1;
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Sub-Scenario */
+  .sub-scenario {
+    background-color: hsl(var(--secondary) / 0.5);
+    border: 1px solid hsl(var(--border));
+    border-left: 4px solid hsl(var(--info));
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .sub-scenario-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: hsl(var(--info));
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Data Tables */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    margin: 1.5rem 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .data-table th {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 600;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .data-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid hsl(var(--border));
+    color: var(--text-primary);
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .data-table tr:nth-child(even) {
+    background-color: hsl(var(--secondary) / 0.3);
+  }
+
+  .data-table tr:nth-child(odd) {
+    background-color: hsl(var(--card));
+  }
+
+  .data-table tr:hover {
+    background-color: hsl(var(--primary) / 0.05);
+  }
+
+  /* Feature Grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .feature-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .feature-card:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .feature-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-description {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .stat-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .stat-card:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .stat-value {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: hsl(var(--primary));
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* Section Title */
+  .section-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 5rem 0 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid hsl(var(--primary));
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-title:first-of-type {
+    margin-top: 0;
   }
 }
 
@@ -983,13 +1410,14 @@
 
 /* Terminal styles */
 .terminal {
-  background-color: hsl(var(--card));
-  color: var(--text-primary);
+  background-color: hsl(var(--code-bg));
+  color: hsl(var(--code-text));
   border: 1px solid hsl(var(--border));
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9375rem;
-  line-height: 1.6;
-  padding: 1rem;
+  line-height: 1.8;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
 }
 
 .terminal-prompt {
@@ -999,7 +1427,7 @@
 
 /* xterm.js styling */
 .xterm {
-  padding: 8px;
+  padding: 12px;
 }
 
 .xterm-viewport::-webkit-scrollbar {
@@ -1027,7 +1455,7 @@
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-primary);
-  border-radius: calc(var(--radius) / 2);
+  border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -1042,29 +1470,34 @@ table {
 
 th {
   font-weight: 600;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
 }
 
 td {
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
 }
 
 /* Code blocks */
 code {
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 0.9375rem;
-  background-color: var(--bg-secondary);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  background-color: hsl(var(--code-bg));
   padding: 0.25rem 0.5rem;
-  border-radius: calc(var(--radius) / 2);
+  border-radius: var(--radius-sm);
+  color: hsl(var(--code-keyword));
+  border: 1px solid hsl(var(--border));
 }
 
 pre code {
-  font-size: 0.875rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
 }
 
 /* Focus styles */
 :focus-visible {
-  outline: 2px solid var(--color-ferox-green);
+  outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
 
@@ -1074,7 +1507,7 @@ pre code {
 }
 
 [data-theme="dark"] ::selection {
-  background: hsl(var(--ferox-green) / 0.3);
+  background: hsl(var(--primary) / 0.3);
 }
 
 /* Icon styling */
@@ -1132,7 +1565,10 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   }
 }
 
-/* Theme-aware utility classes */
+/* ==========================================
+   Theme-aware utility classes
+   ========================================== */
+
 @layer utilities {
   .bg-dark-900 {
     background-color: var(--dark-900);
@@ -1219,11 +1655,6 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     border-color: var(--border-strong);
   }
 
-  /* ==========================================
-     NEW FEROX THEME - Utility Classes
-     Surface & Content semantic naming
-     ========================================== */
-
   /* Surface background utilities */
   .bg-surface-base {
     background-color: var(--surface-base);
@@ -1306,7 +1737,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
 
   /* Number display utilities */
   .number-display {
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "JetBrains Mono", monospace;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
@@ -1314,7 +1745,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
   }
 
   .data-cell {
-    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-family: "JetBrains Mono", monospace;
     font-variant-numeric: tabular-nums;
     color: var(--content-data);
   }
@@ -1352,7 +1783,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     background-color: var(--success-soft);
   }
   .text-success-text {
-    color: var(--success-text);
+    color: var(--success-text-new);
   }
 
   .bg-warning-new {
@@ -1362,7 +1793,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     background-color: var(--warning-soft);
   }
   .text-warning-text {
-    color: var(--warning-text);
+    color: var(--warning-text-new);
   }
 
   .bg-danger-new {
@@ -1382,7 +1813,7 @@ svg:not([class*="text-"]):not([class*="icon-"]) {
     background-color: var(--info-soft);
   }
   .text-info-text {
-    color: var(--info-text);
+    color: var(--info-text-new);
   }
 
   .bg-purple-new {

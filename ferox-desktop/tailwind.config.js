@@ -253,6 +253,10 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
+      },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',
         'slide-in': 'slideIn 0.2s ease-out',
