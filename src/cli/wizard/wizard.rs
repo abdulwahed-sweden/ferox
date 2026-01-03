@@ -10,6 +10,7 @@ use super::types::*;
 use crate::core::module::ModuleRegistry;
 use anyhow::{Result, bail};
 use colored::Colorize;
+use is_terminal::IsTerminal;
 use std::io::{self, Write};
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -66,7 +67,7 @@ impl AttackWizard {
         }
 
         // Check for TTY
-        if !atty::is(atty::Stream::Stdin) {
+        if !std::io::stdin().is_terminal() {
             println!("{}", "━".repeat(80).dimmed());
             println!("{}", "⚠ Attack Wizard requires an interactive terminal.".yellow());
             println!();

@@ -40,7 +40,7 @@ impl SubdomainEnum {
     pub fn new() -> Self {
         let mut options = HashMap::new();
         options.insert("RHOSTS".to_string(), String::new());
-        options.insert("WORDLIST".to_string(), "./wordlist.txt".to_string());
+        options.insert("WORDLIST".to_string(), "./data/wordlists/wordlist.txt".to_string());
         options.insert("THREADS".to_string(), "50".to_string());
         options.insert("TIMEOUT".to_string(), "2000".to_string());
         options.insert("PROBE_HTTP".to_string(), "true".to_string());
@@ -113,13 +113,15 @@ impl SubdomainEnum {
                 let status = resp.status().as_u16();
 
                 // If successful, try GET for title
-                if resp.status().is_success()
-                    && let Ok(Ok(get_resp)) =
+                if resp.status().is_success() {
+                    if let Ok(Ok(get_resp)) =
                         timeout(Duration::from_millis(timeout_ms), client.get(&url).send()).await
-                    && let Ok(text) = get_resp.text().await
-                {
-                    let title = Self::extract_title(&text);
-                    return (Some(status), title);
+                    {
+                        if let Ok(text) = get_resp.text().await {
+                            let title = Self::extract_title(&text);
+                            return (Some(status), title);
+                        }
+                    }
                 }
 
                 (Some(status), None)
@@ -129,12 +131,12 @@ impl SubdomainEnum {
     }
 
     fn extract_title(html: &str) -> Option<String> {
-        if let Some(start) = html.find("<title>")
-            && let Some(end) = html[start..].find("</title>")
-        {
-            let title = html[start + 7..start + end].trim().to_string();
-            if !title.is_empty() {
-                return Some(title);
+        if let Some(start) = html.find("<title>") {
+            if let Some(end) = html[start..].find("</title>") {
+                let title = html[start + 7..start + end].trim().to_string();
+                if !title.is_empty() {
+                    return Some(title);
+                }
             }
         }
         None
@@ -167,7 +169,7 @@ impl Module for SubdomainEnum {
                 name: "WORDLIST".to_string(),
                 description: "Path to subdomain wordlist file".to_string(),
                 required: true,
-                default_value: Some("./wordlist.txt".to_string()),
+                default_value: Some("./data/wordlists/wordlist.txt".to_string()),
                 current_value: self.get_option("WORDLIST"),
             },
             ModuleOption {

@@ -93,6 +93,9 @@ ferox-desktop/src-tauri/target/release/bundle/
 *.code-workspace
 .history/
 
+# Claude Code
+.claude/
+
 # JetBrains
 .idea/
 *.iml

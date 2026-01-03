@@ -346,8 +346,8 @@ impl Module for CredentialCollector {
         let mut all_credentials = Vec::new();
 
         // Extract from memory dump if available
-        if let Some(dump_path_str) = self.options.get("dump_path")
-            && !dump_path_str.is_empty() {
+        if let Some(dump_path_str) = self.options.get("dump_path") {
+            if !dump_path_str.is_empty() {
                 let dump_path = PathBuf::from(dump_path_str);
                 if dump_path.exists() || safe_mode {
                     match self.extract_from_memory(&dump_path).await {
@@ -358,6 +358,7 @@ impl Module for CredentialCollector {
                     }
                 }
             }
+        }
 
         // Extract browser credentials
         match self.extract_browser_credentials() {

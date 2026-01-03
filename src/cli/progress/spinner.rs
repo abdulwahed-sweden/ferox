@@ -115,7 +115,7 @@ impl Spinner {
         self.running.store(false, Ordering::SeqCst);
         if let Some(handle) = self.handle.take() {
             // Give it a moment to clean up
-            let _ = tokio::task::block_in_place(|| {
+            tokio::task::block_in_place(|| {
                 tokio::runtime::Handle::current().block_on(async {
                     let _ = tokio::time::timeout(Duration::from_millis(200), handle).await;
                 })

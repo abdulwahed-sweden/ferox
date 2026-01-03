@@ -210,15 +210,16 @@ impl AuditLogger {
         }
 
         // Log to file if configured
-        if let Some(log_path) = &self.log_file
-            && let Ok(mut file) = tokio::fs::OpenOptions::new()
+        if let Some(log_path) = &self.log_file {
+            if let Ok(mut file) = tokio::fs::OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(log_path)
                 .await
-        {
-            use tokio::io::AsyncWriteExt;
-            let _ = file.write_all(format!("{}\n", entry).as_bytes()).await;
+            {
+                use tokio::io::AsyncWriteExt;
+                let _ = file.write_all(format!("{}\n", entry).as_bytes()).await;
+            }
         }
     }
 }

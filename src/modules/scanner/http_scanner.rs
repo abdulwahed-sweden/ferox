@@ -263,10 +263,10 @@ impl Module for HttpScanner {
         fp.insert("url".to_string(), base.to_string());
         fp.insert("scheme".to_string(), base.scheme().to_string());
         fp.insert("status".to_string(), status.to_string());
-        if let Some(server) = resp.headers().get(reqwest::header::SERVER)
-            && let Ok(s) = server.to_str()
-        {
-            fp.insert("server".to_string(), s.to_string());
+        if let Some(server) = resp.headers().get(reqwest::header::SERVER) {
+            if let Ok(s) = server.to_str() {
+                fp.insert("server".to_string(), s.to_string());
+            }
         }
 
         Ok(CheckResult {

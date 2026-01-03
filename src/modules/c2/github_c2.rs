@@ -247,10 +247,11 @@ impl MockGitHubClient {
 
     /// Inject a command into the Gist (for testing)
     async fn inject_command(&self, gist_id: &str, filename: &str, content: &str) {
-        if let Some(gist) = self.gists.lock().await.get_mut(gist_id)
-            && let Some(file) = gist.files.get_mut(filename) {
+        if let Some(gist) = self.gists.lock().await.get_mut(gist_id) {
+            if let Some(file) = gist.files.get_mut(filename) {
                 file.content = content.to_string();
             }
+        }
         *self.last_command_file.lock().await = Some(content.to_string());
     }
 

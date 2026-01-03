@@ -43,18 +43,19 @@ impl DnsEnumerator {
         opts.timeout = std::time::Duration::from_secs(timeout);
 
         // Custom nameserver if specified
-        if let Some(ns) = self.get_option("NAMESERVER")
-            && !ns.is_empty()
-            && let Ok(ip) = ns.parse::<IpAddr>()
-        {
-            let config = ResolverConfig::from_parts(
-                None,
-                vec![],
-                hickory_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
-            );
-            let builder =
-                TokioResolver::builder_with_config(config, TokioConnectionProvider::default());
-            return Ok(builder.with_options(opts).build());
+        if let Some(ns) = self.get_option("NAMESERVER") {
+            if !ns.is_empty() {
+                if let Ok(ip) = ns.parse::<IpAddr>() {
+                    let config = ResolverConfig::from_parts(
+                        None,
+                        vec![],
+                        hickory_resolver::config::NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
+                    );
+                    let builder =
+                        TokioResolver::builder_with_config(config, TokioConnectionProvider::default());
+                    return Ok(builder.with_options(opts).build());
+                }
+            }
         }
 
         let mut builder = TokioResolver::builder_tokio()?;
@@ -316,11 +317,11 @@ impl Module for DnsEnumerator {
             }
 
             // Zone transfer attempt
-            if self.get_option("ZONE_TRANSFER").unwrap_or_default() == "true"
-                && let Some(ns_records) = records.get("NS")
-            {
-                let zt_results = self.attempt_zone_transfer(&target, ns_records).await;
-                result_data.insert("zone_transfer".to_string(), serde_json::json!(zt_results));
+            if self.get_option("ZONE_TRANSFER").unwrap_or_default() == "true" {
+                if let Some(ns_records) = records.get("NS") {
+                    let zt_results = self.attempt_zone_transfer(&target, ns_records).await;
+                    result_data.insert("zone_transfer".to_string(), serde_json::json!(zt_results));
+                }
             }
         }
 

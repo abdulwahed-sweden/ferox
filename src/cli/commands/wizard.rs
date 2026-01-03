@@ -75,6 +75,12 @@ impl WizardCommands {
 /// Wizard command handler
 pub struct WizardCommandHandler;
 
+impl Default for WizardCommandHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WizardCommandHandler {
     pub fn new() -> Self {
         Self

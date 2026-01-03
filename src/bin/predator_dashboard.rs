@@ -45,11 +45,13 @@ fn run_app(
     loop {
         terminal.draw(|frame| dashboard.render(frame))?;
 
-        if event::poll(tick_rate)?
-            && let Event::Key(key) = event::read()?
-                && key.kind == KeyEventKind::Press && handle_key(dashboard, key.code) {
+        if event::poll(tick_rate)? {
+            if let Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press && handle_key(dashboard, key.code) {
                     break;
                 }
+            }
+        }
     }
     Ok(())
 }

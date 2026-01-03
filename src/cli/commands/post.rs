@@ -515,20 +515,20 @@ impl PostCommandHandler {
         );
         println!("{}", "-".repeat(60));
         println!(
-            "{:<15} {:<12} {:<20} {}",
-            "History", "[SAFE]", "Low", "T1217"
+            "{:<15} {:<12} {:<20} T1217",
+            "History", "[SAFE]", "Low"
         );
         println!(
-            "{:<15} {:<12} {:<20} {}",
-            "Cookies", "[SAFE]", "Medium", "T1539"
+            "{:<15} {:<12} {:<20} T1539",
+            "Cookies", "[SAFE]", "Medium"
         );
         println!(
-            "{:<15} {:<12} {:<20} {}",
-            "Passwords", "[SAFE]", "Critical", "T1555.003"
+            "{:<15} {:<12} {:<20} T1555.003",
+            "Passwords", "[SAFE]", "Critical"
         );
         println!(
-            "{:<15} {:<12} {:<20} {}",
-            "Autofill", "[SAFE]", "High", "T1555.003"
+            "{:<15} {:<12} {:<20} T1555.003",
+            "Autofill", "[SAFE]", "High"
         );
 
         if args.decrypt {
@@ -641,16 +641,16 @@ impl PostCommandHandler {
         );
         println!("{}", "-".repeat(70));
         println!(
-            "{:<8} {:<25} {:<15} {:<10} {}",
-            "[SAFE]", "explorer.exe", "[SAFE]", "[SAFE]", "SAFE_USER"
+            "{:<8} {:<25} {:<15} {:<10} SAFE_USER",
+            "[SAFE]", "explorer.exe", "[SAFE]", "[SAFE]"
         );
         println!(
-            "{:<8} {:<25} {:<15} {:<10} {}",
-            "[SAFE]", "chrome.exe", "[SAFE]", "[SAFE]", "SAFE_USER"
+            "{:<8} {:<25} {:<15} {:<10} SAFE_USER",
+            "[SAFE]", "chrome.exe", "[SAFE]", "[SAFE]"
         );
         println!(
-            "{:<8} {:<25} {:<15} {:<10} {}",
-            "[SAFE]", "svchost.exe", "[SAFE]", "[SAFE]", "SYSTEM"
+            "{:<8} {:<25} {:<15} {:<10} SYSTEM",
+            "[SAFE]", "svchost.exe", "[SAFE]", "[SAFE]"
         );
 
         if let Some(kill_target) = &args.kill {
@@ -729,8 +729,8 @@ impl PostCommandHandler {
                 );
                 println!("{}", "-".repeat(60));
                 println!(
-                    "{:<12} {:<18} {:<18} {}",
-                    "eth0", "[SAFE_MODE]", "[SAFE_MODE]", "UP"
+                    "{:<12} {:<18} {:<18} UP",
+                    "eth0", "[SAFE_MODE]", "[SAFE_MODE]"
                 );
             }
             _ => {}

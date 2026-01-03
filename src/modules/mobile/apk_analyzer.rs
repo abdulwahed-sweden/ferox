@@ -249,7 +249,7 @@ impl ApkAnalyzer {
             if perm.is_dangerous {
                 findings.push(
                     SecurityFinding::new(
-                        &format!("APK-PERM-{}", perm.name.split('.').last().unwrap_or("UNKNOWN")),
+                        &format!("APK-PERM-{}", perm.name.split('.').next_back().unwrap_or("UNKNOWN")),
                         &format!("Dangerous permission: {}", perm.name),
                         Severity::Info,
                         "Permissions",

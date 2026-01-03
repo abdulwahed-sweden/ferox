@@ -177,8 +177,7 @@ impl DependencyChecker {
     pub fn check_ferox_requirements(&self) -> CheckResult {
         let required_paths = [
             Path::new("config"),
-            Path::new("modules"),
-            Path::new("wordlist.txt"),
+            Path::new("data/wordlists"),
         ];
 
         let missing: Vec<String> = required_paths

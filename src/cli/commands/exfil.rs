@@ -382,7 +382,7 @@ let engine = ExfilEngine::new()
 
         // Calculate chunks
         let chunk_size = 1024;
-        let chunks = (data_size + chunk_size - 1) / chunk_size;
+        let chunks = data_size.div_ceil(chunk_size);
 
         Theme::section("Exfiltration Plan");
         println!("Chunks:    {}", chunks);

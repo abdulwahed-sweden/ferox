@@ -265,7 +265,7 @@ pub fn step_modules(state: &mut WizardState) -> Result<()> {
                 3 => "POST-EXPLOITATION",
                 _ => "CUSTOM",
             };
-            println!(" {} PHASE {}: {}", "📦".to_string(), current_phase, phase_name.bold());
+            println!(" 📦 PHASE {}: {}", current_phase, phase_name.bold());
             println!(" ┌────┬─────────────────────────┬────────────────────────────────┬──────────┐");
             println!(" │ ## │ Module                  │ Purpose                        │ Include? │");
             println!(" ├────┼─────────────────────────┼────────────────────────────────┼──────────┤");
@@ -357,7 +357,7 @@ pub fn step_config(state: &mut WizardState) -> Result<()> {
             continue;
         }
 
-        println!(" {} {}", "📦".to_string(), module.name.bold());
+        println!(" 📦 {}", module.name.bold());
 
         // Show key options for configuration
         let configurable_opts = get_configurable_options(&module.path);
@@ -419,9 +419,7 @@ pub fn step_review(state: &mut WizardState) -> Result<ExecutionMode> {
             println!("│  PHASE {}: {:<64} │", current_phase, phase_name.bold());
         }
 
-        let is_last_in_phase = enabled_modules.iter()
-            .filter(|m| m.phase == current_phase)
-            .last()
+        let is_last_in_phase = enabled_modules.iter().rfind(|m| m.phase == current_phase)
             .map(|m| m.path == module.path)
             .unwrap_or(false);
 
@@ -515,7 +513,7 @@ fn get_configurable_options(module_path: &str) -> Vec<(String, String, String)> 
             ("PATHS".to_string(), "/".to_string(), "Paths to probe".to_string()),
         ],
         "recon/subdomain_enum" => vec![
-            ("WORDLIST".to_string(), "./wordlist.txt".to_string(), "Subdomain wordlist".to_string()),
+            ("WORDLIST".to_string(), "./data/wordlists/wordlist.txt".to_string(), "Subdomain wordlist".to_string()),
         ],
         "recon/dns_enum" => vec![
             ("RECORD_TYPES".to_string(), "A,AAAA,MX,NS,TXT".to_string(), "DNS record types".to_string()),

@@ -846,7 +846,7 @@ impl MobileCommandHandler {
                 .get("name")
                 .and_then(|v| v.as_str())
                 .unwrap_or("Unknown");
-            let short_name = name.split('.').last().unwrap_or(name);
+            let short_name = name.split('.').next_back().unwrap_or(name);
 
             println!("{} {} {}", prefix, "🔴".red(), short_name);
         }
@@ -865,7 +865,7 @@ impl MobileCommandHandler {
                     .get("name")
                     .and_then(|v| v.as_str())
                     .unwrap_or("Unknown");
-                let short_name = name.split('.').last().unwrap_or(name);
+                let short_name = name.split('.').next_back().unwrap_or(name);
 
                 println!("{} {} {}", prefix, "🟢".green(), short_name.dimmed());
             }

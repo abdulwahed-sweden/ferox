@@ -142,12 +142,12 @@ impl WhoisLookup {
         // Look for referral WHOIS server in response
         for line in response.lines() {
             let lower = line.to_lowercase();
-            if (lower.contains("whois server:") || lower.contains("referral url:"))
-                && let Some(server) = line.split(':').nth(1)
-            {
-                let server = server.trim().replace("http://", "").replace("https://", "");
-                if server.contains("whois") {
-                    return Some(server);
+            if lower.contains("whois server:") || lower.contains("referral url:") {
+                if let Some(server) = line.split(':').nth(1) {
+                    let server = server.trim().replace("http://", "").replace("https://", "");
+                    if server.contains("whois") {
+                        return Some(server);
+                    }
                 }
             }
         }
@@ -295,21 +295,22 @@ impl Module for WhoisLookup {
         let mut servers_queried = vec![server.clone()];
 
         // Follow referral if enabled
-        if self.get_option("FOLLOW_REFERRAL").unwrap_or_default() == "true"
-            && let Some(referral) = self.extract_referral_server(&raw_response)
-            && referral != server
-        {
-            match self.query_whois(&target, &referral).await {
-                Ok(ref_response) => {
-                    let ref_parsed = self.parse_whois_response(&ref_response);
-                    // Merge results, preferring referral data
-                    for (k, v) in ref_parsed {
-                        final_parsed.insert(k, v);
+        if self.get_option("FOLLOW_REFERRAL").unwrap_or_default() == "true" {
+            if let Some(referral) = self.extract_referral_server(&raw_response) {
+                if referral != server {
+                    match self.query_whois(&target, &referral).await {
+                        Ok(ref_response) => {
+                            let ref_parsed = self.parse_whois_response(&ref_response);
+                            // Merge results, preferring referral data
+                            for (k, v) in ref_parsed {
+                                final_parsed.insert(k, v);
+                            }
+                            servers_queried.push(referral);
+                        }
+                        Err(_) => {
+                            // Referral failed, continue with initial results
+                        }
                     }
-                    servers_queried.push(referral);
-                }
-                Err(_) => {
-                    // Referral failed, continue with initial results
                 }
             }
         }

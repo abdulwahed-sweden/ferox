@@ -315,25 +315,25 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(65));
         println!(
-            "{:<25} {:<15} {:<15} {}",
-            "Security", "[SAFE_MODE]", "[SAFE_MODE]", "T1070.001"
+            "{:<25} {:<15} {:<15} T1070.001",
+            "Security", "[SAFE_MODE]", "[SAFE_MODE]"
         );
         println!(
-            "{:<25} {:<15} {:<15} {}",
-            "System", "[SAFE_MODE]", "[SAFE_MODE]", "T1070.001"
+            "{:<25} {:<15} {:<15} T1070.001",
+            "System", "[SAFE_MODE]", "[SAFE_MODE]"
         );
         println!(
-            "{:<25} {:<15} {:<15} {}",
-            "Application", "[SAFE_MODE]", "[SAFE_MODE]", "T1070.001"
+            "{:<25} {:<15} {:<15} T1070.001",
+            "Application", "[SAFE_MODE]", "[SAFE_MODE]"
         );
         println!(
-            "{:<25} {:<15} {:<15} {}",
-            "PowerShell/Operational", "[SAFE_MODE]", "[SAFE_MODE]", "T1070.001"
+            "{:<25} {:<15} {:<15} T1070.001",
+            "PowerShell/Operational", "[SAFE_MODE]", "[SAFE_MODE]"
         );
         if verbose {
             println!(
-                "{:<25} {:<15} {:<15} {}",
-                "Sysmon/Operational", "[SAFE_MODE]", "[SAFE_MODE]", "T1070.001"
+                "{:<25} {:<15} {:<15} T1070.001",
+                "Sysmon/Operational", "[SAFE_MODE]", "[SAFE_MODE]"
             );
         }
     }
@@ -347,25 +347,25 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(65));
         println!(
-            "{:<40} {:<15} {}",
-            "[SAFE] Payload files", "Executable", "T1070.004"
+            "{:<40} {:<15} T1070.004",
+            "[SAFE] Payload files", "Executable"
         );
         println!(
-            "{:<40} {:<15} {}",
-            "[SAFE] Temp files", "Temporary", "T1070.004"
+            "{:<40} {:<15} T1070.004",
+            "[SAFE] Temp files", "Temporary"
         );
         println!(
-            "{:<40} {:<15} {}",
-            "[SAFE] Downloaded tools", "Tools", "T1070.004"
+            "{:<40} {:<15} T1070.004",
+            "[SAFE] Downloaded tools", "Tools"
         );
         if verbose {
             println!(
-                "{:<40} {:<15} {}",
-                "[SAFE] Config files", "Configuration", "T1070.004"
+                "{:<40} {:<15} T1070.004",
+                "[SAFE] Config files", "Configuration"
             );
             println!(
-                "{:<40} {:<15} {}",
-                "[SAFE] Output files", "Data", "T1070.004"
+                "{:<40} {:<15} T1070.004",
+                "[SAFE] Output files", "Data"
             );
         }
     }
@@ -379,29 +379,29 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(75));
         println!(
-            "{:<35} {:<15} {:<12} {}",
-            "Registry Run Keys", "Windows", "[SAFE_MODE]", "T1547.001"
+            "{:<35} {:<15} {:<12} T1547.001",
+            "Registry Run Keys", "Windows", "[SAFE_MODE]"
         );
         println!(
-            "{:<35} {:<15} {:<12} {}",
-            "Scheduled Tasks", "Windows", "[SAFE_MODE]", "T1053.005"
+            "{:<35} {:<15} {:<12} T1053.005",
+            "Scheduled Tasks", "Windows", "[SAFE_MODE]"
         );
         println!(
-            "{:<35} {:<15} {:<12} {}",
-            "Services", "Windows", "[SAFE_MODE]", "T1543.003"
+            "{:<35} {:<15} {:<12} T1543.003",
+            "Services", "Windows", "[SAFE_MODE]"
         );
         if verbose {
             println!(
-                "{:<35} {:<15} {:<12} {}",
-                "Startup Folder", "Windows", "[SAFE_MODE]", "T1547.001"
+                "{:<35} {:<15} {:<12} T1547.001",
+                "Startup Folder", "Windows", "[SAFE_MODE]"
             );
             println!(
-                "{:<35} {:<15} {:<12} {}",
-                "Cron Jobs", "Linux", "[SAFE_MODE]", "T1053.003"
+                "{:<35} {:<15} {:<12} T1053.003",
+                "Cron Jobs", "Linux", "[SAFE_MODE]"
             );
             println!(
-                "{:<35} {:<15} {:<12} {}",
-                "Systemd Services", "Linux", "[SAFE_MODE]", "T1543.002"
+                "{:<35} {:<15} {:<12} T1543.002",
+                "Systemd Services", "Linux", "[SAFE_MODE]"
             );
         }
     }
@@ -415,16 +415,16 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(55));
         println!(
-            "{:<25} {:<20} {}",
-            "ARP Cache", "[SAFE_MODE]", "T1070"
+            "{:<25} {:<20} T1070",
+            "ARP Cache", "[SAFE_MODE]"
         );
         println!(
-            "{:<25} {:<20} {}",
-            "DNS Cache", "[SAFE_MODE]", "T1070"
+            "{:<25} {:<20} T1070",
+            "DNS Cache", "[SAFE_MODE]"
         );
         println!(
-            "{:<25} {:<20} {}",
-            "Connection History", "[SAFE_MODE]", "T1070"
+            "{:<25} {:<20} T1070",
+            "Connection History", "[SAFE_MODE]"
         );
     }
 
@@ -437,25 +437,25 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(55));
         println!(
-            "{:<30} {:<15} {}",
-            "PowerShell History", "[SAFE_MODE]", "T1070.003"
+            "{:<30} {:<15} T1070.003",
+            "PowerShell History", "[SAFE_MODE]"
         );
         println!(
-            "{:<30} {:<15} {}",
-            "Bash History", "[SAFE_MODE]", "T1070.003"
+            "{:<30} {:<15} T1070.003",
+            "Bash History", "[SAFE_MODE]"
         );
         println!(
-            "{:<30} {:<15} {}",
-            "CMD History", "[SAFE_MODE]", "T1070.003"
+            "{:<30} {:<15} T1070.003",
+            "CMD History", "[SAFE_MODE]"
         );
         if verbose {
             println!(
-                "{:<30} {:<15} {}",
-                "Recent Documents", "[SAFE_MODE]", "T1070"
+                "{:<30} {:<15} T1070",
+                "Recent Documents", "[SAFE_MODE]"
             );
             println!(
-                "{:<30} {:<15} {}",
-                "Jump Lists", "[SAFE_MODE]", "T1070"
+                "{:<30} {:<15} T1070",
+                "Jump Lists", "[SAFE_MODE]"
             );
         }
     }
@@ -573,20 +573,20 @@ impl CleanupCommandHandler {
         );
         println!("{}", "-".repeat(55));
         println!(
-            "{:<30} {:<15} {}",
-            "Registry Run Keys", "Windows", "[SAFE_MODE]"
+            "{:<30} {:<15} [SAFE_MODE]",
+            "Registry Run Keys", "Windows"
         );
         println!(
-            "{:<30} {:<15} {}",
-            "Scheduled Tasks", "Windows", "[SAFE_MODE]"
+            "{:<30} {:<15} [SAFE_MODE]",
+            "Scheduled Tasks", "Windows"
         );
         println!(
-            "{:<30} {:<15} {}",
-            "Services", "Windows", "[SAFE_MODE]"
+            "{:<30} {:<15} [SAFE_MODE]",
+            "Services", "Windows"
         );
         println!(
-            "{:<30} {:<15} {}",
-            "Cron Jobs", "Linux", "[SAFE_MODE]"
+            "{:<30} {:<15} [SAFE_MODE]",
+            "Cron Jobs", "Linux"
         );
 
         println!();

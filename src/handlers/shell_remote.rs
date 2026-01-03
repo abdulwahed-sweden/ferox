@@ -236,14 +236,14 @@ impl RemoteShellHandler {
     /// Get connection information
     pub async fn get_connection_info(&self) -> Option<ConnectionInfo> {
         let conn = self.connection.lock().await;
-        if let Some(stream) = conn.as_ref()
-            && let (Ok(local), Ok(peer)) = (stream.local_addr(), stream.peer_addr())
-        {
-            return Some(ConnectionInfo {
-                shell_type: self.shell_type,
-                local_addr: local.to_string(),
-                peer_addr: peer.to_string(),
-            });
+        if let Some(stream) = conn.as_ref() {
+            if let (Ok(local), Ok(peer)) = (stream.local_addr(), stream.peer_addr()) {
+                return Some(ConnectionInfo {
+                    shell_type: self.shell_type,
+                    local_addr: local.to_string(),
+                    peer_addr: peer.to_string(),
+                });
+            }
         }
         None
     }

@@ -136,8 +136,8 @@ impl MultiProgress {
                     let filled = (op.current as f64 / op.total as f64 * bar_width as f64) as usize;
                     let empty = bar_width - filled;
 
-                    let bar: String = std::iter::repeat('█').take(filled).collect();
-                    let bar_empty: String = std::iter::repeat('░').take(empty).collect();
+                    let bar: String = std::iter::repeat_n('█', filled).collect();
+                    let bar_empty: String = std::iter::repeat_n('░', empty).collect();
 
                     println!(
                         "{} {} {}{} {}% ({}/{}) {}",
@@ -241,8 +241,7 @@ impl PhaseProgress {
             "━".repeat(80).dimmed()
         );
         println!(
-            " {} PHASE {}/{}: {}",
-            "🚀".to_string(),
+            " 🚀 PHASE {}/{}: {}",
             self.phase_num,
             self.total_phases,
             self.phase_name.to_uppercase().bold()

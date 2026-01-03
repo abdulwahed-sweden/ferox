@@ -1,14 +1,15 @@
-# 🦊 Ferox Security Framework v4.0
+# 🦊 Ferox Security Framework v4.1
 
-[![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange)]()
+[![Rust](https://img.shields.io/badge/Rust-2021%20Edition-orange)]()
 [![License](https://img.shields.io/badge/License-MIT-blue)]()
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)]()
-[![Version](https://img.shields.io/badge/Version-4.0.0-brightgreen)]()
+[![Version](https://img.shields.io/badge/Version-4.1.0-brightgreen)]()
 
 **Ferox** is a modern Rust-native offensive security framework designed for authorized penetration testing, security research, and red team operations. Built with performance, safety, and observability in mind.
 
-## What's New in 4.0
+## What's New in 4.1
 
+- **Code Modernization** - Updated to Rust 2021 edition, all dependencies current
 - **Mobile App Analysis** - APK and IPA security assessment modules
 - **Security Assessment Wizard** - Guided workflow for comprehensive assessments
 - **Enhanced Progress Tracking** - Real-time progress with discoveries

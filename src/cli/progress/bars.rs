@@ -216,8 +216,8 @@ impl ProgressBar {
         let empty_width = self.style.width - filled_width;
 
         // Build the bar
-        let filled: String = std::iter::repeat(self.style.filled).take(filled_width).collect();
-        let empty: String = std::iter::repeat(self.style.empty).take(empty_width).collect();
+        let filled: String = std::iter::repeat_n(self.style.filled, filled_width).collect();
+        let empty: String = std::iter::repeat_n(self.style.empty, empty_width).collect();
 
         let bar = if let Some(ref color) = self.style.color {
             match color.as_str() {

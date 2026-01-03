@@ -260,7 +260,7 @@ impl AppRecon {
         let app_name = app_info
             .app_id
             .split('.')
-            .last()
+            .next_back()
             .unwrap_or("app")
             .to_lowercase();
 

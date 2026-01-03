@@ -21,8 +21,10 @@ use std::collections::HashMap;
 
 /// AMSI Bypass techniques available
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum AmsiBypassTechnique {
     /// Patch AmsiScanBuffer to return clean result (most reliable)
+    #[default]
     PatchScanBuffer,
     /// Patch AmsiOpenSession to fail session initialization
     PatchOpenSession,
@@ -36,11 +38,6 @@ pub enum AmsiBypassTechnique {
     ForceUnload,
 }
 
-impl Default for AmsiBypassTechnique {
-    fn default() -> Self {
-        Self::PatchScanBuffer
-    }
-}
 
 impl AmsiBypassTechnique {
     /// Get MITRE ATT&CK technique ID
