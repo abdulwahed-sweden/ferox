@@ -1,0 +1,87 @@
+{
+  "plan_name": "Bug Bounty Recon - scanme.nmap.org",
+  "target": "scanme.nmap.org",
+  "phases": [
+    {
+      "phase_name": "Reconnaissance",
+      "phase_number": 1,
+      "modules": [
+        {
+          "module_path": "recon/dns_enum",
+          "module_name": "DNS Enumeration",
+          "success": true,
+          "message": "🔍 DNS enumeration completed for scanme.nmap.org in 2.14s",
+          "data": {
+            "dns_records": {
+              "A": [
+                "45.33.32.156"
+              ],
+              "AAAA": [
+                "2600:3c01::f03c:91ff:fe18:bb2f"
+              ]
+            },
+            "scan_time_ms": 2139,
+            "target": "scanme.nmap.org"
+          },
+          "duration_ms": 2239,
+          "discoveries": [
+            "A records: 1"
+          ]
+        },
+        {
+          "module_path": "recon/whois_lookup",
+          "module_name": "WHOIS Lookup",
+          "success": true,
+          "message": "📋 WHOIS lookup completed for scanme.nmap.org in 1.00s",
+          "data": {
+            "whois_servers": [
+              "whois.pir.org"
+            ],
+            "raw_response": "Malformed request.\r\n>>> Last update of WHOIS database: 2026-01-03T01:22:10Z <<<\r\n\r\nTerms of Use: Access to Public Interest Registry WHOIS information is provided to assist persons in determining the contents of a domain name registration record in the Public Interest Registry registry database. The data in this record is provided by Public Interest Registry for informational purposes only, and Public Interest Registry does not guarantee its accuracy. This service is intended only for query-based access. You agree that you will use this data only for lawful purposes and that, under no circumstances will you use this data to (a) allow, enable, or otherwise support the transmission by e-mail, telephone, or facsimile of mass unsolicited, commercial advertising or solicitations to entities other than the data recipient's own existing customers; or (b) enable high volume, automated, electronic processes that send queries or data to the systems of Registry Operator, a Registrar, or Identity Digital except as reasonably necessary to register domain names or modify existing registrations. All rights reserved. Public Interest Registry reserves the right to modify these terms at any time. By submitting this query, you agree to abide by this policy.  The Registrar of Record identified in this output may have an RDDS service that can be queried for additional information on how to contact the Registrant, Admin, or Tech contact of the queried domain name.\r\n",
+            "scan_time_ms": 995,
+            "target": "scanme.nmap.org",
+            "whois_data": {}
+          },
+          "duration_ms": 995,
+          "discoveries": []
+        },
+        {
+          "module_path": "recon/asn_discovery",
+          "module_name": "ASN Discovery",
+          "success": true,
+          "message": "🌐 ASN discovery completed for scanme.nmap.org in 0.60s",
+          "data": {
+            "asn_info": {},
+            "resolved_ip": "45.33.32.156",
+            "target": "scanme.nmap.org",
+            "scan_time_ms": 602
+          },
+          "duration_ms": 602,
+          "discoveries": []
+        },
+        {
+          "module_path": "recon/subdomain_enum",
+          "module_name": "Subdomain Enumeration",
+          "success": true,
+          "message": "Found 0 subdomains for scanme.nmap.org",
+          "data": {
+            "domain": "scanme.nmap.org",
+            "total_found": 0,
+            "subdomains": []
+          },
+          "duration_ms": 3670,
+          "discoveries": []
+        }
+      ],
+      "success_count": 4,
+      "total_count": 4,
+      "duration_ms": 7508
+    }
+  ],
+  "total_modules": 4,
+  "successful_modules": 4,
+  "failed_modules": 0,
+  "total_duration_ms": 7508,
+  "started_at": "2026-01-03T01:22:07.402148+00:00",
+  "completed_at": "2026-01-03T01:22:14.910230+00:00"
+}

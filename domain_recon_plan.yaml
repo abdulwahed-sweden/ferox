@@ -1,0 +1,57 @@
+# Domain Reconnaissance Plan for Bug Bounty
+# Target: scanme.nmap.org
+
+name: "Bug Bounty Recon - scanme.nmap.org"
+description: "Domain reconnaissance assessment of scanme.nmap.org"
+version: "1.0"
+
+target:
+  target_type: Domain
+  target: scanme.nmap.org
+  resolved_targets: []
+  authorized: true
+  notes: "Nmap test target - authorized for scanning"
+
+scope:
+  level: ReconOnly
+  intensity: Normal
+  include_post_exploit: false
+
+phases:
+  - number: 1
+    name: "Reconnaissance"
+    completed: false
+    modules:
+      - path: recon/dns_enum
+        name: DNS Enumeration
+        enabled: true
+        options:
+          TARGET: scanme.nmap.org
+          RECORD_TYPES: "A,AAAA,MX,NS,TXT,SOA,CNAME"
+          ZONE_TRANSFER: "true"
+
+      - path: recon/whois_lookup
+        name: WHOIS Lookup
+        enabled: true
+        options:
+          TARGET: scanme.nmap.org
+          FOLLOW_REFERRAL: "true"
+
+      - path: recon/asn_discovery
+        name: ASN Discovery
+        enabled: true
+        options:
+          TARGET: scanme.nmap.org
+          LOOKUP_PREFIXES: "true"
+
+      - path: recon/subdomain_enum
+        name: Subdomain Enumeration
+        enabled: true
+        options:
+          RHOSTS: scanme.nmap.org
+          PROBE_HTTP: "true"
+
+execution_mode: Automatic
+estimated_duration_secs: 20
+created_at: "2026-01-03T00:00:00Z"
+interrupted: false
