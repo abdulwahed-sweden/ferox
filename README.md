@@ -7,6 +7,12 @@
 
 **Ferox** is a modern Rust-native offensive security framework designed for authorized penetration testing, security research, and red team operations. Built with performance, safety, and observability in mind.
 
+> ## ⚠️ Authorized Use Only
+>
+> Ferox is an **offensive-security tool** (recon, exploitation, C2, post-exploitation). Use it **only** against systems you own or for which you hold **explicit, written authorization** — e.g. a signed pentest engagement, a bug-bounty program's scope, or a lab you control.
+>
+> Unauthorized access to computer systems is a **crime** in most jurisdictions (e.g. the U.S. CFAA, the UK Computer Misuse Act, and equivalent EU/Swedish law). You are solely responsible for operating within the law and your authorization. The software is provided "AS IS", without warranty; the author accepts **no liability** for misuse or resulting damage. See the [Security & Authorization](#-security--authorization) section and [LICENSE](./LICENSE).
+
 ## What's New in 4.1
 
 - **Code Modernization** - Updated to Rust 2021 edition, all dependencies current
